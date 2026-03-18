@@ -1,1 +1,114 @@
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css");
 @import "tailwindcss";
+
+@theme {
+  --font-sans: "Pretendard Variable", "Pretendard", system-ui, sans-serif;
+
+  --text-head-01: 2rem / 1.2;
+  --text-head-01--font-weight: 700;
+  --text-head-02: 1.75rem / 1.2;
+  --text-head-02--font-weight: 700;
+  --text-head-03: 1.5rem / 1.2;
+  --text-head-03--font-weight: 700;
+
+  --text-subtitle-01: 1.25rem / 1.2;
+  --text-subtitle-01--font-weight: 700;
+  --text-subtitle-02: 1.125rem / 1.2;
+  --text-subtitle-02--font-weight: 700;
+  --text-subtitle-03: 1rem / 1.2;
+  --text-subtitle-03--font-weight: 700;
+  --text-subtitle-04: 0.875rem / 1.2;
+  --text-subtitle-04--font-weight: 700;
+  --text-subtitle-05: 0.75rem / 1.2;
+  --text-subtitle-05--font-weight: 700;
+
+  --text-body-01: 1rem / 1.6;
+  --text-body-01--font-weight: 400;
+  --text-body-02: 0.875rem / 1.6;
+  --text-body-02--font-weight: 400;
+  --text-body-03: 0.75rem / 1.6;
+  --text-body-03--font-weight: 400;
+
+  --text-caption-01: 0.875rem / 1.4;
+  --text-caption-01--font-weight: 400;
+  --text-caption-02: 0.75rem / 1.4;
+  --text-caption-02--font-weight: 400;
+
+  --text-label-01: 1rem / 1.4;
+  --text-label-01--font-weight: 700;
+  --text-label-02: 1rem / 1.4;
+  --text-label-02--font-weight: 400;
+  --text-label-03: 0.875rem / 1.4;
+  --text-label-03--font-weight: 700;
+  --text-label-04: 0.875rem / 1.4;
+  --text-label-04--font-weight: 400;
+  --text-label-05: 0.75rem / 1.4;
+  --text-label-05--font-weight: 700;
+  --text-label-06: 0.75rem / 1.4;
+  --text-label-06--font-weight: 400;
+
+  --color-primary-900: #001b73;
+  --color-primary-800: #132d88;
+  --color-primary-700: #1d3694;
+  --color-primary-600: #27409f;
+  --color-primary-500: #2d47a9;
+  --color-primary-400: #5062b5;
+  --color-primary-300: #6f7ec2;
+  --color-primary-200: #98a2d3;
+  --color-primary-100: #c1c6e5;
+  --color-primary-50: #e6e8f4;
+
+  --color-secondary-900: #f28b30;
+  --color-secondary-800: #f8b13f;
+  --color-secondary-700: #fbc847;
+  --color-secondary-600: #fddf50;
+  --color-secondary-500: #f6e84d;
+  --color-secondary-400: #f9ed66;
+  --color-secondary-300: #fbf281;
+  --color-secondary-200: #fdf6a5;
+  --color-secondary-100: #fefac9;
+  --color-secondary-50: #fffee9;
+
+  --color-black: #000000;
+  --color-gray-900: #111111;
+  --color-gray-800: #313131;
+  --color-gray-700: #4f4f4f;
+  --color-gray-600: #626262;
+  --color-gray-500: #898989;
+  --color-gray-400: #aaaaaa;
+  --color-gray-300: #cfcfcf;
+  --color-gray-200: #e1e1e1;
+  --color-gray-100: #eeeeee;
+  --color-gray-50: #f7f7f7;
+  --color-white: #ffffff;
+
+  --color-background-dark: #fafafa;
+  --color-background-light: #ffffff;
+
+  --color-error-01: #ff383c;
+  --color-error-02: #ff4245;
+  --color-error-03: #ff6165;
+
+  --color-warning-01: #ffcc00;
+  --color-warning-02: #ffd600;
+  --color-warning-03: #fedf43;
+
+  --color-success-01: #34c759;
+  --color-success-02: #30d158;
+  --color-success-03: #4ae968;
+
+  --color-info-01: #0088ff;
+  --color-info-02: #0091ff;
+  --color-info-03: #5cb8ff;
+
+  --color-text-primary: var(--color-gray-900);
+  --color-text-secondary: var(--color-gray-700);
+  --color-text-tertiary: var(--color-gray-600);
+  --color-text-deactivated: var(--color-gray-500);
+  --color-text-placeholder: var(--color-gray-500);
+  --color-text-inverse: var(--color-white);
+
+  --color-border-strong: var(--color-gray-400);
+  --color-border-default: var(--color-gray-300);
+  --color-border-deactivated: var(--color-gray-200);
+}
