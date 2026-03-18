@@ -13,6 +13,11 @@ const _dirname = path.dirname(fileURLToPath(import.meta.url));
 // More info at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon
 export default defineConfig({
   plugins: [react()],
+  resolve: {
+    alias: {
+      "@": path.resolve(_dirname, "./src"),
+    },
+  },
   test: {
     globals: true, // test, expect 같은 함수를 import 없이 사용 가능
     environment: "jsdom", // 브라우저 환경을 흉내 내서 리액트 컴포넌트 테스트를 가능하게 함
