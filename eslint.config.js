@@ -35,5 +35,13 @@ export default tseslint.config(
         console: "readonly",
       },
     },
+    settings: {
+      react: {
+        version: "detect",
+      },
+    },
+    rules: {
+      "react/jsx-no-target-blank": "error",
+    },
   },
 );
