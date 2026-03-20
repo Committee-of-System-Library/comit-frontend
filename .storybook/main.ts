@@ -7,8 +7,10 @@ const config: StorybookConfig = {
     "@storybook/addon-vitest",
     "@storybook/addon-a11y",
     "@storybook/addon-docs",
-    "@storybook/addon-onboarding",
+    "storybook/viewport",
   ],
+  staticDirs: ["../public"],
   framework: "@storybook/react-vite",
 };
+
 export default config;
