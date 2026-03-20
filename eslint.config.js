@@ -12,6 +12,7 @@ export default tseslint.config(
   {
     ignores: [
       "dist/**",
+      "storybook-static/**",
       "node_modules/**",
       ".storybook/**",
       "*.config.js",
