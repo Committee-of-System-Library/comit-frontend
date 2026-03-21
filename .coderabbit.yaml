@@ -1,0 +1,18 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+language: "ko-KR"
+tone_instructions: "리뷰 코멘트는 간결하고 명확한 한국어로 작성해 주세요."
+
+reviews:
+  profile: "assertive"
+  high_level_summary: true
+  review_status: true
+  auto_review:
+    enabled: true
+    drafts: false
+
+chat:
+  auto_reply: true
+
+code_generation:
+  docstrings:
+    language: "ko-KR"
