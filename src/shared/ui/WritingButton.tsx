@@ -10,6 +10,7 @@ export const WritingButton = ({ disabled = false }: WritingButtonProps) => {
     <button
       disabled={disabled}
       className="group w-full h-12 py-3.25 flex items-center justify-center gap-2 rounded-xl bg-primary-600 hover:bg-primary-1000 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+      aria-label="글 작성하기 버튼"
     >
       <PencilLine className="w-5 h-5 text-text-inverse group-hover:text-text-deactivated transition-colors duration-200" />
       <p className="text-label-01 text-text-inverse group-hover:text-text-deactivated transition-colors duration-200">
