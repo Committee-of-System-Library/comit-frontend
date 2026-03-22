@@ -19,7 +19,7 @@ export const NoticePreviewItem = ({
       <p className="w-full truncate text-[14px] leading-[1.6] text-text-secondary! font-normal">
         {title}
       </p>
-      <p className="w-full truncate text-[12px] leading-[1.4] text-text-placeholder! font-normal">
+      <p className="w-full truncate text-[12px] leading-[1.4] text-text-tertiary! font-normal">
         {date}
       </p>
     </div>

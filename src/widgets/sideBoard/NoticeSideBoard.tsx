@@ -21,7 +21,7 @@ export const NoticeSideBoard = ({
       className={`flex w-70.5 flex-col items-start overflow-hidden rounded-xl border border-border-deactivated bg-white ${className}`}
       {...props}
     >
-      <div className="flex w-full items-center gap-1.5 border-b border-border-deactivated px-4 py-3">
+      <div className="flex w-full items-center gap-2 border-b border-border-deactivated px-4 py-3">
         <Megaphone className="size-6 text-text-primary" />
         <span className="text-subtitle-04 text-text-primary font-bold">
           공지사항
