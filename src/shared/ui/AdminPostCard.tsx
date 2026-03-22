@@ -33,15 +33,15 @@ export const AdminPostCard = ({
         <div className="flex gap-2 text-text-placeholder text-caption-02">
           <div className="flex items-center gap-1">
             <UserRound className="w-4 h-4" />
-            {user}
+            <span className="leading-none">{user}</span>
           </div>
           <div className="flex items-center gap-1">
             <Heart className="w-4 h-4" />
-            {heart}
+            <span className="leading-none">{heart}</span>
           </div>
           <div className="flex items-center gap-1">
             <MessageCircleMore className="w-4 h-4" />
-            {comment}
+            <span className="leading-none">{comment}</span>
           </div>
         </div>
       </div>
