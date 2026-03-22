@@ -1,10 +1,10 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 
-import { PostItem } from "./PostItem";
+import { PostPreviewItem } from "./PostPreviewItem";
 
 const meta = {
-  title: "shared/ui/PostItem",
-  component: PostItem,
+  title: "shared/ui/PostPreviewItem",
+  component: PostPreviewItem,
   parameters: {
     layout: "centered",
   },
@@ -12,7 +12,7 @@ const meta = {
   argTypes: {
     imageUrl: { control: "text" },
   },
-} satisfies Meta<typeof PostItem>;
+} satisfies Meta<typeof PostPreviewItem>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
