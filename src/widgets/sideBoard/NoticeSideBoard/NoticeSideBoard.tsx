@@ -2,13 +2,11 @@ import type { HTMLAttributes } from "react";
 
 import { Megaphone } from "lucide-react";
 
+import type { RecentNotice } from "@/mocks/recentNotices";
 import { NoticePreviewItem } from "@/shared/ui/NoticePreviewItem/NoticePreviewItem";
 
 interface NoticeSideBoardProps extends HTMLAttributes<HTMLDivElement> {
-  notices: {
-    title: string;
-    date: string;
-  }[];
+  notices: RecentNotice[];
 }
 
 export const NoticeSideBoard = ({
