@@ -27,11 +27,10 @@ export function SearchLong({ disabled = false, onSearch }: SearchLongProps) {
 
   return (
     <search className="w-full" aria-label="게시판 검색">
-      <form
-        role="search"
-        className="relative flex items-center"
-        onSubmit={handleSubmit}
-      >
+      <form className="relative flex items-center" onSubmit={handleSubmit}>
+        <label htmlFor="board-search" className="sr-only">
+          게시판 검색
+        </label>
         <input
           id="board-search"
           type="search"
@@ -48,6 +47,7 @@ export function SearchLong({ disabled = false, onSearch }: SearchLongProps) {
         <button
           type="submit"
           disabled={disabled}
+          aria-label="검색"
           className="absolute right-6 flex items-center justify-center disabled:cursor-not-allowed"
         >
           <Search

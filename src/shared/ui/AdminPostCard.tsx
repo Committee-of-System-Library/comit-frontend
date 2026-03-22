@@ -1,6 +1,7 @@
 import { UserRound, Heart, MessageCircleMore } from "lucide-react";
 
 import type { Post } from "@/types/post";
+import { cn } from "@/utils/cn";
 import { formatTimeAgo } from "@/utils/formatTime";
 
 interface AdminPostCardProps extends Post {
@@ -19,7 +20,10 @@ export const AdminPostCard = ({
 }: AdminPostCardProps) => {
   return (
     <article
-      className={`w-full px-4 py-3.5 flex items-start justify-between rounded-xl border border-border-deactivated bg-background-light hover:bg-background-dark transition-colors duration-200 ${disabled ? "opacity-50 pointer-events-none" : ""}`}
+      className={cn(
+        "w-full px-4 py-3.5 flex items-start justify-between rounded-xl border border-border-deactivated bg-background-light hover:bg-background-dark transition-colors duration-200",
+        disabled && "opacity-50 pointer-events-none",
+      )}
     >
       <div className="flex flex-1 flex-col gap-2 overflow-hidden pr-4">
         <div className="flex flex-col gap-1">

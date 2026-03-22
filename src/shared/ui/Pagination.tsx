@@ -44,6 +44,7 @@ export function Pagination({
           <button
             key={page}
             onClick={() => onPageChange(page)}
+            aria-current={currentPage === page ? "page" : undefined}
             className={cn(
               "w-10 h-10 rounded-xl border text-label-04 transition-all duration-200 cursor-pointer",
               currentPage === page

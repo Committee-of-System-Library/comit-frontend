@@ -3,7 +3,7 @@ import { Heart, MessageCircleMore } from "lucide-react";
 import type { Post } from "@/types/post";
 import { formatTimeAgo } from "@/utils/formatTime";
 
-interface AdminPostCardProps extends Post {
+interface PostCardProps extends Post {
   userImage?: string;
   postImage?: string[];
   tags?: string[];
@@ -22,7 +22,7 @@ export const PostCard = ({
   postImage = [],
   tags = [],
   disabled = false,
-}: AdminPostCardProps) => {
+}: PostCardProps) => {
   return (
     <article
       className={`w-full px-4 py-3.5 flex items-start justify-between rounded-xl border border-border-deactivated bg-background-light hover:bg-background-dark transition-colors duration-200 ${disabled ? "opacity-50 pointer-events-none" : ""}`}
@@ -51,20 +51,20 @@ export const PostCard = ({
         {postImage.length > 0 && (
           <div className="relative flex items-center w-full overflow-hidden my-2">
             <div className="flex gap-2 overflow-hidden whitespace-nowrap pr-10">
-              {postImage.map((img, index) => (
+              {postImage.map((img) => (
                 <div
-                  key={index}
+                  key={img}
                   className="w-30 h-30 shrink-0 rounded-lg bg-gray-100 overflow-hidden"
                 >
                   <img
                     src={img}
-                    alt={`post-${index}`}
+                    alt={`post-${img}`}
                     className="w-full h-full object-cover"
                   />
                 </div>
               ))}
             </div>
-            <div className="absolute right-0 top-0 h-full w-14 bg-liner-to-l from-background-light to-transparent pointer-events-none" />
+            <div className="absolute right-0 top-0 h-full w-14 bg-linear-to-l from-background-light to-transparent pointer-events-none" />
           </div>
         )}
         {tags.length > 0 && (
@@ -79,7 +79,7 @@ export const PostCard = ({
                 </span>
               ))}
             </div>
-            <div className="absolute right-0 top-0 h-full w-12 bg-liner-to-l from-background-light to-transparent pointer-events-none" />
+            <div className="absolute right-0 top-0 h-full w-12 bg-linear-to-l from-background-light to-transparent pointer-events-none" />
           </div>
         )}
         <div className="flex gap-2 text-text-placeholder text-caption-02">
