@@ -28,7 +28,7 @@ export const HotPostItem = ({
       <div className="flex flex-1 flex-col gap-2 pt-1 min-w-0">
         <div className="flex flex-row items-center gap-2">
           <div className="flex size-6 shrink-0 items-center justify-center rounded-sm bg-gray-50">
-            <span className="text-label-03 text-text-tertiary! font-bold whitespace-nowrap">
+            <span className="text-label-03 text-text-tertiary font-bold whitespace-nowrap">
               {rank}
             </span>
           </div>
@@ -39,20 +39,20 @@ export const HotPostItem = ({
         <div className="flex flex-row items-center gap-2 pl-8">
           <div className="flex flex-row items-center gap-1 h-4.25">
             <img src={userIcon} alt="user" className="size-4 shrink-0" />
-            <span className="text-[12px] font-normal text-gray-600! leading-[1.4] whitespace-nowrap">
+            <span className="text-[12px] font-normal text-gray-600 leading-[1.4] whitespace-nowrap">
               {author}
             </span>
           </div>
           <div className="flex flex-row items-center gap-0.5 h-4.25">
             <img src={viewIcon} alt="view" className="size-4 shrink-0" />
-            <span className="text-[12px] font-normal text-gray-600! leading-[1.4] whitespace-nowrap">
+            <span className="text-[12px] font-normal text-gray-600 leading-[1.4] whitespace-nowrap">
               {views}
             </span>
           </div>
         </div>
       </div>
       <div className="shrink-0 pt-1 ml-2">
-        <span className="text-right text-[12px] font-normal text-gray-600! leading-[1.4] whitespace-nowrap w-14.5 block">
+        <span className="text-right text-[12px] font-normal text-gray-600 leading-[1.4] whitespace-nowrap w-14.5 block">
           {time}
         </span>
       </div>
