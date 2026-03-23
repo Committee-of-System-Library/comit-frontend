@@ -1,0 +1,32 @@
+import { forwardRef, type ButtonHTMLAttributes } from "react";
+
+import { cn } from "@/shared/utils/cn";
+
+type ButtonVariant = "primary" | "secondary";
+
+const baseClass =
+  "inline-flex h-9 items-center justify-center rounded-lg px-4 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-700 focus-visible:ring-offset-2 disabled:cursor-not-allowed";
+
+const variantClassMap: Record<ButtonVariant, string> = {
+  primary:
+    "bg-primary-700 text-white hover:bg-primary-1000 disabled:bg-gray-300 disabled:text-gray-500",
+  secondary:
+    "border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 disabled:border-gray-200 disabled:bg-gray-50 disabled:text-gray-400",
+};
+
+export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: ButtonVariant;
+}
+
+export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ className, type = "button", variant = "primary", ...props }, ref) => (
+    <button
+      ref={ref}
+      type={type}
+      className={cn(baseClass, variantClassMap[variant], className)}
+      {...props}
+    />
+  ),
+);
+
+Button.displayName = "Button";

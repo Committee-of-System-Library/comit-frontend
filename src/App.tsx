@@ -1,9 +1,7 @@
+import HomePage from "@/pages/home/HomePage";
+
 function App() {
-  return (
-    <main>
-      <h1>Comit</h1>
-    </main>
-  );
+  return <HomePage />;
 }
 
 export default App;
