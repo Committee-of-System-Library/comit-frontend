@@ -15,6 +15,7 @@ export const ArrowButton = ({
 
   return (
     <button
+      type="button"
       className={`group relative flex size-10 items-center justify-center rounded-full bg-transparent transition-colors hover:bg-gray-200 active:bg-gray-300 disabled:cursor-not-allowed disabled:opacity-40 ${className}`}
       aria-label={direction === "left" ? "Previous slide" : "Next slide"}
       {...props}
