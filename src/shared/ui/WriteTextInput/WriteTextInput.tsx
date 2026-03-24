@@ -12,12 +12,24 @@ export interface WriteTextInputProps extends Omit<
   "size"
 > {
   label?: ReactNode;
+  labelClassName?: string;
   helperText?: string;
   errorMessage?: string;
 }
 
 export const WriteTextInput = forwardRef<HTMLInputElement, WriteTextInputProps>(
-  ({ id, label, helperText, errorMessage, className, ...props }, ref) => {
+  (
+    {
+      id,
+      label,
+      labelClassName,
+      helperText,
+      errorMessage,
+      className,
+      ...props
+    },
+    ref,
+  ) => {
     const fallbackId = useId();
     const inputId = id ?? `write-text-input-${fallbackId}`;
     const helperId = `${inputId}-helper`;
@@ -25,7 +37,13 @@ export const WriteTextInput = forwardRef<HTMLInputElement, WriteTextInputProps>(
     return (
       <div className="space-y-2">
         {label ? (
-          <label className="text-label-04 text-text-tertiary" htmlFor={inputId}>
+          <label
+            className={cn(
+              "pl-3 text-base leading-10 font-bold text-text-tertiary",
+              labelClassName,
+            )}
+            htmlFor={inputId}
+          >
             {label}
           </label>
         ) : null}
@@ -36,7 +54,7 @@ export const WriteTextInput = forwardRef<HTMLInputElement, WriteTextInputProps>(
           aria-invalid={Boolean(errorMessage)}
           aria-describedby={helperText || errorMessage ? helperId : undefined}
           className={cn(
-            "h-11 w-full rounded-xl border px-4 text-sm text-text-primary transition-colors",
+            "h-12 w-full rounded-xl border px-4 text-sm leading-6 text-text-primary transition-colors",
             "placeholder:text-text-placeholder focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-100",
             errorMessage
               ? "border-error-01"

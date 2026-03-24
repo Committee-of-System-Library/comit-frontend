@@ -13,6 +13,7 @@ export interface WriteTextareaFieldProps extends Omit<
   "children"
 > {
   label?: ReactNode;
+  labelClassName?: string;
   helperText?: string;
   errorMessage?: string;
   showCount?: boolean;
@@ -43,6 +44,7 @@ export const WriteTextareaField = forwardRef<
     {
       id,
       label,
+      labelClassName,
       helperText,
       errorMessage,
       className,
@@ -68,7 +70,10 @@ export const WriteTextareaField = forwardRef<
       <div className="space-y-2">
         {label ? (
           <label
-            className="text-label-04 text-text-tertiary"
+            className={cn(
+              "pl-3 text-base leading-10 font-bold text-text-tertiary",
+              labelClassName,
+            )}
             htmlFor={textareaId}
           >
             {label}
@@ -82,7 +87,7 @@ export const WriteTextareaField = forwardRef<
             aria-invalid={Boolean(errorMessage)}
             aria-describedby={helperText || errorMessage ? helperId : undefined}
             className={cn(
-              "min-h-[220px] w-full resize-none rounded-xl border px-4 py-3 text-sm text-text-primary transition-colors",
+              "min-h-60 w-full resize-none rounded-xl border p-4 text-base leading-6 text-text-primary transition-colors",
               "placeholder:text-text-placeholder focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-100",
               errorMessage
                 ? "border-error-01"
@@ -98,7 +103,7 @@ export const WriteTextareaField = forwardRef<
           />
 
           {showCount ? (
-            <p className="pointer-events-none absolute bottom-3 right-4 text-label-06 text-text-tertiary">
+            <p className="pointer-events-none absolute right-4 bottom-3 text-xs leading-4 text-text-placeholder">
               {currentLength}자
               {typeof maxLength === "number" ? "/최대글자수" : null}
             </p>
