@@ -14,9 +14,9 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<HomePage />} />
-          <Route path="/qna" element={<QnABoardPage />} />
-          <Route path="/info" element={<InfoBoardPage />} />
-          <Route path="/free" element={<FreeBoardPage />} />
+          <Route path="board/qna" element={<QnABoardPage />} />
+          <Route path="board/info" element={<InfoBoardPage />} />
+          <Route path="board/free" element={<FreeBoardPage />} />
           <Route path="/notice" element={<NoticeBoardPage />} />
           <Route path="/event" element={<EventBoardPage />} />
         </Routes>
