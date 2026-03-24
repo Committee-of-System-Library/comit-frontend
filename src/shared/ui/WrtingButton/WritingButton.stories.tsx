@@ -9,7 +9,7 @@ const meta = {
   parameters: {
     docs: {
       description: {
-        component: "연필 아이콘 + 글 작성하기 버튼",
+        component: "write: 연필 아이콘 + 글 작성하기/ complete: 작성 완료 버튼",
       },
     },
   },
@@ -18,8 +18,17 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Default: Story = {};
+export const WriteState: Story = {
+  args: {
+    variant: "write",
+  },
+};
 
+export const CompleteState: Story = {
+  args: {
+    variant: "complete",
+  },
+};
 export const Disabled: Story = {
   args: {
     disabled: true,
