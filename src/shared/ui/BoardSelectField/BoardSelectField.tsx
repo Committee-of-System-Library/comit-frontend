@@ -104,21 +104,30 @@ export const BoardSelectField = ({
         </label>
       ) : null}
 
-      <div className="relative">
+      <div
+        className={cn(
+          "overflow-hidden rounded-xl border bg-white transition-colors duration-400",
+          errorMessage
+            ? "border-error-01"
+            : isOpen
+              ? "border-primary-700"
+              : "border-gray-200",
+          disabled && "border-gray-200 bg-gray-50",
+        )}
+      >
         <button
           id={selectId}
           aria-haspopup="listbox"
           aria-expanded={isOpen}
           aria-describedby={errorMessage ? errorId : undefined}
           className={cn(
-            "flex h-12 w-full items-center justify-between rounded-xl border bg-white px-4 text-left text-sm leading-5 transition-colors",
+            "flex h-12 w-full items-center justify-between px-4 text-left text-sm leading-5 transition-colors",
             "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-100",
             errorMessage
-              ? "border-error-01 text-error-01"
-              : "border-gray-200 text-text-secondary focus-visible:border-primary-700",
+              ? "text-error-01"
+              : "text-text-secondary focus-visible:border-primary-700",
             disabled &&
-              "cursor-not-allowed border-gray-200 bg-gray-50 text-gray-400 focus-visible:ring-0",
-            isOpen && !errorMessage && "border-primary-700",
+              "cursor-not-allowed bg-gray-50 text-gray-400 focus-visible:ring-0",
             triggerClassName,
           )}
           disabled={disabled}
@@ -141,10 +150,17 @@ export const BoardSelectField = ({
           )}
         </button>
 
-        {isOpen ? (
+        <div
+          className={cn(
+            "overflow-hidden transition-[max-height,opacity] duration-400 ease-out",
+            isOpen
+              ? "max-h-56 opacity-100"
+              : "pointer-events-none max-h-0 opacity-0",
+          )}
+        >
           <ul
             className={cn(
-              "absolute z-20 mt-1 max-h-56 w-full overflow-y-auto rounded-xl border border-primary-300 bg-white py-1 shadow-sm",
+              "max-h-56 overflow-y-auto border-t border-gray-100 py-1",
               menuClassName,
             )}
             role="listbox"
@@ -170,7 +186,7 @@ export const BoardSelectField = ({
               );
             })}
           </ul>
-        ) : null}
+        </div>
       </div>
 
       {errorMessage ? (
