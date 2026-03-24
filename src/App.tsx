@@ -7,7 +7,11 @@ function App() {
 
   return (
     <AppDesktopShell
-      mainClassName={isWritePath ? "space-y-0" : undefined}
+      mainClassName={
+        isWritePath
+          ? "min-w-[1200px] max-w-[1440px] px-80 pt-24 pb-20 space-y-10"
+          : undefined
+      }
       rightRail={isWritePath ? null : undefined}
     >
       {isWritePath ? <WritePage /> : <HomePage />}

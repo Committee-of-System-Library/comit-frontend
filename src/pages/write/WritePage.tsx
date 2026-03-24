@@ -222,26 +222,27 @@ const WritePage = () => {
   };
 
   return (
-    <section className="w-full py-4 min-[1200px]:py-8">
-      <h1 className="mb-10 text-3xl leading-[1.15] font-bold text-text-primary">
+    <section className="w-full">
+      <h1 className="w-full max-w-[792px] text-3xl leading-8 font-bold text-text-primary">
         글 작성하기
       </h1>
 
       <form
-        className="space-y-8"
+        className="mt-10 flex flex-col items-center gap-8"
         id="write-post-form"
         onSubmit={handleSubmit(onSubmit)}
       >
-        <div className="max-w-[380px]">
+        <div className="w-full max-w-[792px]">
           <Controller
             control={control}
             name="board"
             render={({ field }) => (
               <BoardSelectField
+                className="w-72"
                 errorMessage={errors.board?.message}
                 label={
                   <>
-                    게시판 선택 <span className="text-error-01">*</span>
+                    게시판 선택 <span className="text-error-03">*</span>
                   </>
                 }
                 onChange={field.onChange}
@@ -253,69 +254,79 @@ const WritePage = () => {
           />
         </div>
 
-        <Controller
-          control={control}
-          name="title"
-          render={({ field }) => (
-            <WriteTextInput
-              {...field}
-              errorMessage={errors.title?.message}
-              label={
-                <>
-                  제목 <span className="text-error-01">*</span>
-                </>
-              }
-              maxLength={WRITE_POST_MAX_TITLE_LENGTH}
-              placeholder="제목을 입력하세요"
-            />
-          )}
-        />
+        <div className="w-full max-w-[792px]">
+          <Controller
+            control={control}
+            name="title"
+            render={({ field }) => (
+              <WriteTextInput
+                {...field}
+                errorMessage={errors.title?.message}
+                label={
+                  <>
+                    제목 <span className="text-error-03">*</span>
+                  </>
+                }
+                maxLength={WRITE_POST_MAX_TITLE_LENGTH}
+                placeholder="제목을 입력하세요"
+              />
+            )}
+          />
+        </div>
 
-        <Controller
-          control={control}
-          name="content"
-          render={({ field }) => (
-            <WriteTextareaField
-              {...field}
-              className="min-h-[320px]"
-              errorMessage={errors.content?.message}
-              label="내용"
-              maxLength={WRITE_POST_MAX_CONTENT_LENGTH}
-              placeholder="게시판의 성격에 맞지 않는 글은 삭제될 수 있습니다"
-            />
-          )}
-        />
+        <div className="w-full max-w-[792px]">
+          <Controller
+            control={control}
+            name="content"
+            render={({ field }) => (
+              <WriteTextareaField
+                {...field}
+                className="h-60 min-h-60"
+                errorMessage={errors.content?.message}
+                label="내용"
+                maxLength={WRITE_POST_MAX_CONTENT_LENGTH}
+                placeholder="게시판의 성격에 맞지 않는 글은 삭제될 수 있습니다"
+              />
+            )}
+          />
+        </div>
 
-        <WriteTagInputField
-          chipPrefix="+ #"
-          emptyChips={writeTagPreviewChips}
-          errorMessage={errors.tags?.message}
-          label="해시태그 선택"
-          maxTags={WRITE_POST_MAX_TAG_COUNT}
-          onAddTag={handleAddTag}
-          onRemoveTag={handleRemoveTag}
-          onValueChange={setTagInput}
-          placeholder="게시글당 최대 5개의 태그를 지정할 수 있습니다"
-          showAddButton={false}
-          showCount={false}
-          showRemoveButton={false}
-          tags={currentTags}
-          value={tagInput}
-        />
+        <div className="w-full max-w-[792px]">
+          <WriteTagInputField
+            chipClassName="w-20 justify-center"
+            chipPrefix="#"
+            emptyChips={writeTagPreviewChips}
+            errorMessage={errors.tags?.message}
+            label="해시태그 선택"
+            maxTags={WRITE_POST_MAX_TAG_COUNT}
+            onAddTag={handleAddTag}
+            onRemoveTag={handleRemoveTag}
+            onValueChange={setTagInput}
+            placeholder="게시글당 최대 5개의 태그를 지정할 수 있습니다"
+            showAddButton={false}
+            showCount={false}
+            showLeadingPlusIcon
+            showRemoveButton={false}
+            tags={currentTags}
+            value={tagInput}
+          />
+        </div>
 
-        <WriteImageUploadField
-          countText={`${currentImages.length}/최대 업로드 용량`}
-          errorMessage={errors.images?.message}
-          files={currentImages}
-          label="이미지 첨부"
-          maxFiles={WRITE_POST_MAX_IMAGE_COUNT}
-          onFilesSelect={handleFilesSelect}
-          onRemoveFile={handleRemoveImage}
-          uploadButtonText="이미지를 드래그하거나 업로드하세요 (PNG, JPG ...)"
-        />
+        <div className="w-full max-w-[792px]">
+          <WriteImageUploadField
+            countText={`${currentImages.length}/최대 업로드 용량`}
+            errorMessage={errors.images?.message}
+            files={currentImages}
+            label="이미지 첨부"
+            maxFiles={WRITE_POST_MAX_IMAGE_COUNT}
+            onFilesSelect={handleFilesSelect}
+            onRemoveFile={handleRemoveImage}
+            uploadButtonText="이미지를 드래그하거나 업로드하세요 (PNG, JPG ...)"
+          />
+        </div>
 
         <WriteActionButton
-          className="h-14 rounded-xl text-subtitle-04"
+          className="h-12 w-full max-w-[792px] rounded-xl text-base leading-6 font-bold"
           disabled={isSubmitting}
           form="write-post-form"
           type="submit"
