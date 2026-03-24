@@ -1,6 +1,6 @@
 import { Github, Instagram } from "lucide-react";
 
-import { cn } from "@/shared/utils/cn";
+import { cn } from "@/utils/cn";
 
 type FooterLink = {
   href: string;

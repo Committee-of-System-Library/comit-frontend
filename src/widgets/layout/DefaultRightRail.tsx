@@ -2,7 +2,7 @@ import type { HTMLAttributes } from "react";
 
 import { mockHotPosts, type HotPost } from "@/mocks/hotPosts";
 import { mockRecentNotices, type RecentNotice } from "@/mocks/recentNotices";
-import { cn } from "@/shared/utils/cn";
+import { cn } from "@/utils/cn";
 import { HotPostSideBoard } from "@/widgets/sideBoard/HotPostSideBoard/HotPostSideBoard";
 import { NoticeSideBoard } from "@/widgets/sideBoard/NoticeSideBoard/NoticeSideBoard";
 
