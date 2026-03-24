@@ -7,6 +7,7 @@ import { cn } from "@/utils/cn";
 export interface WriteTagInputFieldProps {
   id?: string;
   label?: ReactNode;
+  labelClassName?: string;
   helperText?: string;
   errorMessage?: string;
   tags?: string[];
@@ -16,9 +17,11 @@ export interface WriteTagInputFieldProps {
   disabled?: boolean;
   className?: string;
   chipPrefix?: string;
+  chipClassName?: string;
   emptyChips?: string[];
   showCount?: boolean;
   showAddButton?: boolean;
+  showLeadingPlusIcon?: boolean;
   showRemoveButton?: boolean;
   onValueChange?: (nextValue: string) => void;
   onAddTag?: (tag: string) => void;
@@ -28,6 +31,7 @@ export interface WriteTagInputFieldProps {
 export const WriteTagInputField = ({
   id,
   label,
+  labelClassName,
   helperText,
   errorMessage,
   tags = [],
@@ -37,9 +41,11 @@ export const WriteTagInputField = ({
   disabled = false,
   className,
   chipPrefix = "#",
+  chipClassName,
   emptyChips = [],
   showCount = true,
   showAddButton = true,
+  showLeadingPlusIcon = false,
   showRemoveButton = true,
   onValueChange,
   onAddTag,
@@ -72,7 +78,13 @@ export const WriteTagInputField = ({
   return (
     <div className={cn("space-y-2", className)}>
       {label ? (
-        <label className="text-label-04 text-text-tertiary" htmlFor={inputId}>
+        <label
+          className={cn(
+            "pl-3 text-base leading-10 font-bold text-text-tertiary",
+            labelClassName,
+          )}
+          htmlFor={inputId}
+        >
           {label}
         </label>
       ) : null}
@@ -83,7 +95,7 @@ export const WriteTagInputField = ({
           aria-invalid={Boolean(errorMessage)}
           aria-describedby={helperText || errorMessage ? helperId : undefined}
           className={cn(
-            "h-11 min-w-0 flex-1 rounded-xl border px-4 text-sm text-text-primary",
+            "h-14 min-w-0 flex-1 rounded-xl border px-4 text-sm leading-5 text-text-primary",
             "placeholder:text-text-placeholder focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-100",
             errorMessage
               ? "border-error-01"
@@ -115,7 +127,15 @@ export const WriteTagInputField = ({
           <ul className="flex flex-wrap gap-2">
             {tags.map((tag) => (
               <li key={tag}>
-                <div className="inline-flex items-center gap-1 rounded-md bg-gray-50 px-2 py-1 text-label-06 text-text-tertiary">
+                <div
+                  className={cn(
+                    "inline-flex items-center gap-0.5 rounded-sm bg-gray-50 px-1 py-0.5 text-xs leading-4 text-text-tertiary",
+                    chipClassName,
+                  )}
+                >
+                  {showLeadingPlusIcon ? (
+                    <Plus aria-hidden className="size-4 text-gray-500" />
+                  ) : null}
                   <span className="truncate">
                     {chipPrefix} {tag}
                   </span>
@@ -138,7 +158,15 @@ export const WriteTagInputField = ({
           <ul className="flex flex-wrap gap-2">
             {emptyChips.map((tag, index) => (
               <li key={`${tag}-${index}`}>
-                <div className="inline-flex items-center gap-1 rounded-md bg-gray-50 px-2 py-1 text-label-06 text-text-tertiary">
+                <div
+                  className={cn(
+                    "inline-flex items-center gap-0.5 rounded-sm bg-gray-50 px-1 py-0.5 text-xs leading-4 text-text-tertiary",
+                    chipClassName,
+                  )}
+                >
+                  {showLeadingPlusIcon ? (
+                    <Plus aria-hidden className="size-4 text-gray-500" />
+                  ) : null}
                   <span className="truncate">
                     {chipPrefix} {tag}
                   </span>

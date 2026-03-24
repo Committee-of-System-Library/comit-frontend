@@ -14,6 +14,7 @@ export interface WriteImageUploadItem {
 export interface WriteImageUploadFieldProps {
   id?: string;
   label?: ReactNode;
+  labelClassName?: string;
   helperText?: string;
   errorMessage?: string;
   files?: WriteImageUploadItem[];
@@ -30,6 +31,7 @@ export interface WriteImageUploadFieldProps {
 export const WriteImageUploadField = ({
   id,
   label,
+  labelClassName,
   helperText,
   errorMessage,
   files = [],
@@ -67,7 +69,13 @@ export const WriteImageUploadField = ({
   return (
     <div className={cn("space-y-2", className)}>
       {label ? (
-        <label className="text-label-04 text-text-tertiary" htmlFor={uploadId}>
+        <label
+          className={cn(
+            "pl-3 text-base leading-10 font-bold text-text-tertiary",
+            labelClassName,
+          )}
+          htmlFor={uploadId}
+        >
           {label}
         </label>
       ) : null}
@@ -83,11 +91,11 @@ export const WriteImageUploadField = ({
         type="file"
       />
 
-      <div className="space-y-3 rounded-xl border border-gray-200 bg-white p-3">
+      <div className="space-y-2 rounded-xl border border-gray-200 bg-white p-4">
         <button
           aria-describedby={helperText || errorMessage ? helperId : undefined}
           className={cn(
-            "flex h-14 w-full items-center justify-center gap-2 rounded-xl border border-dashed text-sm transition-colors",
+            "flex h-12 w-full items-center justify-center gap-2 rounded-lg border border-dashed bg-background-dark text-sm leading-5 transition-colors",
             "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-100",
             errorMessage
               ? "border-error-01 text-error-01"
@@ -151,7 +159,7 @@ export const WriteImageUploadField = ({
       </div>
 
       <div className="flex items-center justify-end">
-        <p className="text-label-06 text-text-tertiary">
+        <p className="pr-3 text-xs leading-4 text-text-placeholder">
           {countText ?? `${files.length}/${maxFiles}`}
         </p>
       </div>
