@@ -1,7 +1,5 @@
-// src/mocks/mockPosts.ts (경로는 프로젝트 설정에 맞게 조정하세요)
 import type { Post } from "@/types/post";
 
-// PostCardProps에 맞추면서 고유 id를 가지도록 타입 확장
 export interface MockPostData extends Post {
   id: number;
   userImage?: string;
@@ -20,7 +18,6 @@ export const MOCK_QNA_POSTS: MockPostData[] = [
     comment: 5,
     createdAt: "2026-03-24T10:00:00Z",
     tags: ["React", "Hooks"],
-    // 사진 없는 케이스
   },
   {
     id: 2,
@@ -37,7 +34,6 @@ export const MOCK_QNA_POSTS: MockPostData[] = [
     ],
     tags: ["Tailwind", "CSS"],
     userImage: "https://picsum.photos/seed/user1/50/50",
-    // 사진과 유저 이미지가 모두 있는 케이스
   },
   {
     id: 3,
@@ -62,7 +58,6 @@ export const MOCK_QNA_POSTS: MockPostData[] = [
     postImage: ["https://picsum.photos/seed/vite/200/200"],
     tags: ["Vite", "Build"],
   },
-  // --- 아래부터는 레이아웃 채우기용 더미 데이터 ---
   {
     id: 5,
     title: "라우팅 설정 질문",
