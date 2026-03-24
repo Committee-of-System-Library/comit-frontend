@@ -1,4 +1,11 @@
-import { useEffect, useId, useMemo, useRef, useState } from "react";
+import {
+  type ReactNode,
+  useEffect,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 import { ChevronDown, ChevronUp } from "lucide-react";
 
@@ -11,7 +18,7 @@ export interface BoardSelectOption {
 
 export interface BoardSelectFieldProps {
   id?: string;
-  label?: string;
+  label?: ReactNode;
   placeholder?: string;
   options: BoardSelectOption[];
   value?: string;

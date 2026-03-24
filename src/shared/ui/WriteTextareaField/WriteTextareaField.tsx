@@ -1,4 +1,10 @@
-import { forwardRef, type TextareaHTMLAttributes, useId, useMemo } from "react";
+import {
+  forwardRef,
+  type ReactNode,
+  type TextareaHTMLAttributes,
+  useId,
+  useMemo,
+} from "react";
 
 import { cn } from "@/utils/cn";
 
@@ -6,7 +12,7 @@ export interface WriteTextareaFieldProps extends Omit<
   TextareaHTMLAttributes<HTMLTextAreaElement>,
   "children"
 > {
-  label?: string;
+  label?: ReactNode;
   helperText?: string;
   errorMessage?: string;
   showCount?: boolean;
@@ -69,28 +75,37 @@ export const WriteTextareaField = forwardRef<
           </label>
         ) : null}
 
-        <textarea
-          ref={ref}
-          id={textareaId}
-          aria-invalid={Boolean(errorMessage)}
-          aria-describedby={helperText || errorMessage ? helperId : undefined}
-          className={cn(
-            "min-h-[220px] w-full resize-none rounded-xl border px-4 py-3 text-sm text-text-primary transition-colors",
-            "placeholder:text-text-placeholder focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-100",
-            errorMessage
-              ? "border-error-01"
-              : "border-gray-200 focus-visible:border-primary-700",
-            "disabled:cursor-not-allowed disabled:border-gray-200 disabled:bg-gray-50 disabled:text-gray-400",
-            className,
-          )}
-          defaultValue={defaultValue}
-          maxLength={maxLength}
-          rows={rows}
-          value={value}
-          {...props}
-        />
+        <div className="relative">
+          <textarea
+            ref={ref}
+            id={textareaId}
+            aria-invalid={Boolean(errorMessage)}
+            aria-describedby={helperText || errorMessage ? helperId : undefined}
+            className={cn(
+              "min-h-[220px] w-full resize-none rounded-xl border px-4 py-3 text-sm text-text-primary transition-colors",
+              "placeholder:text-text-placeholder focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-100",
+              errorMessage
+                ? "border-error-01"
+                : "border-gray-200 focus-visible:border-primary-700",
+              "pb-10 disabled:cursor-not-allowed disabled:border-gray-200 disabled:bg-gray-50 disabled:text-gray-400",
+              className,
+            )}
+            defaultValue={defaultValue}
+            maxLength={maxLength}
+            rows={rows}
+            value={value}
+            {...props}
+          />
 
-        <div className="flex items-start justify-between gap-4">
+          {showCount ? (
+            <p className="pointer-events-none absolute bottom-3 right-4 text-label-06 text-text-tertiary">
+              {currentLength}자
+              {typeof maxLength === "number" ? "/최대글자수" : null}
+            </p>
+          ) : null}
+        </div>
+
+        {helperText || errorMessage ? (
           <p
             className={cn(
               "text-label-06",
@@ -101,14 +116,7 @@ export const WriteTextareaField = forwardRef<
           >
             {errorMessage ?? helperText}
           </p>
-
-          {showCount ? (
-            <p className="shrink-0 text-label-06 text-text-tertiary">
-              현재 {currentLength}자
-              {typeof maxLength === "number" ? ` / 최대 ${maxLength}자` : null}
-            </p>
-          ) : null}
-        </div>
+        ) : null}
       </div>
     );
   },

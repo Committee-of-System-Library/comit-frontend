@@ -1,4 +1,9 @@
-import { forwardRef, type InputHTMLAttributes, useId } from "react";
+import {
+  forwardRef,
+  type InputHTMLAttributes,
+  type ReactNode,
+  useId,
+} from "react";
 
 import { cn } from "@/utils/cn";
 
@@ -6,7 +11,7 @@ export interface WriteTextInputProps extends Omit<
   InputHTMLAttributes<HTMLInputElement>,
   "size"
 > {
-  label?: string;
+  label?: ReactNode;
   helperText?: string;
   errorMessage?: string;
 }
