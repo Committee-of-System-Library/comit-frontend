@@ -34,9 +34,7 @@ const QnABoardPage = () => {
   return (
     <main className="max-w-4xl mx-auto w-full px-4 pt-4 pb-5 flex flex-col">
       <section className="flex flex-col gap-10 pb-6">
-        <h1 className="text-head-02 text-[28px] text-text-primary">
-          Q&A 게시판
-        </h1>
+        <h1 className="text-head-02 text-text-primary">Q&A 게시판</h1>
         <SearchLong onSearch={handleSearch} />
       </section>
       <section className="flex flex-col gap-4">

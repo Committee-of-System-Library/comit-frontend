@@ -4,11 +4,14 @@
 @theme {
   --font-sans: "Pretendard Variable", "Pretendard", system-ui, sans-serif;
 
-  --text-head-01: 2rem / 1.2;
+  --text-head-01: 2rem;
+  --text-head-02--line-height: 1.2;
   --text-head-01--font-weight: 700;
-  --text-head-02: 1.75rem / 1.2;
+  --text-head-02: 1.75rem;
+  --text-head-02--line-height: 1.2;
   --text-head-02--font-weight: 700;
-  --text-head-03: 1.5rem / 1.2;
+  --text-head-03: 1.5rem;
+  --text-head-03--line-height: 1.2;
   --text-head-03--font-weight: 700;
 
   --text-subtitle-01: 1.25rem / 1.2;
