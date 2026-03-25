@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+import { NoSearchResult } from "@/components/common/NoSearchResult";
 import { MOCK_QNA_POSTS } from "@/mocks/mockPosts";
 import { AdminPostCard } from "@/shared/ui/AdminPostCard/AdminPostCard";
 import { Pagination } from "@/shared/ui/Pagination/Pagination";
@@ -52,11 +53,7 @@ const EventBoardPage = () => {
             />
           ))
         ) : (
-          <div className="py-20 text-center text-text-tertiary">
-            {searchTerm
-              ? `'${searchTerm}'에 대한 검색 결과가 없습니다.`
-              : "게시글이 존재하지 않습니다."}
-          </div>
+          <NoSearchResult searchWord={searchTerm} />
         )}
       </section>
       <Pagination
