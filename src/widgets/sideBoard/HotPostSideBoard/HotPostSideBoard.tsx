@@ -20,7 +20,7 @@ export const HotPostSideBoard = ({
       {...props}
     >
       <div className="flex w-full items-center gap-2 border-b border-border-deactivated px-4 py-3">
-        <TrendingUp className="size-6 text-text-primary" />
+        <TrendingUp className="size-6 text-error-01" />
         <span className="text-subtitle-04 text-text-primary font-bold">
           인기글 상위 5개
         </span>

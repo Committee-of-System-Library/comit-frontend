@@ -1,6 +1,6 @@
 import type { HTMLAttributes } from "react";
 
-import { Megaphone } from "lucide-react";
+import { Volume2 } from "lucide-react";
 
 import type { RecentNotice } from "@/mocks/recentNotices";
 import { NoticePreviewItem } from "@/shared/ui/NoticePreviewItem/NoticePreviewItem";
@@ -20,7 +20,7 @@ export const NoticeSideBoard = ({
       {...props}
     >
       <div className="flex w-full items-center gap-2 border-b border-border-deactivated px-4 py-3">
-        <Megaphone className="size-6 text-text-primary" />
+        <Volume2 className="size-6 text-info-01" />
         <span className="text-subtitle-04 text-text-primary font-bold">
           공지사항
         </span>
