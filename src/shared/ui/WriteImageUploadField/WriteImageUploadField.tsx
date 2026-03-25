@@ -71,7 +71,7 @@ export const WriteImageUploadField = ({
       {label ? (
         <label
           className={cn(
-            "pl-3 text-base leading-10 font-bold text-text-tertiary",
+            "pl-3 text-label-01 text-text-tertiary",
             labelClassName,
           )}
           htmlFor={uploadId}
@@ -95,7 +95,7 @@ export const WriteImageUploadField = ({
         <button
           aria-describedby={helperText || errorMessage ? helperId : undefined}
           className={cn(
-            "flex h-12 w-full items-center justify-center gap-2 rounded-lg border border-dashed bg-background-dark text-sm leading-5 transition-colors",
+            "flex h-12 w-full items-center justify-center gap-2 rounded-lg border border-dashed bg-background-dark text-label-04 transition-colors",
             "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-100",
             errorMessage
               ? "border-error-01 text-error-01"
@@ -159,7 +159,7 @@ export const WriteImageUploadField = ({
       </div>
 
       <div className="flex items-center justify-end">
-        <p className="pr-3 text-xs leading-4 text-text-placeholder">
+        <p className="pr-3 text-label-06 text-text-placeholder">
           {countText ?? `${files.length}/${maxFiles}`}
         </p>
       </div>

@@ -8,7 +8,7 @@ type DemoButtonProps = {
 
 const DemoButton = ({ disabled = false, label, tone }: DemoButtonProps) => {
   const baseClass =
-    "rounded-md px-4 py-2 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50";
+    "rounded-md px-4 py-2 text-label-03 transition-colors disabled:cursor-not-allowed disabled:opacity-50";
   const toneClass =
     tone === "primary"
       ? "bg-blue-700 text-white hover:bg-blue-600"

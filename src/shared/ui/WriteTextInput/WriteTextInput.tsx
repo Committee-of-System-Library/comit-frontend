@@ -39,7 +39,7 @@ export const WriteTextInput = forwardRef<HTMLInputElement, WriteTextInputProps>(
         {label ? (
           <label
             className={cn(
-              "pl-3 text-base leading-10 font-bold text-text-tertiary",
+              "pl-3 text-label-01 text-text-tertiary",
               labelClassName,
             )}
             htmlFor={inputId}
@@ -54,7 +54,7 @@ export const WriteTextInput = forwardRef<HTMLInputElement, WriteTextInputProps>(
           aria-invalid={Boolean(errorMessage)}
           aria-describedby={helperText || errorMessage ? helperId : undefined}
           className={cn(
-            "h-12 w-full rounded-xl border px-4 text-sm leading-6 text-text-primary transition-colors",
+            "h-12 w-full rounded-xl border px-4 text-label-04 text-text-primary transition-colors",
             "placeholder:text-text-placeholder focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-100",
             errorMessage
               ? "border-error-01"

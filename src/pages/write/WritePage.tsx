@@ -223,7 +223,7 @@ const WritePage = () => {
 
   return (
     <section className="w-full">
-      <h1 className="w-full max-w-[792px] text-3xl leading-8 font-bold text-text-primary">
+      <h1 className="w-full max-w-[792px] text-head-01 text-text-primary">
         글 작성하기
       </h1>
 
@@ -326,7 +326,7 @@ const WritePage = () => {
         </div>
 
         <WriteActionButton
-          className="h-12 w-full max-w-[792px] rounded-xl text-base leading-6 font-bold"
+          className="h-12 w-full max-w-[792px] rounded-xl text-label-01"
           disabled={isSubmitting}
           form="write-post-form"
           type="submit"

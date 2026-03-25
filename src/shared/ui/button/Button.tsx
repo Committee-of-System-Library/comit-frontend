@@ -5,7 +5,7 @@ import { cn } from "@/utils/cn";
 type ButtonVariant = "primary" | "secondary";
 
 const baseClass =
-  "inline-flex h-9 items-center justify-center whitespace-nowrap rounded-lg px-4 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-700 focus-visible:ring-offset-2 disabled:cursor-not-allowed";
+  "inline-flex h-9 items-center justify-center whitespace-nowrap rounded-lg px-4 text-label-03 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-700 focus-visible:ring-offset-2 disabled:cursor-not-allowed";
 
 const variantClassMap: Record<ButtonVariant, string> = {
   primary:

@@ -80,7 +80,7 @@ export const WriteTagInputField = ({
       {label ? (
         <label
           className={cn(
-            "pl-3 text-base leading-10 font-bold text-text-tertiary",
+            "pl-3 text-label-01 text-text-tertiary",
             labelClassName,
           )}
           htmlFor={inputId}
@@ -95,7 +95,7 @@ export const WriteTagInputField = ({
           aria-invalid={Boolean(errorMessage)}
           aria-describedby={helperText || errorMessage ? helperId : undefined}
           className={cn(
-            "h-14 min-w-0 flex-1 rounded-xl border px-4 text-sm leading-5 text-text-primary",
+            "h-14 min-w-0 flex-1 rounded-xl border px-4 text-label-04 text-text-primary",
             "placeholder:text-text-placeholder focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-100",
             errorMessage
               ? "border-error-01"
@@ -129,7 +129,7 @@ export const WriteTagInputField = ({
               <li key={tag}>
                 <div
                   className={cn(
-                    "inline-flex items-center gap-0.5 rounded-sm bg-gray-50 px-1 py-0.5 text-xs leading-4 text-text-tertiary",
+                    "inline-flex items-center gap-0.5 rounded-sm bg-gray-50 px-1 py-0.5 text-caption-02 text-text-tertiary",
                     chipClassName,
                   )}
                 >
@@ -160,7 +160,7 @@ export const WriteTagInputField = ({
               <li key={`${tag}-${index}`}>
                 <div
                   className={cn(
-                    "inline-flex items-center gap-0.5 rounded-sm bg-gray-50 px-1 py-0.5 text-xs leading-4 text-text-tertiary",
+                    "inline-flex items-center gap-0.5 rounded-sm bg-gray-50 px-1 py-0.5 text-caption-02 text-text-tertiary",
                     chipClassName,
                   )}
                 >

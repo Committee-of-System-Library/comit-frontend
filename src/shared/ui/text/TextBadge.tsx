@@ -21,7 +21,7 @@ export const TextBadge = ({
 }: TextBadgeProps) => (
   <span
     className={cn(
-      "inline-flex items-center rounded-full px-4 py-1 text-sm font-semibold",
+      "inline-flex items-center rounded-full px-4 py-1 text-label-03",
       variantClassMap[variant],
       className,
     )}

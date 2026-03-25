@@ -95,7 +95,7 @@ export const BoardSelectField = ({
       {label ? (
         <label
           className={cn(
-            "pl-3 text-base leading-10 font-bold text-text-tertiary",
+            "pl-3 text-label-01 text-text-tertiary",
             labelClassName,
           )}
           htmlFor={selectId}
@@ -121,7 +121,7 @@ export const BoardSelectField = ({
           aria-expanded={isOpen}
           aria-describedby={errorMessage ? errorId : undefined}
           className={cn(
-            "flex h-12 w-full items-center justify-between px-4 text-left text-sm leading-5 transition-colors",
+            "flex h-12 w-full items-center justify-between px-4 text-left text-label-04 transition-colors",
             "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-100",
             errorMessage
               ? "text-error-01"
@@ -172,7 +172,7 @@ export const BoardSelectField = ({
                 <li key={option.value} role="option" aria-selected={isSelected}>
                   <button
                     className={cn(
-                      "flex w-full items-center px-4 py-3.5 text-left text-sm leading-5 transition-colors",
+                      "flex w-full items-center px-4 py-3.5 text-left text-label-04 transition-colors",
                       isSelected
                         ? "bg-primary-50 text-primary-700"
                         : "text-text-secondary hover:bg-gray-50",

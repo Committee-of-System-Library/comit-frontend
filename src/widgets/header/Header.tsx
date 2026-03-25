@@ -41,7 +41,7 @@ export const Header = ({
       <div className="mx-auto flex w-full max-w-[1440px] items-center gap-6 px-6 py-4">
         <a
           aria-label="Comit 홈으로 이동"
-          className="text-3xl font-bold text-gray-900 transition-opacity hover:opacity-80"
+          className="text-head-02 text-gray-900 transition-opacity hover:opacity-80"
           href="/"
         >
           로고
@@ -55,7 +55,7 @@ export const Header = ({
             <a
               key={item.label}
               className={cn(
-                "text-sm font-medium transition-colors hover:text-gray-900",
+                "text-label-04 font-medium transition-colors hover:text-gray-900",
                 item.isActive ? "text-gray-900" : "text-gray-600",
               )}
               href={item.href}

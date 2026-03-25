@@ -25,8 +25,8 @@ export const Footer = ({
   <footer className={cn("w-full border-t border-gray-200 bg-white", className)}>
     <div className="mx-auto grid w-full max-w-[1440px] grid-cols-[1fr_auto_auto] items-start gap-8 px-6 py-10">
       <section className="space-y-4">
-        <h2 className="text-2xl font-bold text-gray-900">로고</h2>
-        <p className="max-w-[460px] text-sm text-gray-600">
+        <h2 className="text-head-03 text-gray-900">로고</h2>
+        <p className="max-w-[460px] text-body-02 text-gray-600">
           경북대학교 컴퓨터학부 학생들을 위한 지식 나눔 커뮤니티입니다.
           <br />
           올바른 대화의 장을 만들어 갑니다.
@@ -34,12 +34,12 @@ export const Footer = ({
       </section>
 
       <section className="space-y-4">
-        <h3 className="text-xl font-bold text-gray-900">서비스</h3>
+        <h3 className="text-subtitle-01 text-gray-900">서비스</h3>
         <ul className="space-y-2">
           {serviceLinks.map((link) => (
             <li key={link.label}>
               <a
-                className="text-sm text-gray-600 transition-colors hover:text-gray-900"
+                className="text-body-02 text-gray-600 transition-colors hover:text-gray-900"
                 href={link.href}
               >
                 {link.label}
