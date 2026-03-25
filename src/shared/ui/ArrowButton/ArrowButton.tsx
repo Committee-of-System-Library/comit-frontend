@@ -12,12 +12,14 @@ export const ArrowButton = ({
   ...props
 }: ArrowButtonProps) => {
   const Icon = direction === "left" ? ChevronLeft : ChevronRight;
+  const Label =
+    direction === "left" ? "이전 슬라이드로 이동" : "다음 슬라이드로 이동";
 
   return (
     <button
       type="button"
       className={`group relative flex size-10 items-center justify-center rounded-full bg-transparent transition-colors hover:bg-gray-200 active:bg-gray-300 disabled:cursor-not-allowed disabled:opacity-40 ${className}`}
-      aria-label={direction === "left" ? "Previous slide" : "Next slide"}
+      aria-label={Label}
       {...props}
     >
       <Icon className="size-6 text-text-primary" strokeWidth={2.5} />
