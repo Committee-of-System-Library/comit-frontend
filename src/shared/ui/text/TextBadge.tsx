@@ -5,8 +5,8 @@ import { cn } from "@/utils/cn";
 type TextBadgeVariant = "primary" | "secondary";
 
 const variantClassMap: Record<TextBadgeVariant, string> = {
-  primary: "bg-primary-700 text-white",
-  secondary: "bg-gray-100 text-gray-600",
+  primary: "bg-primary-600 text-text-inverse",
+  secondary: "bg-gray-100 text-text-tertiary",
 };
 
 export interface TextBadgeProps extends HTMLAttributes<HTMLSpanElement> {
@@ -21,7 +21,7 @@ export const TextBadge = ({
 }: TextBadgeProps) => (
   <span
     className={cn(
-      "inline-flex items-center rounded-full px-4 py-1 text-label-03",
+      "inline-flex items-center rounded-full px-3 py-1.5 text-label-06",
       variantClassMap[variant],
       className,
     )}
