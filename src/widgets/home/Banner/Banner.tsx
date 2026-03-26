@@ -1,15 +1,8 @@
 import { useState } from "react";
 
+import type { BannerItem } from "@/mocks/bannerItems";
 import { ArrowButton } from "@/shared/ui/ArrowButton/ArrowButton";
-import { cn } from "@/shared/utils/cn";
-
-interface BannerItem {
-  id: number;
-  imageUrl: string;
-  link?: string;
-  alt: string;
-  backgroundColor?: string;
-}
+import { cn } from "@/utils/cn";
 
 interface BannerProps {
   items: BannerItem[];

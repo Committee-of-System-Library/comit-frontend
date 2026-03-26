@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router";
 
 import { AppDesktopShell } from "@/app/layout/AppDesktopShell";
+import { mockBannerItems } from "@/mocks/bannerItems";
 import EventBoardPage from "@/pages/board/EventBoardPage";
 import FreeBoardPage from "@/pages/board/FreeBoardPage";
 import InfoBoardPage from "@/pages/board/InfoBoardPage";
@@ -8,9 +9,11 @@ import NoticeBoardPage from "@/pages/board/NoticeBoardPage";
 import QnABoardPage from "@/pages/board/QnABoardPage";
 import HomePage from "@/pages/home/HomePage";
 import WritePage from "@/pages/write/WritePage";
+import { Banner } from "@/widgets/home/Banner/Banner";
 
 function App() {
   const isWritePath = /^\/write\/?$/.test(window.location.pathname);
+  const isMainPage = window.location.pathname === "/";
 
   return (
     <AppDesktopShell
@@ -20,6 +23,7 @@ function App() {
           : undefined
       }
       rightRail={isWritePath ? null : undefined}
+      topBanner={isMainPage ? <Banner items={mockBannerItems} /> : undefined}
     >
       <BrowserRouter>
         <Routes>
