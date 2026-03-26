@@ -64,7 +64,7 @@ export const CommonDesktopLayout = ({
           ) : (
             <section
               className={cn(
-                "w-full max-w-[894px] mx-auto min-w-0 space-y-9",
+                "w-full max-w-[1040px] mx-auto min-w-0 space-y-4",
                 mainClassName,
               )}
             >
