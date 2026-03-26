@@ -111,8 +111,9 @@ export const Header = ({
               </Button>
             ) : (
               <Button
-                className="h-9 px-3 text-label-04 font-normal"
+                className="h-9 px-3 text-label-04 text-text-inverse font-normal"
                 onClick={handleAuthActionClick}
+                variant="primary"
               >
                 로그인/회원가입
               </Button>
