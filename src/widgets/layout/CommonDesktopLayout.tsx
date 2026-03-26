@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-import { cn } from "@/shared/utils/cn";
+import { cn } from "@/utils/cn";
 import { Footer, type FooterProps } from "@/widgets/footer/Footer";
 import { Header, type HeaderProps } from "@/widgets/header/Header";
 
@@ -57,7 +57,7 @@ export const CommonDesktopLayout = ({
         ) : (
           <section
             className={cn(
-              "w-full max-w-[894px] min-w-0 space-y-4",
+              "w-full max-w-[1040px] min-w-0 space-y-4",
               mainClassName,
             )}
           >

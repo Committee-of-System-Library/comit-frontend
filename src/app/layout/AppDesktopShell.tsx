@@ -6,17 +6,20 @@ import { DefaultRightRail } from "@/widgets/layout/DefaultRightRail";
 interface AppDesktopShellProps {
   children: ReactNode;
   isAuthenticated?: boolean;
-  rightRail?: ReactNode;
+  mainClassName?: string;
+  rightRail?: ReactNode | null;
 }
 
 export const AppDesktopShell = ({
   children,
   isAuthenticated = true,
+  mainClassName,
   rightRail,
 }: AppDesktopShellProps) => (
   <CommonDesktopLayout
     headerProps={{ isAuthenticated }}
-    rightRail={rightRail ?? <DefaultRightRail />}
+    mainClassName={mainClassName}
+    rightRail={rightRail === undefined ? <DefaultRightRail /> : rightRail}
   >
     {children}
   </CommonDesktopLayout>
