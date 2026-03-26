@@ -1,6 +1,6 @@
 import { Button } from "@/shared/ui/button/Button";
 import { SearchInput } from "@/shared/ui/input/SearchInput";
-import { cn } from "@/shared/utils/cn";
+import { cn } from "@/utils/cn";
 
 type HeaderNavItem = {
   href: string;

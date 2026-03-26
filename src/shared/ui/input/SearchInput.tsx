@@ -2,7 +2,7 @@ import { forwardRef, type InputHTMLAttributes } from "react";
 
 import { Search } from "lucide-react";
 
-import { cn } from "@/shared/utils/cn";
+import { cn } from "@/utils/cn";
 
 export interface SearchInputProps extends Omit<
   InputHTMLAttributes<HTMLInputElement>,

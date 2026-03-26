@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-import { cn } from "@/shared/utils/cn";
+import { cn } from "@/utils/cn";
 import { Footer, type FooterProps } from "@/widgets/footer/Footer";
 import { Header, type HeaderProps } from "@/widgets/header/Header";
 
