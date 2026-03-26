@@ -3,7 +3,7 @@ import type { HTMLAttributes } from "react";
 import { mockHotPosts, type HotPost } from "@/mocks/hotPosts";
 import { mockRecentEvents, type RecentEvent } from "@/mocks/recentEvents";
 import { mockRecentNotices, type RecentNotice } from "@/mocks/recentNotices";
-
+import { cn } from "@/utils/cn";
 import { EventSideBoard } from "@/widgets/sideBoard/EventSideBoard/EventSideBoard";
 import { HotPostSideBoard } from "@/widgets/sideBoard/HotPostSideBoard/HotPostSideBoard";
 import { NoticeSideBoard } from "@/widgets/sideBoard/NoticeSideBoard/NoticeSideBoard";
