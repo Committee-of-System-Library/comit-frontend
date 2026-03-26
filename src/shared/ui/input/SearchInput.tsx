@@ -1,4 +1,9 @@
-import { forwardRef, type InputHTMLAttributes } from "react";
+import {
+  forwardRef,
+  type FocusEvent,
+  type InputHTMLAttributes,
+  useState,
+} from "react";
 
 import { Search } from "lucide-react";
 
@@ -9,28 +14,64 @@ export interface SearchInputProps extends Omit<
   "type"
 > {
   containerClassName?: string;
+  state?: "default" | "typing";
+  typingText?: string;
 }
 
 export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
-  ({ className, containerClassName, ...props }, ref) => (
-    <div className={cn("relative w-full", containerClassName)}>
-      <input
-        ref={ref}
-        type="search"
-        className={cn(
-          "h-10 w-full rounded-full border border-gray-200 bg-gray-100 px-4 pr-10 text-label-04 text-gray-700 placeholder:text-gray-500",
-          "focus:border-primary-700 focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary-100",
-          "disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-400",
-          className,
-        )}
-        {...props}
-      />
-      <Search
-        aria-hidden
-        className="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-gray-500"
-      />
-    </div>
-  ),
+  (
+    {
+      className,
+      containerClassName,
+      state = "default",
+      typingText = "입력중...",
+      onBlur,
+      onFocus,
+      placeholder = "검색어를 입력하세요",
+      ...props
+    },
+    ref,
+  ) => {
+    const [isFocused, setIsFocused] = useState(false);
+    const isTyping = state === "typing" || isFocused;
+
+    const handleFocus = (event: FocusEvent<HTMLInputElement>) => {
+      setIsFocused(true);
+      onFocus?.(event);
+    };
+
+    const handleBlur = (event: FocusEvent<HTMLInputElement>) => {
+      setIsFocused(false);
+      onBlur?.(event);
+    };
+
+    return (
+      <div className={cn("relative w-full", containerClassName)}>
+        <input
+          ref={ref}
+          type="search"
+          className={cn(
+            className,
+            "h-10 w-[417px] rounded-full border border-transparent bg-gray-50 px-4 pr-10 text-label-04 focus:border-primary-600 focus:outline-none disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-400",
+            isTyping
+              ? "border-primary-600 text-text-primary placeholder:text-primary-600"
+              : "text-text-primary placeholder:text-text-placeholder",
+          )}
+          onBlur={handleBlur}
+          onFocus={handleFocus}
+          placeholder={isTyping ? typingText : placeholder}
+          {...props}
+        />
+        <Search
+          aria-hidden
+          className={cn(
+            "pointer-events-none absolute right-[14px] top-1/2 size-4 -translate-y-1/2",
+            isTyping ? "text-primary-600" : "text-gray-500",
+          )}
+        />
+      </div>
+    );
+  },
 );
 
 SearchInput.displayName = "SearchInput";
