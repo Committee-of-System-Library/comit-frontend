@@ -9,7 +9,7 @@ type HeaderNavItem = {
 };
 
 const defaultNavItems: HeaderNavItem[] = [
-  { href: "/", isActive: true, label: "홈" },
+  { href: "/", label: "홈" },
   { href: "/board/qna", label: "Q&A" },
   { href: "/board/info", label: "정보게시판" },
   { href: "/board/free", label: "자유게시판" },
@@ -28,56 +28,74 @@ export const Header = ({
   isAuthenticated = false,
   navItems = defaultNavItems,
 }: HeaderProps) => {
-  const handlePrimaryActionClick = () => {
-    if (isAuthenticated) {
-      window.location.href = "/write";
-    }
+  const handleAuthActionClick = () => {
+    window.location.href = isAuthenticated ? "/mypage" : "/login";
   };
 
   return (
     <header
-      className={cn("w-full border-b border-gray-200 bg-white", className)}
+      className={cn(
+        "h-16 w-full overflow-hidden bg-white/90 shadow-[0px_4px_20px_0px_rgba(0,0,0,0.04)] backdrop-blur-[100px]",
+        className,
+      )}
     >
-      <div className="mx-auto flex w-full max-w-[1440px] items-center gap-6 px-6 py-4">
-        <a
-          aria-label="Comit 홈으로 이동"
-          className="text-head-02 text-gray-900 transition-opacity hover:opacity-80"
-          href="/"
-        >
-          로고
-        </a>
+      <div className="mx-auto flex h-full w-full max-w-[1440px] items-center justify-between px-10">
+        <div className="flex items-center gap-8">
+          <a
+            aria-label="Comit 홈으로 이동"
+            className="text-head-03 text-text-primary transition-opacity hover:opacity-80"
+            href="/"
+          >
+            로고
+          </a>
 
-        <nav
-          aria-label="주요 메뉴"
-          className="flex min-w-fit items-center gap-6"
-        >
-          {navItems.map((item) => (
-            <a
-              key={item.label}
-              className={cn(
-                "text-label-04 font-medium transition-colors hover:text-gray-900",
-                item.isActive ? "text-gray-900" : "text-gray-600",
-              )}
-              href={item.href}
-            >
-              {item.label}
-            </a>
-          ))}
-        </nav>
+          <nav
+            aria-label="주요 메뉴"
+            className="flex min-w-fit items-center gap-2"
+          >
+            {navItems.map((item) => (
+              <a
+                key={item.label}
+                className={cn(
+                  "inline-flex items-center rounded-lg px-3 py-2 text-label-04 transition-colors",
+                  item.isActive
+                    ? "bg-gray-50 text-primary-800"
+                    : "text-text-deactivated hover:bg-gray-50 hover:text-primary-800",
+                )}
+                href={item.href}
+              >
+                {item.label}
+              </a>
+            ))}
+          </nav>
+        </div>
 
-        <SearchInput
-          aria-label="게시글 검색"
-          containerClassName="ml-auto w-full max-w-[420px]"
-          placeholder="검색어를 입력하세요"
-        />
+        <div className="flex items-center justify-end gap-6">
+          <SearchInput
+            aria-label="게시글 검색"
+            className="border-border-deactivated bg-gray-50 text-label-04 text-text-primary placeholder:text-text-placeholder"
+            containerClassName="w-full min-w-[240px] max-w-[417px]"
+            placeholder="검색어를 입력하세요"
+          />
 
-        <div className="flex items-center gap-2">
-          <Button variant="secondary">
-            {isAuthenticated ? "마이페이지" : "회원가입"}
-          </Button>
-          <Button onClick={handlePrimaryActionClick}>
-            {isAuthenticated ? "글쓰기" : "로그인"}
-          </Button>
+          <div className="flex items-center">
+            {isAuthenticated ? (
+              <Button
+                className="h-9 px-3 text-label-04 font-normal"
+                onClick={handleAuthActionClick}
+                variant="secondary"
+              >
+                마이페이지
+              </Button>
+            ) : (
+              <Button
+                className="h-9 px-3 text-label-04 font-normal"
+                onClick={handleAuthActionClick}
+              >
+                로그인/회원가입
+              </Button>
+            )}
+          </div>
         </div>
       </div>
     </header>
