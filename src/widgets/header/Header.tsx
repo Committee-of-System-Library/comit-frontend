@@ -27,44 +27,59 @@ export const Header = ({
   className,
   isAuthenticated = false,
   navItems = defaultNavItems,
-}: HeaderProps) => (
-  <header className={cn("w-full border-b border-gray-200 bg-white", className)}>
-    <div className="mx-auto flex w-full max-w-[1440px] items-center gap-6 px-6 py-4">
-      <a
-        aria-label="Comit 홈으로 이동"
-        className="text-3xl font-bold text-gray-900 transition-opacity hover:opacity-80"
-        href="/"
-      >
-        로고
-      </a>
+}: HeaderProps) => {
+  const handlePrimaryActionClick = () => {
+    if (isAuthenticated) {
+      window.location.href = "/write";
+    }
+  };
 
-      <nav aria-label="주요 메뉴" className="flex min-w-fit items-center gap-6">
-        {navItems.map((item) => (
-          <a
-            key={item.label}
-            className={cn(
-              "text-sm font-medium transition-colors hover:text-gray-900",
-              item.isActive ? "text-gray-900" : "text-gray-600",
-            )}
-            href={item.href}
-          >
-            {item.label}
-          </a>
-        ))}
-      </nav>
+  return (
+    <header
+      className={cn("w-full border-b border-gray-200 bg-white", className)}
+    >
+      <div className="mx-auto flex w-full max-w-[1440px] items-center gap-6 px-6 py-4">
+        <a
+          aria-label="Comit 홈으로 이동"
+          className="text-3xl font-bold text-gray-900 transition-opacity hover:opacity-80"
+          href="/"
+        >
+          로고
+        </a>
 
-      <SearchInput
-        aria-label="게시글 검색"
-        containerClassName="ml-auto w-full max-w-[420px]"
-        placeholder="검색어를 입력하세요"
-      />
+        <nav
+          aria-label="주요 메뉴"
+          className="flex min-w-fit items-center gap-6"
+        >
+          {navItems.map((item) => (
+            <a
+              key={item.label}
+              className={cn(
+                "text-sm font-medium transition-colors hover:text-gray-900",
+                item.isActive ? "text-gray-900" : "text-gray-600",
+              )}
+              href={item.href}
+            >
+              {item.label}
+            </a>
+          ))}
+        </nav>
 
-      <div className="flex items-center gap-2">
-        <Button variant="secondary">
-          {isAuthenticated ? "마이페이지" : "회원가입"}
-        </Button>
-        <Button>{isAuthenticated ? "글쓰기" : "로그인"}</Button>
+        <SearchInput
+          aria-label="게시글 검색"
+          containerClassName="ml-auto w-full max-w-[420px]"
+          placeholder="검색어를 입력하세요"
+        />
+
+        <div className="flex items-center gap-2">
+          <Button variant="secondary">
+            {isAuthenticated ? "마이페이지" : "회원가입"}
+          </Button>
+          <Button onClick={handlePrimaryActionClick}>
+            {isAuthenticated ? "글쓰기" : "로그인"}
+          </Button>
+        </div>
       </div>
-    </div>
-  </header>
-);
+    </header>
+  );
+};

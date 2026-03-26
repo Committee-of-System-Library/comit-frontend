@@ -9,7 +9,7 @@ const baseClass =
 
 const variantClassMap: Record<WriteActionButtonVariant, string> = {
   default:
-    "bg-primary-600 text-text-inverse hover:bg-primary-700 disabled:bg-gray-300 disabled:text-gray-500",
+    "bg-primary-600 text-text-inverse hover:bg-primary-1000 disabled:bg-gray-300 disabled:text-gray-500",
   dark: "bg-primary-1000 text-text-inverse hover:bg-primary-900 disabled:bg-gray-300 disabled:text-gray-500",
 };
 
