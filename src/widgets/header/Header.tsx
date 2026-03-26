@@ -28,6 +28,23 @@ export const Header = ({
   isAuthenticated = false,
   navItems = defaultNavItems,
 }: HeaderProps) => {
+  const currentPath = (() => {
+    const normalizedPath = window.location.pathname.replace(/\/+$/, "");
+    return normalizedPath.length > 0 ? normalizedPath : "/";
+  })();
+
+  const isNavItemActive = (item: HeaderNavItem) => {
+    if (typeof item.isActive === "boolean") {
+      return item.isActive;
+    }
+
+    if (item.href === "/") {
+      return currentPath === "/";
+    }
+
+    return currentPath === item.href || currentPath.startsWith(`${item.href}/`);
+  };
+
   const handleAuthActionClick = () => {
     window.location.href = isAuthenticated ? "/mypage" : "/login";
   };
@@ -53,20 +70,25 @@ export const Header = ({
             aria-label="주요 메뉴"
             className="flex min-w-fit items-center gap-2"
           >
-            {navItems.map((item) => (
-              <a
-                key={item.label}
-                className={cn(
-                  "inline-flex items-center rounded-lg px-3 py-2 text-label-04 transition-colors",
-                  item.isActive
-                    ? "bg-gray-50 text-primary-800"
-                    : "text-text-deactivated hover:bg-gray-50 hover:text-primary-800",
-                )}
-                href={item.href}
-              >
-                {item.label}
-              </a>
-            ))}
+            {navItems.map((item) => {
+              const isActive = isNavItemActive(item);
+
+              return (
+                <a
+                  key={item.label}
+                  aria-current={isActive ? "page" : undefined}
+                  className={cn(
+                    "inline-flex items-center rounded-lg px-3 py-2 text-label-04 transition-colors",
+                    isActive
+                      ? "bg-gray-50 text-primary-800"
+                      : "text-text-deactivated hover:bg-gray-50 hover:text-primary-800",
+                  )}
+                  href={item.href}
+                >
+                  {item.label}
+                </a>
+              );
+            })}
           </nav>
         </div>
 
