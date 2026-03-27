@@ -1,5 +1,7 @@
 import type { HTMLAttributes } from "react";
 
+import { useNavigate } from "react-router-dom";
+
 import { mockHotPosts, type HotPost } from "@/mocks/hotPosts";
 import { mockRecentEvents, type RecentEvent } from "@/mocks/recentEvents";
 import { mockRecentNotices, type RecentNotice } from "@/mocks/recentNotices";
@@ -24,15 +26,15 @@ export const DefaultRightRail = ({
   onWriteClick,
   ...props
 }: DefaultRightRailProps) => {
+  const navigate = useNavigate();
+
   const handleWriteClick = () => {
     if (onWriteClick) {
       onWriteClick();
       return;
     }
 
-    if (typeof window !== "undefined") {
-      window.location.assign("/write");
-    }
+    navigate("/write");
   };
 
   return (
