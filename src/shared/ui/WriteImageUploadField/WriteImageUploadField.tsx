@@ -17,6 +17,7 @@ export interface WriteImageUploadFieldProps {
   labelClassName?: string;
   helperText?: string;
   errorMessage?: string;
+  inlineError?: boolean;
   files?: WriteImageUploadItem[];
   maxFiles?: number;
   disabled?: boolean;
@@ -34,6 +35,7 @@ export const WriteImageUploadField = ({
   labelClassName,
   helperText,
   errorMessage,
+  inlineError = false,
   files = [],
   maxFiles = 5,
   disabled = false,
@@ -48,6 +50,7 @@ export const WriteImageUploadField = ({
   const uploadId = id ?? `write-image-upload-${fallbackId}`;
   const helperId = `${uploadId}-helper`;
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const shouldShowInlineError = inlineError && Boolean(errorMessage);
 
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     const selectedFiles = event.target.files;
@@ -67,11 +70,11 @@ export const WriteImageUploadField = ({
   };
 
   return (
-    <div className={cn("space-y-2", className)}>
+    <div className={cn("space-y-[8px]", className)}>
       {label ? (
         <label
           className={cn(
-            "pl-3 text-base leading-10 font-bold text-text-tertiary",
+            "block pl-3 text-label-01 text-text-tertiary",
             labelClassName,
           )}
           htmlFor={uploadId}
@@ -91,15 +94,19 @@ export const WriteImageUploadField = ({
         type="file"
       />
 
-      <div className="space-y-2 rounded-xl border border-gray-200 bg-white p-4">
+      <div className="space-y-2 rounded-xl border border-gray-200 bg-background-light p-4">
         <button
-          aria-describedby={helperText || errorMessage ? helperId : undefined}
+          aria-describedby={
+            helperText || (errorMessage && !shouldShowInlineError)
+              ? helperId
+              : undefined
+          }
           className={cn(
-            "flex h-12 w-full items-center justify-center gap-2 rounded-lg border border-dashed bg-background-dark text-sm leading-5 transition-colors",
+            "flex h-[50px] w-full items-center justify-center gap-2 rounded-lg border border-dashed bg-background-dark text-label-04 transition-colors",
             "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-100",
             errorMessage
               ? "border-error-01 text-error-01"
-              : "border-gray-300 text-text-tertiary hover:border-primary-300 hover:text-text-secondary",
+              : "border-gray-300 text-text-placeholder hover:border-primary-300 hover:text-text-secondary",
             disabled &&
               "cursor-not-allowed border-gray-200 bg-gray-50 text-gray-400 hover:border-gray-200 hover:text-gray-400",
           )}
@@ -108,7 +115,9 @@ export const WriteImageUploadField = ({
           type="button"
         >
           <Upload aria-hidden className="size-4" />
-          <span className="truncate">{uploadButtonText}</span>
+          <span className="truncate">
+            {shouldShowInlineError ? errorMessage : uploadButtonText}
+          </span>
         </button>
 
         {files.length > 0 ? (
@@ -116,7 +125,7 @@ export const WriteImageUploadField = ({
             {files.map((file) => (
               <li
                 key={file.id}
-                className="flex items-center justify-between gap-3 rounded-xl border border-gray-200 bg-white p-3"
+                className="flex items-center justify-between gap-3 rounded-xl border border-gray-200 bg-background-light p-3"
               >
                 <div className="flex min-w-0 items-center gap-3">
                   {file.thumbnailUrl ? (
@@ -159,21 +168,21 @@ export const WriteImageUploadField = ({
       </div>
 
       <div className="flex items-center justify-end">
-        <p className="pr-3 text-xs leading-4 text-text-placeholder">
+        <p className="pr-3 text-label-06 text-text-placeholder">
           {countText ?? `${files.length}/${maxFiles}`}
         </p>
       </div>
 
-      {helperText || errorMessage ? (
+      {helperText || (errorMessage && !shouldShowInlineError) ? (
         <p
           className={cn(
             "text-label-06",
             errorMessage ? "text-error-01" : "text-text-tertiary",
           )}
           id={helperId}
-          role={errorMessage ? "alert" : undefined}
+          role={errorMessage && !shouldShowInlineError ? "alert" : undefined}
         >
-          {errorMessage ?? helperText}
+          {shouldShowInlineError ? helperText : (errorMessage ?? helperText)}
         </p>
       ) : null}
     </div>

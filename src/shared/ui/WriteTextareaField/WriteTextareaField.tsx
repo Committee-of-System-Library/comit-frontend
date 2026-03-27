@@ -17,6 +17,7 @@ export interface WriteTextareaFieldProps extends Omit<
   helperText?: string;
   errorMessage?: string;
   showCount?: boolean;
+  inlineError?: boolean;
 }
 
 const getStringLength = (
@@ -49,9 +50,11 @@ export const WriteTextareaField = forwardRef<
       errorMessage,
       className,
       showCount = true,
+      inlineError = false,
       value,
       defaultValue,
       maxLength,
+      placeholder,
       rows = 8,
       ...props
     },
@@ -66,12 +69,14 @@ export const WriteTextareaField = forwardRef<
       [defaultValue, value],
     );
 
+    const shouldShowInlineError = inlineError && Boolean(errorMessage);
+
     return (
-      <div className="space-y-2">
+      <div className="space-y-[8px]">
         {label ? (
           <label
             className={cn(
-              "pl-3 text-base leading-10 font-bold text-text-tertiary",
+              "block pl-3 text-label-01 text-text-tertiary",
               labelClassName,
             )}
             htmlFor={textareaId}
@@ -85,32 +90,40 @@ export const WriteTextareaField = forwardRef<
             ref={ref}
             id={textareaId}
             aria-invalid={Boolean(errorMessage)}
-            aria-describedby={helperText || errorMessage ? helperId : undefined}
+            aria-describedby={
+              helperText || (errorMessage && !shouldShowInlineError)
+                ? helperId
+                : undefined
+            }
             className={cn(
-              "min-h-60 w-full resize-none rounded-xl border p-4 text-base leading-6 text-text-primary transition-colors",
-              "placeholder:text-text-placeholder focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-100",
+              "min-h-60 w-full resize-none rounded-xl border bg-background-light p-4 text-body-01 text-text-primary transition-colors",
+              shouldShowInlineError
+                ? "placeholder:text-error-03"
+                : "placeholder:text-text-placeholder",
+              "focus-visible:outline-none focus-visible:ring-primary-100",
               errorMessage
                 ? "border-error-01"
                 : "border-gray-200 focus-visible:border-primary-700",
-              "pb-10 disabled:cursor-not-allowed disabled:border-gray-200 disabled:bg-gray-50 disabled:text-gray-400",
+              "pb-4 disabled:cursor-not-allowed disabled:border-gray-200 disabled:bg-gray-50 disabled:text-gray-400",
               className,
             )}
             defaultValue={defaultValue}
             maxLength={maxLength}
+            placeholder={shouldShowInlineError ? errorMessage : placeholder}
             rows={rows}
             value={value}
             {...props}
           />
 
           {showCount ? (
-            <p className="pointer-events-none absolute right-4 bottom-3 text-xs leading-4 text-text-placeholder">
+            <p className="pointer-events-none absolute right-4 bottom-5 text-caption-02 text-text-placeholder">
               {currentLength}자
               {typeof maxLength === "number" ? "/최대글자수" : null}
             </p>
           ) : null}
         </div>
 
-        {helperText || errorMessage ? (
+        {helperText || (errorMessage && !shouldShowInlineError) ? (
           <p
             className={cn(
               "text-label-06",

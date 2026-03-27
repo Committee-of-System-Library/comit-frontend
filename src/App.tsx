@@ -1,38 +1,91 @@
-import { BrowserRouter, Routes, Route } from "react-router";
+import { useEffect, useState } from "react";
 
+import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
+
+import { AuthStateDevTool } from "@/app/devtools/AuthStateDevTool";
 import { AppDesktopShell } from "@/app/layout/AppDesktopShell";
+import { mockBannerItems } from "@/mocks/bannerItems";
 import EventBoardPage from "@/pages/board/EventBoardPage";
 import FreeBoardPage from "@/pages/board/FreeBoardPage";
 import InfoBoardPage from "@/pages/board/InfoBoardPage";
 import NoticeBoardPage from "@/pages/board/NoticeBoardPage";
 import QnABoardPage from "@/pages/board/QnABoardPage";
 import HomePage from "@/pages/home/HomePage";
+import LoginPage from "@/pages/login/LoginPage";
+import MyPage from "@/pages/mypage/MyPage";
 import WritePage from "@/pages/write/WritePage";
+import { Banner } from "@/widgets/home/Banner/Banner";
 
-function App() {
-  const isWritePath = /^\/write\/?$/.test(window.location.pathname);
+const DEV_AUTH_STORAGE_KEY = "comit.dev.authenticated";
+
+const getInitialAuthState = () => {
+  if (!import.meta.env.DEV) {
+    return false;
+  }
+
+  return window.localStorage.getItem(DEV_AUTH_STORAGE_KEY) === "true";
+};
+
+interface AppContentProps {
+  isAuthenticated: boolean;
+}
+
+const AppContent = ({ isAuthenticated }: AppContentProps) => {
+  const { pathname } = useLocation();
+  const isWritePath = /^\/write\/?$/.test(pathname);
+  const isMainPage = pathname === "/";
+  const isTitleBoardPage =
+    /^\/board\/(qna|info|free)\/?$/.test(pathname) ||
+    /^\/(notice|event)\/?$/.test(pathname);
 
   return (
     <AppDesktopShell
-      mainClassName={
-        isWritePath
-          ? "min-w-[1200px] max-w-[1440px] px-80 pt-4 pb-20 space-y-10"
-          : undefined
-      }
+      isAuthenticated={isAuthenticated}
+      mainClassName={isWritePath ? "max-w-[792px] pt-10 pb-20" : undefined}
+      rightRailClassName={isTitleBoardPage ? "pt-[90px]" : undefined}
       rightRail={isWritePath ? null : undefined}
+      topBanner={isMainPage ? <Banner items={mockBannerItems} /> : undefined}
     >
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/write" element={<WritePage />} />
-          <Route path="board/qna" element={<QnABoardPage />} />
-          <Route path="board/info" element={<InfoBoardPage />} />
-          <Route path="board/free" element={<FreeBoardPage />} />
-          <Route path="/notice" element={<NoticeBoardPage />} />
-          <Route path="/event" element={<EventBoardPage />} />
-        </Routes>
-      </BrowserRouter>
+      <Routes>
+        <Route element={<HomePage />} path="/" />
+        <Route element={<WritePage />} path="/write" />
+        <Route element={<QnABoardPage />} path="/board/qna" />
+        <Route element={<InfoBoardPage />} path="/board/info" />
+        <Route element={<FreeBoardPage />} path="/board/free" />
+        <Route element={<NoticeBoardPage />} path="/notice" />
+        <Route element={<EventBoardPage />} path="/event" />
+        <Route element={<LoginPage />} path="/login" />
+        <Route element={<MyPage />} path="/mypage" />
+      </Routes>
     </AppDesktopShell>
+  );
+};
+
+function App() {
+  const [isAuthenticated, setIsAuthenticated] =
+    useState<boolean>(getInitialAuthState);
+
+  useEffect(() => {
+    if (!import.meta.env.DEV) {
+      return;
+    }
+
+    window.localStorage.setItem(DEV_AUTH_STORAGE_KEY, String(isAuthenticated));
+  }, [isAuthenticated]);
+
+  return (
+    <>
+      <BrowserRouter>
+        <AppContent isAuthenticated={isAuthenticated} />
+      </BrowserRouter>
+
+      {import.meta.env.DEV ? (
+        <AuthStateDevTool
+          isAuthenticated={isAuthenticated}
+          onChange={setIsAuthenticated}
+        />
+      ) : null}
+    </>
   );
 }
 

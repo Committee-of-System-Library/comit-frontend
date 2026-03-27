@@ -15,6 +15,7 @@ export interface WriteTextInputProps extends Omit<
   labelClassName?: string;
   helperText?: string;
   errorMessage?: string;
+  inlineError?: boolean;
 }
 
 export const WriteTextInput = forwardRef<HTMLInputElement, WriteTextInputProps>(
@@ -25,7 +26,9 @@ export const WriteTextInput = forwardRef<HTMLInputElement, WriteTextInputProps>(
       labelClassName,
       helperText,
       errorMessage,
+      inlineError = false,
       className,
+      placeholder,
       ...props
     },
     ref,
@@ -34,12 +37,14 @@ export const WriteTextInput = forwardRef<HTMLInputElement, WriteTextInputProps>(
     const inputId = id ?? `write-text-input-${fallbackId}`;
     const helperId = `${inputId}-helper`;
 
+    const shouldShowInlineError = inlineError && Boolean(errorMessage);
+
     return (
-      <div className="space-y-2">
+      <div className="space-y-[8px]">
         {label ? (
           <label
             className={cn(
-              "pl-3 text-base leading-10 font-bold text-text-tertiary",
+              "block pl-3 text-label-01 text-text-tertiary",
               labelClassName,
             )}
             htmlFor={inputId}
@@ -52,10 +57,17 @@ export const WriteTextInput = forwardRef<HTMLInputElement, WriteTextInputProps>(
           ref={ref}
           id={inputId}
           aria-invalid={Boolean(errorMessage)}
-          aria-describedby={helperText || errorMessage ? helperId : undefined}
+          aria-describedby={
+            helperText || (errorMessage && !shouldShowInlineError)
+              ? helperId
+              : undefined
+          }
           className={cn(
-            "h-12 w-full rounded-xl border px-4 text-sm leading-6 text-text-primary transition-colors",
-            "placeholder:text-text-placeholder focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-100",
+            "h-[50px] w-full rounded-xl border bg-background-light px-4 text-body-02 text-text-primary transition-colors",
+            shouldShowInlineError
+              ? "placeholder:text-error-03"
+              : "placeholder:text-text-placeholder",
+            "focus-visible:outline-none focus-visible:ring-primary-100",
             errorMessage
               ? "border-error-01"
               : "border-gray-200 focus-visible:border-primary-700",
@@ -63,10 +75,11 @@ export const WriteTextInput = forwardRef<HTMLInputElement, WriteTextInputProps>(
             className,
           )}
           type="text"
+          placeholder={shouldShowInlineError ? errorMessage : placeholder}
           {...props}
         />
 
-        {helperText || errorMessage ? (
+        {helperText || (errorMessage && !shouldShowInlineError) ? (
           <p
             className={cn(
               "text-label-06",
