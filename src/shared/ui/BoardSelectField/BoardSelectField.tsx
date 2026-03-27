@@ -24,6 +24,7 @@ export interface BoardSelectFieldProps {
   options: BoardSelectOption[];
   value?: string;
   errorMessage?: string;
+  inlineError?: boolean;
   disabled?: boolean;
   className?: string;
   menuClassName?: string;
@@ -39,6 +40,7 @@ export const BoardSelectField = ({
   options,
   value,
   errorMessage,
+  inlineError = false,
   disabled = false,
   className,
   menuClassName,
@@ -57,7 +59,10 @@ export const BoardSelectField = ({
     [options, value],
   );
 
-  const displayLabel = selectedOption?.label ?? placeholder;
+  const shouldShowInlineError = inlineError && Boolean(errorMessage);
+  const displayLabel = shouldShowInlineError
+    ? errorMessage
+    : (selectedOption?.label ?? placeholder);
 
   useEffect(() => {
     if (!isOpen) {
@@ -119,13 +124,17 @@ export const BoardSelectField = ({
           id={selectId}
           aria-haspopup="listbox"
           aria-expanded={isOpen}
-          aria-describedby={errorMessage ? errorId : undefined}
+          aria-describedby={
+            errorMessage && !shouldShowInlineError ? errorId : undefined
+          }
           className={cn(
             "flex h-[50px] w-full items-center justify-between px-4 text-left text-label-04 transition-colors",
             "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-100",
-            errorMessage
-              ? "text-error-01"
-              : "text-text-secondary focus-visible:border-primary-600",
+            shouldShowInlineError
+              ? "text-error-03"
+              : errorMessage
+                ? "text-error-01"
+                : "text-text-secondary focus-visible:border-primary-600",
             disabled &&
               "cursor-not-allowed bg-gray-50 text-gray-400 focus-visible:ring-0",
             triggerClassName,
@@ -137,7 +146,11 @@ export const BoardSelectField = ({
           <span
             className={cn(
               "truncate",
-              selectedOption ? "text-text-primary" : "text-text-placeholder",
+              shouldShowInlineError
+                ? "text-error-03"
+                : selectedOption
+                  ? "text-text-primary"
+                  : "text-text-placeholder",
               disabled && "text-gray-400",
             )}
           >
@@ -189,7 +202,7 @@ export const BoardSelectField = ({
         </div>
       </div>
 
-      {errorMessage ? (
+      {errorMessage && !shouldShowInlineError ? (
         <p className="text-label-06 text-error-01" id={errorId} role="alert">
           {errorMessage}
         </p>

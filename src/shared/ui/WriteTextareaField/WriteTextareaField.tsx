@@ -17,6 +17,7 @@ export interface WriteTextareaFieldProps extends Omit<
   helperText?: string;
   errorMessage?: string;
   showCount?: boolean;
+  inlineError?: boolean;
 }
 
 const getStringLength = (
@@ -49,9 +50,11 @@ export const WriteTextareaField = forwardRef<
       errorMessage,
       className,
       showCount = true,
+      inlineError = false,
       value,
       defaultValue,
       maxLength,
+      placeholder,
       rows = 8,
       ...props
     },
@@ -65,6 +68,8 @@ export const WriteTextareaField = forwardRef<
       () => getStringLength(value, defaultValue),
       [defaultValue, value],
     );
+
+    const shouldShowInlineError = inlineError && Boolean(errorMessage);
 
     return (
       <div className="space-y-[8px]">
@@ -85,10 +90,17 @@ export const WriteTextareaField = forwardRef<
             ref={ref}
             id={textareaId}
             aria-invalid={Boolean(errorMessage)}
-            aria-describedby={helperText || errorMessage ? helperId : undefined}
+            aria-describedby={
+              helperText || (errorMessage && !shouldShowInlineError)
+                ? helperId
+                : undefined
+            }
             className={cn(
               "min-h-60 w-full resize-none rounded-xl border bg-background-light p-4 text-body-01 text-text-primary transition-colors",
-              "placeholder:text-text-placeholder focus-visible:outline-none focus-visible:ring-primary-100",
+              shouldShowInlineError
+                ? "placeholder:text-error-03"
+                : "placeholder:text-text-placeholder",
+              "focus-visible:outline-none focus-visible:ring-primary-100",
               errorMessage
                 ? "border-error-01"
                 : "border-gray-200 focus-visible:border-primary-700",
@@ -97,6 +109,7 @@ export const WriteTextareaField = forwardRef<
             )}
             defaultValue={defaultValue}
             maxLength={maxLength}
+            placeholder={shouldShowInlineError ? errorMessage : placeholder}
             rows={rows}
             value={value}
             {...props}
@@ -110,7 +123,7 @@ export const WriteTextareaField = forwardRef<
           ) : null}
         </div>
 
-        {helperText || errorMessage ? (
+        {helperText || (errorMessage && !shouldShowInlineError) ? (
           <p
             className={cn(
               "text-label-06",

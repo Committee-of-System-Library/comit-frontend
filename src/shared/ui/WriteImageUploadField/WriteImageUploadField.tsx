@@ -17,6 +17,7 @@ export interface WriteImageUploadFieldProps {
   labelClassName?: string;
   helperText?: string;
   errorMessage?: string;
+  inlineError?: boolean;
   files?: WriteImageUploadItem[];
   maxFiles?: number;
   disabled?: boolean;
@@ -34,6 +35,7 @@ export const WriteImageUploadField = ({
   labelClassName,
   helperText,
   errorMessage,
+  inlineError = false,
   files = [],
   maxFiles = 5,
   disabled = false,
@@ -48,6 +50,7 @@ export const WriteImageUploadField = ({
   const uploadId = id ?? `write-image-upload-${fallbackId}`;
   const helperId = `${uploadId}-helper`;
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const shouldShowInlineError = inlineError && Boolean(errorMessage);
 
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     const selectedFiles = event.target.files;
@@ -93,7 +96,11 @@ export const WriteImageUploadField = ({
 
       <div className="space-y-2 rounded-xl border border-gray-200 bg-background-light p-4">
         <button
-          aria-describedby={helperText || errorMessage ? helperId : undefined}
+          aria-describedby={
+            helperText || (errorMessage && !shouldShowInlineError)
+              ? helperId
+              : undefined
+          }
           className={cn(
             "flex h-[50px] w-full items-center justify-center gap-2 rounded-lg border border-dashed bg-background-dark text-label-04 transition-colors",
             "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-100",
@@ -108,7 +115,9 @@ export const WriteImageUploadField = ({
           type="button"
         >
           <Upload aria-hidden className="size-4" />
-          <span className="truncate">{uploadButtonText}</span>
+          <span className="truncate">
+            {shouldShowInlineError ? errorMessage : uploadButtonText}
+          </span>
         </button>
 
         {files.length > 0 ? (
@@ -164,7 +173,7 @@ export const WriteImageUploadField = ({
         </p>
       </div>
 
-      {helperText || errorMessage ? (
+      {helperText || (errorMessage && !shouldShowInlineError) ? (
         <p
           className={cn(
             "text-label-06",

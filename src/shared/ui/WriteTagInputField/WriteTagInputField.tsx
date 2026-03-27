@@ -21,6 +21,7 @@ export interface WriteTagInputFieldProps {
   emptyChips?: string[];
   availableTags?: string[];
   selectionOnly?: boolean;
+  inlineError?: boolean;
   showCount?: boolean;
   showAddButton?: boolean;
   showLeadingPlusIcon?: boolean;
@@ -48,6 +49,7 @@ export const WriteTagInputField = ({
   emptyChips = [],
   availableTags = [],
   selectionOnly = false,
+  inlineError = false,
   showCount = true,
   showAddButton = true,
   showLeadingPlusIcon = false,
@@ -62,6 +64,7 @@ export const WriteTagInputField = ({
   const helperId = `${inputId}-helper`;
 
   const isLimitReached = tags.length >= maxTags;
+  const shouldShowInlineError = inlineError && Boolean(errorMessage);
 
   const handleAdd = () => {
     const normalizedValue = value.trim();
@@ -129,7 +132,11 @@ export const WriteTagInputField = ({
 
       {selectionOnly ? (
         <div
-          aria-describedby={helperText || errorMessage ? helperId : undefined}
+          aria-describedby={
+            helperText || (errorMessage && !shouldShowInlineError)
+              ? helperId
+              : undefined
+          }
           className={cn(
             tags.length > 0 ? "min-h-[68px] p-4" : "h-[55px] px-4",
             "rounded-xl border bg-background-light",
@@ -162,8 +169,15 @@ export const WriteTagInputField = ({
               ))}
             </ul>
           ) : (
-            <p className="flex h-full items-center text-text-placeholder">
-              {placeholder}
+            <p
+              className={cn(
+                "flex h-full items-center",
+                shouldShowInlineError
+                  ? "text-error-03"
+                  : "text-text-placeholder",
+              )}
+            >
+              {shouldShowInlineError ? errorMessage : placeholder}
             </p>
           )}
         </div>
@@ -172,10 +186,17 @@ export const WriteTagInputField = ({
           <input
             id={inputId}
             aria-invalid={Boolean(errorMessage)}
-            aria-describedby={helperText || errorMessage ? helperId : undefined}
+            aria-describedby={
+              helperText || (errorMessage && !shouldShowInlineError)
+                ? helperId
+                : undefined
+            }
             className={cn(
               "h-[55px] min-w-0 flex-1 rounded-xl border px-4 text-label-04 text-text-primary",
-              "placeholder:text-text-placeholder focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-100",
+              shouldShowInlineError
+                ? "placeholder:text-error-03"
+                : "placeholder:text-text-placeholder",
+              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-100",
               errorMessage
                 ? "border-error-01"
                 : "border-gray-200 focus-visible:border-primary-700",
@@ -184,7 +205,7 @@ export const WriteTagInputField = ({
             disabled={disabled || isLimitReached}
             onChange={(event) => onValueChange?.(event.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder={placeholder}
+            placeholder={shouldShowInlineError ? errorMessage : placeholder}
             type="text"
             value={value}
           />
@@ -289,9 +310,9 @@ export const WriteTagInputField = ({
         )}
       </div>
 
-      {helperText || errorMessage || showCount ? (
+      {helperText || (errorMessage && !shouldShowInlineError) || showCount ? (
         <div className="flex items-start justify-between gap-4">
-          {helperText || errorMessage ? (
+          {helperText || (errorMessage && !shouldShowInlineError) ? (
             <p
               className={cn(
                 "text-label-06",

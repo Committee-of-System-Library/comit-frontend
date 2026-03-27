@@ -191,6 +191,7 @@ const WritePage = () => {
               <BoardSelectField
                 className="w-[282px]"
                 errorMessage={errors.board?.message}
+                inlineError
                 label={
                   <>
                     게시판 선택 <span className="text-error-03">*</span>
@@ -213,6 +214,7 @@ const WritePage = () => {
               <WriteTextInput
                 {...field}
                 errorMessage={errors.title?.message}
+                inlineError
                 label={
                   <>
                     제목 <span className="text-error-03">*</span>
@@ -234,6 +236,7 @@ const WritePage = () => {
                 {...field}
                 className="h-60 min-h-60"
                 errorMessage={errors.content?.message}
+                inlineError
                 label="내용"
                 maxLength={WRITE_POST_MAX_CONTENT_LENGTH}
                 placeholder="게시판의 성격에 맞지 않는 글은 삭제될 수 있습니다"
@@ -248,6 +251,7 @@ const WritePage = () => {
             chipPrefix="#"
             availableTags={WRITE_POST_PRESET_TAGS}
             errorMessage={errors.tags?.message}
+            inlineError
             label="해시태그 선택"
             maxTags={WRITE_POST_MAX_TAG_COUNT}
             placeholder="게시글당 최대 5개의 태그를 지정할 수 있습니다"
@@ -266,6 +270,7 @@ const WritePage = () => {
             countText={`${currentImages.length}/최대 업로드 용량`}
             errorMessage={errors.images?.message}
             files={currentImages}
+            inlineError
             label="이미지 첨부"
             maxFiles={WRITE_POST_MAX_IMAGE_COUNT}
             onFilesSelect={handleFilesSelect}
