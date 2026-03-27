@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 
+import { WRITE_POST_PRESET_TAGS } from "@/constants/writeTags";
 import {
   WRITE_POST_MAX_CONTENT_LENGTH,
   WRITE_POST_MAX_IMAGE_COUNT,
@@ -61,29 +62,6 @@ const writePostFormSchema = z.object({
 });
 
 type WritePostFormValues = z.infer<typeof writePostFormSchema>;
-
-const writeTagPreviewChips = [
-  "해시태그",
-  "해시태그",
-  "해시태그",
-  "해시태그",
-  "해시태그",
-  "해시태그",
-  "해시태그",
-  "해시태그",
-  "해시태그",
-  "해시태그",
-  "해시태그",
-  "해시태그",
-  "해시태그",
-  "해시태그",
-  "해시태그",
-  "해시태그",
-  "해시태그",
-  "해시태그",
-  "해시태그",
-  "해시태그",
-];
 
 const createUploadItems = (selectedFiles: File[]) =>
   selectedFiles.map<WriteImageUploadItem>((file) => ({
@@ -296,9 +274,9 @@ const WritePage = () => {
 
         <div className="w-full">
           <WriteTagInputField
-            chipClassName="w-[78px] justify-center"
+            chipClassName="min-w-[78px] justify-center px-2"
             chipPrefix="#"
-            emptyChips={writeTagPreviewChips}
+            emptyChips={WRITE_POST_PRESET_TAGS}
             errorMessage={errors.tags?.message}
             label="해시태그 선택"
             maxTags={WRITE_POST_MAX_TAG_COUNT}
