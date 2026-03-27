@@ -19,7 +19,7 @@ import {
 import { WriteTagInputField } from "@/shared/ui/WriteTagInputField/WriteTagInputField";
 import { WriteTextareaField } from "@/shared/ui/WriteTextareaField/WriteTextareaField";
 import { WriteTextInput } from "@/shared/ui/WriteTextInput/WriteTextInput";
-import { WritingButton } from "@/shared/ui/WritingButton";
+import { WritingButton } from "@/shared/ui/WritingButton/WritingButton";
 
 const writePostFormSchema = z.object({
   board: z.string().min(1, "게시판은 반드시 선택해야 합니다"),
