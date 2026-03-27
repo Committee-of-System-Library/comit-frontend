@@ -32,11 +32,15 @@ const AppContent = ({ isAuthenticated }: AppContentProps) => {
   const { pathname } = useLocation();
   const isWritePath = /^\/write\/?$/.test(pathname);
   const isMainPage = pathname === "/";
+  const isTitleBoardPage =
+    /^\/board\/(qna|info|free)\/?$/.test(pathname) ||
+    /^\/(notice|event)\/?$/.test(pathname);
 
   return (
     <AppDesktopShell
       isAuthenticated={isAuthenticated}
       mainClassName={isWritePath ? "max-w-[792px] pt-10 pb-20" : undefined}
+      rightRailClassName={isTitleBoardPage ? "pt-[90px]" : undefined}
       rightRail={isWritePath ? null : undefined}
       topBanner={isMainPage ? <Banner items={mockBannerItems} /> : undefined}
     >

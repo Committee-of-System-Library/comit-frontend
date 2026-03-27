@@ -8,6 +8,7 @@ interface AppDesktopShellProps {
   isAuthenticated: boolean;
   mainClassName?: string;
   rightRail?: ReactNode | null;
+  rightRailClassName?: string;
   topBanner?: ReactNode;
 }
 
@@ -16,12 +17,14 @@ export const AppDesktopShell = ({
   isAuthenticated,
   mainClassName,
   rightRail,
+  rightRailClassName,
   topBanner,
 }: AppDesktopShellProps) => (
   <CommonDesktopLayout
     headerProps={{ isAuthenticated }}
     mainClassName={mainClassName}
     rightRail={rightRail === undefined ? <DefaultRightRail /> : rightRail}
+    rightRailClassName={rightRailClassName}
     topBanner={topBanner}
   >
     {children}
