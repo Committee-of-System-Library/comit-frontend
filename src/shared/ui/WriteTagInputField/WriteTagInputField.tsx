@@ -95,7 +95,7 @@ export const WriteTagInputField = ({
           aria-invalid={Boolean(errorMessage)}
           aria-describedby={helperText || errorMessage ? helperId : undefined}
           className={cn(
-            "h-14 min-w-0 flex-1 rounded-xl border px-4 text-label-04 text-text-primary",
+            "h-[55px] min-w-0 flex-1 rounded-xl border px-4 text-label-04 text-text-primary",
             "placeholder:text-text-placeholder focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-100",
             errorMessage
               ? "border-error-01"
@@ -122,7 +122,7 @@ export const WriteTagInputField = ({
         ) : null}
       </div>
 
-      <div className="rounded-xl border border-gray-200 bg-white p-3">
+      <div className="rounded-xl border border-gray-200 bg-white p-4">
         {tags.length > 0 ? (
           <ul className="flex flex-wrap gap-2">
             {tags.map((tag) => (
@@ -179,24 +179,28 @@ export const WriteTagInputField = ({
         )}
       </div>
 
-      <div className="flex items-start justify-between gap-4">
-        <p
-          className={cn(
-            "text-label-06",
-            errorMessage ? "text-error-01" : "text-text-tertiary",
-          )}
-          id={helperId}
-          role={errorMessage ? "alert" : undefined}
-        >
-          {errorMessage ?? helperText}
-        </p>
+      {helperText || errorMessage || showCount ? (
+        <div className="flex items-start justify-between gap-4">
+          {helperText || errorMessage ? (
+            <p
+              className={cn(
+                "text-label-06",
+                errorMessage ? "text-error-01" : "text-text-tertiary",
+              )}
+              id={helperId}
+              role={errorMessage ? "alert" : undefined}
+            >
+              {errorMessage ?? helperText}
+            </p>
+          ) : null}
 
-        {showCount ? (
-          <p className="shrink-0 text-label-06 text-text-tertiary">
-            {tags.length}/{maxTags}
-          </p>
-        ) : null}
-      </div>
+          {showCount ? (
+            <p className="shrink-0 text-label-06 text-text-tertiary">
+              {tags.length}/{maxTags}
+            </p>
+          ) : null}
+        </div>
+      ) : null}
     </div>
   );
 };

@@ -54,7 +54,7 @@ export const WriteTextInput = forwardRef<HTMLInputElement, WriteTextInputProps>(
           aria-invalid={Boolean(errorMessage)}
           aria-describedby={helperText || errorMessage ? helperId : undefined}
           className={cn(
-            "h-12 w-full rounded-xl border px-4 text-label-04 text-text-primary transition-colors",
+            "h-[50px] w-full rounded-xl border px-4 text-body-02 text-text-primary transition-colors",
             "placeholder:text-text-placeholder focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-100",
             errorMessage
               ? "border-error-01"

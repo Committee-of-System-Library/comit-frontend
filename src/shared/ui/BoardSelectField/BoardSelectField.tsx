@@ -110,7 +110,7 @@ export const BoardSelectField = ({
           errorMessage
             ? "border-error-01"
             : isOpen
-              ? "border-primary-700"
+              ? "border-primary-600"
               : "border-gray-200",
           disabled && "border-gray-200 bg-gray-50",
         )}
@@ -121,11 +121,11 @@ export const BoardSelectField = ({
           aria-expanded={isOpen}
           aria-describedby={errorMessage ? errorId : undefined}
           className={cn(
-            "flex h-12 w-full items-center justify-between px-4 text-left text-label-04 transition-colors",
+            "flex h-[50px] w-full items-center justify-between px-4 text-left text-label-04 transition-colors",
             "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-100",
             errorMessage
               ? "text-error-01"
-              : "text-text-secondary focus-visible:border-primary-700",
+              : "text-text-secondary focus-visible:border-primary-600",
             disabled &&
               "cursor-not-allowed bg-gray-50 text-gray-400 focus-visible:ring-0",
             triggerClassName,
@@ -144,9 +144,9 @@ export const BoardSelectField = ({
             {displayLabel}
           </span>
           {isOpen ? (
-            <ChevronUp aria-hidden className="size-4 shrink-0" />
+            <ChevronUp aria-hidden className="size-5 shrink-0" />
           ) : (
-            <ChevronDown aria-hidden className="size-4 shrink-0" />
+            <ChevronDown aria-hidden className="size-5 shrink-0" />
           )}
         </button>
 

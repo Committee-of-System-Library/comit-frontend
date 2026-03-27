@@ -32,11 +32,7 @@ function App() {
     <>
       <AppDesktopShell
         isAuthenticated={isAuthenticated}
-        mainClassName={
-          isWritePath
-            ? "min-w-[1200px] max-w-[1440px] px-80 pt-4 pb-20 space-y-10"
-            : undefined
-        }
+        mainClassName={isWritePath ? "max-w-[792px] pt-10 pb-20" : undefined}
         rightRail={isWritePath ? null : undefined}
       >
         {isWritePath ? <WritePage /> : <HomePage />}

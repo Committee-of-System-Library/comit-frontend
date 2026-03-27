@@ -95,11 +95,11 @@ export const WriteImageUploadField = ({
         <button
           aria-describedby={helperText || errorMessage ? helperId : undefined}
           className={cn(
-            "flex h-12 w-full items-center justify-center gap-2 rounded-lg border border-dashed bg-background-dark text-label-04 transition-colors",
+            "flex h-[50px] w-full items-center justify-center gap-2 rounded-lg border border-dashed bg-background-dark text-label-04 transition-colors",
             "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-100",
             errorMessage
               ? "border-error-01 text-error-01"
-              : "border-gray-300 text-text-tertiary hover:border-primary-300 hover:text-text-secondary",
+              : "border-gray-300 text-text-placeholder hover:border-primary-300 hover:text-text-secondary",
             disabled &&
               "cursor-not-allowed border-gray-200 bg-gray-50 text-gray-400 hover:border-gray-200 hover:text-gray-400",
           )}

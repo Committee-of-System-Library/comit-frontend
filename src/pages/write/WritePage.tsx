@@ -12,7 +12,6 @@ import {
   writeBoardOptions,
 } from "@/mocks/writeForm";
 import { BoardSelectField } from "@/shared/ui/BoardSelectField/BoardSelectField";
-import { WriteActionButton } from "@/shared/ui/WriteActionButton/WriteActionButton";
 import {
   WriteImageUploadField,
   type WriteImageUploadItem,
@@ -20,6 +19,7 @@ import {
 import { WriteTagInputField } from "@/shared/ui/WriteTagInputField/WriteTagInputField";
 import { WriteTextareaField } from "@/shared/ui/WriteTextareaField/WriteTextareaField";
 import { WriteTextInput } from "@/shared/ui/WriteTextInput/WriteTextInput";
+import { WritingButton } from "@/shared/ui/WritingButton";
 
 const writePostFormSchema = z.object({
   board: z.string().min(1, "게시판은 반드시 선택해야 합니다"),
@@ -63,6 +63,11 @@ const writePostFormSchema = z.object({
 type WritePostFormValues = z.infer<typeof writePostFormSchema>;
 
 const writeTagPreviewChips = [
+  "해시태그",
+  "해시태그",
+  "해시태그",
+  "해시태그",
+  "해시태그",
   "해시태그",
   "해시태그",
   "해시태그",
@@ -222,23 +227,21 @@ const WritePage = () => {
   };
 
   return (
-    <section className="w-full">
-      <h1 className="w-full max-w-[792px] text-head-01 text-text-primary">
-        글 작성하기
-      </h1>
+    <section className="w-full space-y-10">
+      <h1 className="w-full text-head-02 text-text-primary">글 작성하기</h1>
 
       <form
-        className="mt-10 flex flex-col items-center gap-8"
+        className="flex flex-col gap-8"
         id="write-post-form"
         onSubmit={handleSubmit(onSubmit)}
       >
-        <div className="w-full max-w-[792px]">
+        <div className="w-full">
           <Controller
             control={control}
             name="board"
             render={({ field }) => (
               <BoardSelectField
-                className="w-72"
+                className="w-[282px]"
                 errorMessage={errors.board?.message}
                 label={
                   <>
@@ -254,7 +257,7 @@ const WritePage = () => {
           />
         </div>
 
-        <div className="w-full max-w-[792px]">
+        <div className="w-full">
           <Controller
             control={control}
             name="title"
@@ -274,7 +277,7 @@ const WritePage = () => {
           />
         </div>
 
-        <div className="w-full max-w-[792px]">
+        <div className="w-full">
           <Controller
             control={control}
             name="content"
@@ -291,9 +294,9 @@ const WritePage = () => {
           />
         </div>
 
-        <div className="w-full max-w-[792px]">
+        <div className="w-full">
           <WriteTagInputField
-            chipClassName="w-20 justify-center"
+            chipClassName="w-[78px] justify-center"
             chipPrefix="#"
             emptyChips={writeTagPreviewChips}
             errorMessage={errors.tags?.message}
@@ -312,7 +315,7 @@ const WritePage = () => {
           />
         </div>
 
-        <div className="w-full max-w-[792px]">
+        <div className="w-full">
           <WriteImageUploadField
             countText={`${currentImages.length}/최대 업로드 용량`}
             errorMessage={errors.images?.message}
@@ -325,14 +328,15 @@ const WritePage = () => {
           />
         </div>
 
-        <WriteActionButton
-          className="h-12 w-full max-w-[792px] rounded-xl text-label-01"
+        <WritingButton
           disabled={isSubmitting}
           form="write-post-form"
+          icon={null}
           type="submit"
+          variant="writing"
         >
           작성 완료
-        </WriteActionButton>
+        </WritingButton>
       </form>
     </section>
   );
