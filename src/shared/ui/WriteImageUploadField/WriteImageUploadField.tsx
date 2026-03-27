@@ -67,11 +67,11 @@ export const WriteImageUploadField = ({
   };
 
   return (
-    <div className={cn("space-y-2", className)}>
+    <div className={cn("space-y-[8px]", className)}>
       {label ? (
         <label
           className={cn(
-            "pl-3 text-label-01 text-text-tertiary",
+            "block pl-3 text-label-01 text-text-tertiary",
             labelClassName,
           )}
           htmlFor={uploadId}
@@ -91,7 +91,7 @@ export const WriteImageUploadField = ({
         type="file"
       />
 
-      <div className="space-y-2 rounded-xl border border-gray-200 bg-white p-4">
+      <div className="space-y-2 rounded-xl border border-gray-200 bg-background-light p-4">
         <button
           aria-describedby={helperText || errorMessage ? helperId : undefined}
           className={cn(
@@ -116,7 +116,7 @@ export const WriteImageUploadField = ({
             {files.map((file) => (
               <li
                 key={file.id}
-                className="flex items-center justify-between gap-3 rounded-xl border border-gray-200 bg-white p-3"
+                className="flex items-center justify-between gap-3 rounded-xl border border-gray-200 bg-background-light p-3"
               >
                 <div className="flex min-w-0 items-center gap-3">
                   {file.thumbnailUrl ? (

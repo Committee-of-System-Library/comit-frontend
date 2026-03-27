@@ -67,11 +67,11 @@ export const WriteTextareaField = forwardRef<
     );
 
     return (
-      <div className="space-y-2">
+      <div className="space-y-[8px]">
         {label ? (
           <label
             className={cn(
-              "pl-3 text-label-01 text-text-tertiary",
+              "block pl-3 text-label-01 text-text-tertiary",
               labelClassName,
             )}
             htmlFor={textareaId}
@@ -87,12 +87,12 @@ export const WriteTextareaField = forwardRef<
             aria-invalid={Boolean(errorMessage)}
             aria-describedby={helperText || errorMessage ? helperId : undefined}
             className={cn(
-              "min-h-60 w-full resize-none rounded-xl border p-4 text-body-01 text-text-primary transition-colors",
+              "min-h-60 w-full resize-none rounded-xl border bg-background-light p-4 text-body-01 text-text-primary transition-colors",
               "placeholder:text-text-placeholder focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-100",
               errorMessage
                 ? "border-error-01"
                 : "border-gray-200 focus-visible:border-primary-700",
-              "pb-10 disabled:cursor-not-allowed disabled:border-gray-200 disabled:bg-gray-50 disabled:text-gray-400",
+              "pb-4 disabled:cursor-not-allowed disabled:border-gray-200 disabled:bg-gray-50 disabled:text-gray-400",
               className,
             )}
             defaultValue={defaultValue}
@@ -103,7 +103,7 @@ export const WriteTextareaField = forwardRef<
           />
 
           {showCount ? (
-            <p className="pointer-events-none absolute right-4 bottom-3 text-caption-02 text-text-placeholder">
+            <p className="pointer-events-none absolute right-4 bottom-5 text-caption-02 text-text-placeholder">
               {currentLength}자
               {typeof maxLength === "number" ? "/최대글자수" : null}
             </p>

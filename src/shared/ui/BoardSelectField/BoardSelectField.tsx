@@ -91,11 +91,11 @@ export const BoardSelectField = ({
   };
 
   return (
-    <div className={cn("space-y-2", className)} ref={rootRef}>
+    <div className={cn("space-y-[8px]", className)} ref={rootRef}>
       {label ? (
         <label
           className={cn(
-            "pl-3 text-label-01 text-text-tertiary",
+            "block pl-3 text-label-01 text-text-tertiary",
             labelClassName,
           )}
           htmlFor={selectId}
@@ -106,7 +106,7 @@ export const BoardSelectField = ({
 
       <div
         className={cn(
-          "overflow-hidden rounded-xl border bg-white transition-colors duration-400",
+          "overflow-hidden rounded-xl border bg-background-light transition-colors duration-400",
           errorMessage
             ? "border-error-01"
             : isOpen

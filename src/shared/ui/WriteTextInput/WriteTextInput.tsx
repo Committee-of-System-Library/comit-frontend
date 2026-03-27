@@ -35,11 +35,11 @@ export const WriteTextInput = forwardRef<HTMLInputElement, WriteTextInputProps>(
     const helperId = `${inputId}-helper`;
 
     return (
-      <div className="space-y-2">
+      <div className="space-y-[8px]">
         {label ? (
           <label
             className={cn(
-              "pl-3 text-label-01 text-text-tertiary",
+              "block pl-3 text-label-01 text-text-tertiary",
               labelClassName,
             )}
             htmlFor={inputId}
@@ -54,7 +54,7 @@ export const WriteTextInput = forwardRef<HTMLInputElement, WriteTextInputProps>(
           aria-invalid={Boolean(errorMessage)}
           aria-describedby={helperText || errorMessage ? helperId : undefined}
           className={cn(
-            "h-[50px] w-full rounded-xl border px-4 text-body-02 text-text-primary transition-colors",
+            "h-[50px] w-full rounded-xl border bg-background-light px-4 text-body-02 text-text-primary transition-colors",
             "placeholder:text-text-placeholder focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-100",
             errorMessage
               ? "border-error-01"

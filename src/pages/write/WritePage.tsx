@@ -1,5 +1,3 @@
-import { useMemo, useState } from "react";
-
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
@@ -71,8 +69,6 @@ const createUploadItems = (selectedFiles: File[]) =>
   }));
 
 const WritePage = () => {
-  const [tagInput, setTagInput] = useState("");
-
   const {
     control,
     clearErrors,
@@ -99,35 +95,21 @@ const WritePage = () => {
     defaultValue: [],
   });
 
-  const normalizedTagSet = useMemo(
-    () => new Set(currentTags.map((tag) => tag.trim().toLowerCase())),
-    [currentTags],
-  );
-
-  const handleAddTag = (rawTag: string) => {
-    const normalizedTag = rawTag.trim();
-
-    if (!normalizedTag) {
-      return;
-    }
-
-    if (normalizedTag.length > 20) {
-      setError("tags", {
-        type: "manual",
-        message: "태그는 최대 20자까지 입력 가능합니다",
-      });
-      return;
-    }
-
-    if (normalizedTagSet.has(normalizedTag.toLowerCase())) {
-      setError("tags", {
-        type: "manual",
-        message: "중복 태그는 추가할 수 없습니다",
-      });
-      return;
-    }
-
+  const handleToggleTag = (tag: string) => {
     const previousTags = getValues("tags");
+    const isSelected = previousTags.includes(tag);
+
+    if (isSelected) {
+      const nextTags = previousTags.filter((item) => item !== tag);
+
+      setValue("tags", nextTags, {
+        shouldDirty: true,
+        shouldValidate: true,
+      });
+
+      clearErrors("tags");
+      return;
+    }
 
     if (previousTags.length >= WRITE_POST_MAX_TAG_COUNT) {
       setError("tags", {
@@ -137,19 +119,7 @@ const WritePage = () => {
       return;
     }
 
-    setValue("tags", [...previousTags, normalizedTag], {
-      shouldDirty: true,
-      shouldValidate: true,
-    });
-
-    clearErrors("tags");
-    setTagInput("");
-  };
-
-  const handleRemoveTag = (targetTag: string) => {
-    const nextTags = getValues("tags").filter((tag) => tag !== targetTag);
-
-    setValue("tags", nextTags, {
+    setValue("tags", [...previousTags, tag], {
       shouldDirty: true,
       shouldValidate: true,
     });
@@ -276,20 +246,18 @@ const WritePage = () => {
           <WriteTagInputField
             chipClassName="min-w-[78px] justify-center px-2"
             chipPrefix="#"
-            emptyChips={WRITE_POST_PRESET_TAGS}
+            availableTags={WRITE_POST_PRESET_TAGS}
             errorMessage={errors.tags?.message}
             label="해시태그 선택"
             maxTags={WRITE_POST_MAX_TAG_COUNT}
-            onAddTag={handleAddTag}
-            onRemoveTag={handleRemoveTag}
-            onValueChange={setTagInput}
             placeholder="게시글당 최대 5개의 태그를 지정할 수 있습니다"
+            selectionOnly
             showAddButton={false}
             showCount={false}
             showLeadingPlusIcon
             showRemoveButton={false}
             tags={currentTags}
-            value={tagInput}
+            onToggleTag={handleToggleTag}
           />
         </div>
 
