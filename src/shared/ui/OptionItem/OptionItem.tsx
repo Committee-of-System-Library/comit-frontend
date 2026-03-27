@@ -7,7 +7,7 @@ import { cn } from "@/utils/cn";
 type OptionItemVariant = "report" | "delete" | "edit";
 
 const baseClass =
-  "w-[84px] h-[40px] flex items-center justify-center gap-2 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed";
+  "w-[92px] h-[48px] flex items-center justify-center gap-2 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed";
 
 const variantClassMap: Record<OptionItemVariant, string> = {
   report: "bg-white hover:bg-gray-100",
@@ -57,21 +57,21 @@ export const OptionItem = forwardRef<HTMLButtonElement, OptionItemProps>(
         {variant === "report" && (
           <>
             <Siren className="w-6 h-6" />
-            <p className="text-label-04">신고</p>
+            <p className="text-label-04 leading-none">신고</p>
           </>
         )}
 
         {variant === "delete" && (
           <>
             <Trash2 className="w-6 h-6" />
-            <p className="text-label-04">삭제</p>
+            <p className="text-label-04 leading-none">삭제</p>
           </>
         )}
 
         {variant === "edit" && (
           <>
             <PencilLine className="w-6 h-6" />
-            <p className="text-label-04">수정</p>
+            <p className="text-label-04 leading-none">수정</p>
           </>
         )}
       </button>
