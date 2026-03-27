@@ -124,9 +124,7 @@ export const BoardSelectField = ({
           id={selectId}
           aria-haspopup="listbox"
           aria-expanded={isOpen}
-          aria-describedby={
-            errorMessage && !shouldShowInlineError ? errorId : undefined
-          }
+          aria-describedby={errorMessage ? errorId : undefined}
           className={cn(
             "flex h-[50px] w-full items-center justify-between px-4 text-left text-label-04 transition-colors",
             "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-100",
@@ -202,10 +200,15 @@ export const BoardSelectField = ({
         </div>
       </div>
 
-      {errorMessage && !shouldShowInlineError ? (
-        <p className="text-label-06 text-error-01" id={errorId} role="alert">
-          {errorMessage}
-        </p>
+      {errorMessage ? (
+        <>
+          <p className="sr-only" id={errorId} role="alert">
+            {errorMessage}
+          </p>
+          {!shouldShowInlineError ? (
+            <p className="text-label-06 text-error-01">{errorMessage}</p>
+          ) : null}
+        </>
       ) : null}
     </div>
   );
