@@ -13,7 +13,7 @@ const variantClassMap: Record<WritingButtonVariant, string> = {
   writing:
     "group h-12 gap-2 bg-primary-600 py-3.25 text-text-inverse hover:bg-primary-1000 disabled:cursor-not-allowed disabled:opacity-50",
   action:
-    "h-[50px] px-[86px] text-text-inverse bg-primary-600 hover:bg-primary-700 active:bg-primary-800 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-500",
+    "group h-[50px] px-[86px] text-text-inverse bg-primary-600 hover:bg-primary-1000 active:bg-primary-800 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-500",
 };
 
 export interface WritingButtonProps extends Omit<
@@ -39,10 +39,12 @@ export const WritingButton = forwardRef<HTMLButtonElement, WritingButtonProps>(
     },
     ref,
   ) => {
-    const iconClassName =
-      variant === "writing"
-        ? "size-5 shrink-0 text-text-inverse transition-colors duration-200 group-hover:text-text-deactivated"
-        : "size-5 shrink-0";
+    const iconClassName = cn(
+      "size-5 shrink-0 transition-colors duration-200",
+      variant === "writing" || variant === "action"
+        ? "text-text-inverse group-hover:text-text-deactivated"
+        : "text-text-inverse",
+    );
 
     const resolvedIcon =
       icon === undefined ? (
@@ -51,10 +53,12 @@ export const WritingButton = forwardRef<HTMLButtonElement, WritingButtonProps>(
         icon
       );
 
-    const labelClassName =
-      variant === "writing"
-        ? "transition-colors duration-200 group-hover:text-text-deactivated"
-        : undefined;
+    const labelClassName = cn(
+      "transition-colors duration-200",
+      variant === "writing" || variant === "action"
+        ? "group-hover:text-text-deactivated"
+        : undefined,
+    );
 
     return (
       <button
