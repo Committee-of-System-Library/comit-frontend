@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { BrowserRouter, Route, Routes, useLocation } from "react-router";
+import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
 
 import { AuthStateDevTool } from "@/app/devtools/AuthStateDevTool";
 import { AppDesktopShell } from "@/app/layout/AppDesktopShell";
@@ -11,6 +11,8 @@ import InfoBoardPage from "@/pages/board/InfoBoardPage";
 import NoticeBoardPage from "@/pages/board/NoticeBoardPage";
 import QnABoardPage from "@/pages/board/QnABoardPage";
 import HomePage from "@/pages/home/HomePage";
+import LoginPage from "@/pages/login/LoginPage";
+import MyPage from "@/pages/mypage/MyPage";
 import WritePage from "@/pages/write/WritePage";
 import { Banner } from "@/widgets/home/Banner/Banner";
 
@@ -52,6 +54,8 @@ const AppContent = ({ isAuthenticated }: AppContentProps) => {
         <Route element={<FreeBoardPage />} path="/board/free" />
         <Route element={<NoticeBoardPage />} path="/notice" />
         <Route element={<EventBoardPage />} path="/event" />
+        <Route element={<LoginPage />} path="/login" />
+        <Route element={<MyPage />} path="/mypage" />
       </Routes>
     </AppDesktopShell>
   );
