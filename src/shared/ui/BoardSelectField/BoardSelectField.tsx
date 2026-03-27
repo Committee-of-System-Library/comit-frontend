@@ -24,6 +24,7 @@ export interface BoardSelectFieldProps {
   options: BoardSelectOption[];
   value?: string;
   errorMessage?: string;
+  inlineError?: boolean;
   disabled?: boolean;
   className?: string;
   menuClassName?: string;
@@ -39,6 +40,7 @@ export const BoardSelectField = ({
   options,
   value,
   errorMessage,
+  inlineError = false,
   disabled = false,
   className,
   menuClassName,
@@ -57,7 +59,10 @@ export const BoardSelectField = ({
     [options, value],
   );
 
-  const displayLabel = selectedOption?.label ?? placeholder;
+  const shouldShowInlineError = inlineError && Boolean(errorMessage);
+  const displayLabel = shouldShowInlineError
+    ? errorMessage
+    : (selectedOption?.label ?? placeholder);
 
   useEffect(() => {
     if (!isOpen) {
@@ -91,11 +96,11 @@ export const BoardSelectField = ({
   };
 
   return (
-    <div className={cn("space-y-2", className)} ref={rootRef}>
+    <div className={cn("space-y-[8px]", className)} ref={rootRef}>
       {label ? (
         <label
           className={cn(
-            "pl-3 text-base leading-10 font-bold text-text-tertiary",
+            "block pl-3 text-label-01 text-text-tertiary",
             labelClassName,
           )}
           htmlFor={selectId}
@@ -106,11 +111,11 @@ export const BoardSelectField = ({
 
       <div
         className={cn(
-          "overflow-hidden rounded-xl border bg-white transition-colors duration-400",
+          "overflow-hidden rounded-xl border bg-background-light transition-colors duration-400",
           errorMessage
             ? "border-error-01"
             : isOpen
-              ? "border-primary-700"
+              ? "border-primary-600"
               : "border-gray-200",
           disabled && "border-gray-200 bg-gray-50",
         )}
@@ -121,11 +126,13 @@ export const BoardSelectField = ({
           aria-expanded={isOpen}
           aria-describedby={errorMessage ? errorId : undefined}
           className={cn(
-            "flex h-12 w-full items-center justify-between px-4 text-left text-sm leading-5 transition-colors",
+            "flex h-[50px] w-full items-center justify-between px-4 text-left text-label-04 transition-colors",
             "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-100",
-            errorMessage
-              ? "text-error-01"
-              : "text-text-secondary focus-visible:border-primary-700",
+            shouldShowInlineError
+              ? "text-error-03"
+              : errorMessage
+                ? "text-error-01"
+                : "text-text-secondary focus-visible:border-primary-600",
             disabled &&
               "cursor-not-allowed bg-gray-50 text-gray-400 focus-visible:ring-0",
             triggerClassName,
@@ -137,16 +144,20 @@ export const BoardSelectField = ({
           <span
             className={cn(
               "truncate",
-              selectedOption ? "text-text-primary" : "text-text-placeholder",
+              shouldShowInlineError
+                ? "text-error-03"
+                : selectedOption
+                  ? "text-text-primary"
+                  : "text-text-placeholder",
               disabled && "text-gray-400",
             )}
           >
             {displayLabel}
           </span>
           {isOpen ? (
-            <ChevronUp aria-hidden className="size-4 shrink-0" />
+            <ChevronUp aria-hidden className="size-5 shrink-0" />
           ) : (
-            <ChevronDown aria-hidden className="size-4 shrink-0" />
+            <ChevronDown aria-hidden className="size-5 shrink-0" />
           )}
         </button>
 
@@ -172,7 +183,7 @@ export const BoardSelectField = ({
                 <li key={option.value} role="option" aria-selected={isSelected}>
                   <button
                     className={cn(
-                      "flex w-full items-center px-4 py-3.5 text-left text-sm leading-5 transition-colors",
+                      "flex w-full items-center px-4 py-3.5 text-left text-label-04 transition-colors",
                       isSelected
                         ? "bg-primary-50 text-primary-700"
                         : "text-text-secondary hover:bg-gray-50",
@@ -190,9 +201,14 @@ export const BoardSelectField = ({
       </div>
 
       {errorMessage ? (
-        <p className="text-label-06 text-error-01" id={errorId} role="alert">
-          {errorMessage}
-        </p>
+        <>
+          <p className="sr-only" id={errorId} role="alert">
+            {errorMessage}
+          </p>
+          {!shouldShowInlineError ? (
+            <p className="text-label-06 text-error-01">{errorMessage}</p>
+          ) : null}
+        </>
       ) : null}
     </div>
   );

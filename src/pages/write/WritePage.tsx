@@ -1,9 +1,8 @@
-import { useMemo, useState } from "react";
-
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 
+import { WRITE_POST_PRESET_TAGS } from "@/constants/writeTags";
 import {
   WRITE_POST_MAX_CONTENT_LENGTH,
   WRITE_POST_MAX_IMAGE_COUNT,
@@ -12,7 +11,6 @@ import {
   writeBoardOptions,
 } from "@/mocks/writeForm";
 import { BoardSelectField } from "@/shared/ui/BoardSelectField/BoardSelectField";
-import { WriteActionButton } from "@/shared/ui/WriteActionButton/WriteActionButton";
 import {
   WriteImageUploadField,
   type WriteImageUploadItem,
@@ -20,6 +18,7 @@ import {
 import { WriteTagInputField } from "@/shared/ui/WriteTagInputField/WriteTagInputField";
 import { WriteTextareaField } from "@/shared/ui/WriteTextareaField/WriteTextareaField";
 import { WriteTextInput } from "@/shared/ui/WriteTextInput/WriteTextInput";
+import { WritingButton } from "@/shared/ui/WritingButton/WritingButton";
 
 const writePostFormSchema = z.object({
   board: z.string().min(1, "게시판은 반드시 선택해야 합니다"),
@@ -34,7 +33,6 @@ const writePostFormSchema = z.object({
   content: z
     .string()
     .trim()
-    .min(10, "본문을 최소 10자 이상 입력해 주세요")
     .max(
       WRITE_POST_MAX_CONTENT_LENGTH,
       `본문은 최대 ${WRITE_POST_MAX_CONTENT_LENGTH}자까지 입력 가능합니다`,
@@ -62,24 +60,6 @@ const writePostFormSchema = z.object({
 
 type WritePostFormValues = z.infer<typeof writePostFormSchema>;
 
-const writeTagPreviewChips = [
-  "해시태그",
-  "해시태그",
-  "해시태그",
-  "해시태그",
-  "해시태그",
-  "해시태그",
-  "해시태그",
-  "해시태그",
-  "해시태그",
-  "해시태그",
-  "해시태그",
-  "해시태그",
-  "해시태그",
-  "해시태그",
-  "해시태그",
-];
-
 const createUploadItems = (selectedFiles: File[]) =>
   selectedFiles.map<WriteImageUploadItem>((file) => ({
     id: `${file.name}-${file.lastModified}-${file.size}`,
@@ -88,8 +68,6 @@ const createUploadItems = (selectedFiles: File[]) =>
   }));
 
 const WritePage = () => {
-  const [tagInput, setTagInput] = useState("");
-
   const {
     control,
     clearErrors,
@@ -116,35 +94,21 @@ const WritePage = () => {
     defaultValue: [],
   });
 
-  const normalizedTagSet = useMemo(
-    () => new Set(currentTags.map((tag) => tag.trim().toLowerCase())),
-    [currentTags],
-  );
-
-  const handleAddTag = (rawTag: string) => {
-    const normalizedTag = rawTag.trim();
-
-    if (!normalizedTag) {
-      return;
-    }
-
-    if (normalizedTag.length > 20) {
-      setError("tags", {
-        type: "manual",
-        message: "태그는 최대 20자까지 입력 가능합니다",
-      });
-      return;
-    }
-
-    if (normalizedTagSet.has(normalizedTag.toLowerCase())) {
-      setError("tags", {
-        type: "manual",
-        message: "중복 태그는 추가할 수 없습니다",
-      });
-      return;
-    }
-
+  const handleToggleTag = (tag: string) => {
     const previousTags = getValues("tags");
+    const isSelected = previousTags.includes(tag);
+
+    if (isSelected) {
+      const nextTags = previousTags.filter((item) => item !== tag);
+
+      setValue("tags", nextTags, {
+        shouldDirty: true,
+        shouldValidate: true,
+      });
+
+      clearErrors("tags");
+      return;
+    }
 
     if (previousTags.length >= WRITE_POST_MAX_TAG_COUNT) {
       setError("tags", {
@@ -154,19 +118,7 @@ const WritePage = () => {
       return;
     }
 
-    setValue("tags", [...previousTags, normalizedTag], {
-      shouldDirty: true,
-      shouldValidate: true,
-    });
-
-    clearErrors("tags");
-    setTagInput("");
-  };
-
-  const handleRemoveTag = (targetTag: string) => {
-    const nextTags = getValues("tags").filter((tag) => tag !== targetTag);
-
-    setValue("tags", nextTags, {
+    setValue("tags", [...previousTags, tag], {
       shouldDirty: true,
       shouldValidate: true,
     });
@@ -222,24 +174,23 @@ const WritePage = () => {
   };
 
   return (
-    <section className="w-full">
-      <h1 className="w-full max-w-[792px] text-3xl leading-8 font-bold text-text-primary">
-        글 작성하기
-      </h1>
+    <section className="w-full space-y-10">
+      <h1 className="w-full text-head-02 text-text-primary">글 작성하기</h1>
 
       <form
-        className="mt-10 flex flex-col items-center gap-8"
+        className="flex flex-col gap-8"
         id="write-post-form"
         onSubmit={handleSubmit(onSubmit)}
       >
-        <div className="w-full max-w-[792px]">
+        <div className="w-full">
           <Controller
             control={control}
             name="board"
             render={({ field }) => (
               <BoardSelectField
-                className="w-72"
+                className="w-[282px]"
                 errorMessage={errors.board?.message}
+                inlineError
                 label={
                   <>
                     게시판 선택 <span className="text-error-03">*</span>
@@ -254,7 +205,7 @@ const WritePage = () => {
           />
         </div>
 
-        <div className="w-full max-w-[792px]">
+        <div className="w-full">
           <Controller
             control={control}
             name="title"
@@ -262,6 +213,7 @@ const WritePage = () => {
               <WriteTextInput
                 {...field}
                 errorMessage={errors.title?.message}
+                inlineError
                 label={
                   <>
                     제목 <span className="text-error-03">*</span>
@@ -274,7 +226,7 @@ const WritePage = () => {
           />
         </div>
 
-        <div className="w-full max-w-[792px]">
+        <div className="w-full">
           <Controller
             control={control}
             name="content"
@@ -282,7 +234,6 @@ const WritePage = () => {
               <WriteTextareaField
                 {...field}
                 className="h-60 min-h-60"
-                errorMessage={errors.content?.message}
                 label="내용"
                 maxLength={WRITE_POST_MAX_CONTENT_LENGTH}
                 placeholder="게시판의 성격에 맞지 않는 글은 삭제될 수 있습니다"
@@ -291,32 +242,32 @@ const WritePage = () => {
           />
         </div>
 
-        <div className="w-full max-w-[792px]">
+        <div className="w-full">
           <WriteTagInputField
-            chipClassName="w-20 justify-center"
+            chipClassName="min-w-[78px] justify-center px-2"
             chipPrefix="#"
-            emptyChips={writeTagPreviewChips}
+            availableTags={WRITE_POST_PRESET_TAGS}
             errorMessage={errors.tags?.message}
+            inlineError
             label="해시태그 선택"
             maxTags={WRITE_POST_MAX_TAG_COUNT}
-            onAddTag={handleAddTag}
-            onRemoveTag={handleRemoveTag}
-            onValueChange={setTagInput}
             placeholder="게시글당 최대 5개의 태그를 지정할 수 있습니다"
+            selectionOnly
             showAddButton={false}
             showCount={false}
             showLeadingPlusIcon
-            showRemoveButton={false}
+            showRemoveButton
             tags={currentTags}
-            value={tagInput}
+            onToggleTag={handleToggleTag}
           />
         </div>
 
-        <div className="w-full max-w-[792px]">
+        <div className="w-full">
           <WriteImageUploadField
             countText={`${currentImages.length}/최대 업로드 용량`}
             errorMessage={errors.images?.message}
             files={currentImages}
+            inlineError
             label="이미지 첨부"
             maxFiles={WRITE_POST_MAX_IMAGE_COUNT}
             onFilesSelect={handleFilesSelect}
@@ -325,14 +276,15 @@ const WritePage = () => {
           />
         </div>
 
-        <WriteActionButton
-          className="h-12 w-full max-w-[792px] rounded-xl text-base leading-6 font-bold"
+        <WritingButton
           disabled={isSubmitting}
           form="write-post-form"
+          icon={null}
           type="submit"
+          variant="writing"
         >
           작성 완료
-        </WriteActionButton>
+        </WritingButton>
       </form>
     </section>
   );

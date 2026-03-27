@@ -27,6 +27,12 @@ export const Disabled: Story = {
   },
 };
 
+export const Typing: Story = {
+  args: {
+    state: "typing",
+  },
+};
+
 export const EdgeCase: Story = {
   args: {
     placeholder:

@@ -13,6 +13,7 @@ export interface CommonDesktopLayoutProps {
   headerProps?: HeaderProps;
   mainClassName?: string;
   rightRail?: ReactNode | null;
+  rightRailClassName?: string;
 }
 
 export const CommonDesktopLayout = ({
@@ -24,6 +25,7 @@ export const CommonDesktopLayout = ({
   headerProps,
   mainClassName,
   rightRail,
+  rightRailClassName,
 }: CommonDesktopLayoutProps) => {
   const hasRightRail = Boolean(rightRail);
   const responsiveRightRailClassName = hasRightRail ? "min-[1024px]:block" : "";
@@ -56,6 +58,7 @@ export const CommonDesktopLayout = ({
                 className={cn(
                   "hidden w-[282px] shrink-0",
                   responsiveRightRailClassName,
+                  rightRailClassName,
                 )}
               >
                 <div className="sticky top-6">{rightRail}</div>
