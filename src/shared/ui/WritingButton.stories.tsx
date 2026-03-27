@@ -49,11 +49,3 @@ export const WriteActionStyle: Story = {
     variant: "action",
   },
 };
-
-export const HoveringState: Story = {
-  args: {
-    children: "작성 완료",
-    icon: null,
-    variant: "action",
-  },
-};

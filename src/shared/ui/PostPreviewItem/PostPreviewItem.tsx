@@ -1,8 +1,6 @@
 import type { HTMLAttributes } from "react";
 
-import commentIcon from "@/assets/comment.svg";
-import heartIcon from "@/assets/heart.svg";
-import userIcon from "@/assets/user.svg";
+import { UserRound, Heart, MessageCircleMore } from "lucide-react";
 
 interface PostPreviewItemProps extends HTMLAttributes<HTMLDivElement> {
   title: string;
@@ -32,35 +30,31 @@ export const PostPreviewItem = ({
     >
       <div className="flex flex-1 flex-col gap-[9px] min-w-0">
         <div className="flex flex-col gap-1 min-w-0 overflow-hidden">
-          <p className="overflow-hidden text-ellipsis whitespace-nowrap text-[16px] text-text-primary font-bold leading-[1.2]">
+          <p className="overflow-hidden text-ellipsis whitespace-nowrap text-subtitle-03 text-text-primary leading-[1.2]">
             {title}
           </p>
-          <p className="overflow-hidden text-ellipsis whitespace-nowrap text-[14px] text-text-secondary font-normal leading-[1.6]">
+          <p className="overflow-hidden text-ellipsis whitespace-nowrap text-body-02 text-text-tertiary leading-[1.6]">
             {content}
           </p>
         </div>
 
         <div className="flex flex-row items-center gap-2 h-4.25 w-full min-w-0">
-          <div className="flex flex-row items-center gap-1 shrink-0">
-            <img src={userIcon} alt="user" className="size-4 shrink-0" />
-            <span className="text-[12px] font-normal text-text-secondary leading-[1.4] whitespace-nowrap">
+          <div className="flex flex-row text-text-placeholder items-center gap-1 shrink-0">
+            <UserRound className="w-4 h-4" />
+            <span className="text-caption-02 leading-[1.4] whitespace-nowrap">
               {author}
             </span>
           </div>
           <div className="flex flex-row items-center gap-2 min-w-0">
-            <div className="flex flex-row items-center gap-0.5 shrink-0">
-              <img src={heartIcon} alt="heart" className="size-4 shrink-0" />
-              <span className="text-[12px] font-normal text-text-secondary leading-[1.4] whitespace-nowrap">
+            <div className="flex flex-row text-text-placeholder items-center gap-0.5 shrink-0">
+              <Heart className="w-4 h-4" />
+              <span className="text-caption-02 leading-[1.4] whitespace-nowrap">
                 {likes}
               </span>
             </div>
-            <div className="flex flex-row items-center gap-0.5 shrink-0">
-              <img
-                src={commentIcon}
-                alt="comment"
-                className="size-4 shrink-0"
-              />
-              <span className="text-[12px] font-normal text-text-secondary leading-[1.4] whitespace-nowrap">
+            <div className="flex flex-row text-text-placeholder items-center gap-0.5 shrink-0">
+              <MessageCircleMore className="w-4 h-4" />
+              <span className="text-caption-02 leading-[1.4] whitespace-nowrap">
                 {comments}
               </span>
             </div>
