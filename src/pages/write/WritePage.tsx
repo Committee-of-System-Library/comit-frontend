@@ -255,7 +255,7 @@ const WritePage = () => {
             showAddButton={false}
             showCount={false}
             showLeadingPlusIcon
-            showRemoveButton={false}
+            showRemoveButton
             tags={currentTags}
             onToggleTag={handleToggleTag}
           />
