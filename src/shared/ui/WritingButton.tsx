@@ -1,21 +1,78 @@
+import { forwardRef, type ButtonHTMLAttributes, type ReactNode } from "react";
+
 import { PencilLine } from "lucide-react";
 
-interface WritingButtonProps {
-  disabled?: boolean;
-  onClick?: () => void;
+import { cn } from "@/utils/cn";
+
+type WritingButtonVariant = "writing" | "action";
+
+const baseClass =
+  "inline-flex items-center justify-center whitespace-nowrap rounded-xl text-label-01 transition-colors duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-700 focus-visible:ring-offset-2";
+
+const variantClassMap: Record<WritingButtonVariant, string> = {
+  writing:
+    "group h-12 gap-2 bg-primary-600 py-3.25 text-text-inverse hover:bg-primary-1000 disabled:cursor-not-allowed disabled:opacity-50",
+  action:
+    "h-[50px] px-[86px] text-text-inverse bg-primary-600 hover:bg-primary-700 active:bg-primary-800 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-500",
+};
+
+export interface WritingButtonProps extends Omit<
+  ButtonHTMLAttributes<HTMLButtonElement>,
+  "type"
+> {
+  variant?: WritingButtonVariant;
+  fullWidth?: boolean;
+  icon?: ReactNode;
+  type?: "button" | "submit" | "reset";
 }
 
-export const WritingButton = ({ disabled = false }: WritingButtonProps) => {
-  return (
-    <button
-      disabled={disabled}
-      className="group w-full h-12 py-3.25 flex items-center justify-center gap-2 rounded-xl bg-primary-600 hover:bg-primary-1000 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-      aria-label="글 작성하기 버튼"
-    >
-      <PencilLine className="w-5 h-5 text-text-inverse group-hover:text-text-deactivated transition-colors duration-200" />
-      <p className="text-label-01 text-text-inverse group-hover:text-text-deactivated transition-colors duration-200">
-        글 작성하기
-      </p>
-    </button>
-  );
-};
+export const WritingButton = forwardRef<HTMLButtonElement, WritingButtonProps>(
+  (
+    {
+      type = "button",
+      variant = "writing",
+      fullWidth = true,
+      icon,
+      children = "글 작성하기",
+      className,
+      ...props
+    },
+    ref,
+  ) => {
+    const iconClassName =
+      variant === "writing"
+        ? "size-5 shrink-0 text-text-inverse transition-colors duration-200 group-hover:text-text-deactivated"
+        : "size-5 shrink-0";
+
+    const resolvedIcon =
+      icon === undefined ? (
+        <PencilLine aria-hidden className={iconClassName} />
+      ) : (
+        icon
+      );
+
+    const labelClassName =
+      variant === "writing"
+        ? "transition-colors duration-200 group-hover:text-text-deactivated"
+        : undefined;
+
+    return (
+      <button
+        ref={ref}
+        type={type}
+        className={cn(
+          baseClass,
+          fullWidth && "w-full",
+          variantClassMap[variant],
+          className,
+        )}
+        {...props}
+      >
+        {resolvedIcon}
+        <span className={labelClassName}>{children}</span>
+      </button>
+    );
+  },
+);
+
+WritingButton.displayName = "WritingButton";
