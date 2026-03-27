@@ -10,7 +10,7 @@ export interface WriteTagInputFieldProps {
   labelClassName?: string;
   helperText?: string;
   errorMessage?: string;
-  tags?: string[];
+  tags?: readonly string[];
   value?: string;
   placeholder?: string;
   maxTags?: number;
@@ -18,8 +18,8 @@ export interface WriteTagInputFieldProps {
   className?: string;
   chipPrefix?: string;
   chipClassName?: string;
-  emptyChips?: string[];
-  availableTags?: string[];
+  emptyChips?: readonly string[];
+  availableTags?: readonly string[];
   selectionOnly?: boolean;
   inlineError?: boolean;
   showCount?: boolean;
@@ -61,6 +61,7 @@ export const WriteTagInputField = ({
 }: WriteTagInputFieldProps) => {
   const fallbackId = useId();
   const inputId = id ?? `write-tag-input-${fallbackId}`;
+  const labelId = `${inputId}-label`;
   const helperId = `${inputId}-helper`;
 
   const isLimitReached = tags.length >= maxTags;
@@ -119,19 +120,33 @@ export const WriteTagInputField = ({
   return (
     <div className={cn("space-y-2", className)}>
       {label ? (
-        <label
-          className={cn(
-            "block pl-3 text-label-01 text-text-tertiary",
-            labelClassName,
-          )}
-          htmlFor={inputId}
-        >
-          {label}
-        </label>
+        selectionOnly ? (
+          <p
+            className={cn(
+              "block pl-3 text-label-01 text-text-tertiary",
+              labelClassName,
+            )}
+            id={labelId}
+          >
+            {label}
+          </p>
+        ) : (
+          <label
+            className={cn(
+              "block pl-3 text-label-01 text-text-tertiary",
+              labelClassName,
+            )}
+            htmlFor={inputId}
+          >
+            {label}
+          </label>
+        )
       ) : null}
 
       {selectionOnly ? (
         <div
+          role="group"
+          aria-labelledby={label ? labelId : undefined}
           aria-describedby={
             helperText || (errorMessage && !shouldShowInlineError)
               ? helperId
