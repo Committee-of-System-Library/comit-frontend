@@ -88,7 +88,7 @@ export const WriteTextareaField = forwardRef<
             aria-describedby={helperText || errorMessage ? helperId : undefined}
             className={cn(
               "min-h-60 w-full resize-none rounded-xl border bg-background-light p-4 text-body-01 text-text-primary transition-colors",
-              "placeholder:text-text-placeholder focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-100",
+              "placeholder:text-text-placeholder focus-visible:outline-none focus-visible:ring-primary-100",
               errorMessage
                 ? "border-error-01"
                 : "border-gray-200 focus-visible:border-primary-700",
