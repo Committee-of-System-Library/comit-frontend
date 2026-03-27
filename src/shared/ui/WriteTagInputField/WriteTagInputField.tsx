@@ -150,7 +150,7 @@ export const WriteTagInputField = ({
                 <li key={`selected-${tag}`}>
                   <button
                     className={cn(
-                      "inline-flex items-center gap-1 rounded-sm bg-gray-50 px-2 py-1 text-caption-02 text-text-tertiary transition-colors",
+                      "inline-flex items-center gap-1 rounded-sm bg-gray-50 px-2 py-1 text-label-06 text-text-tertiary transition-colors",
                       "hover:bg-gray-100 disabled:cursor-not-allowed disabled:text-gray-300",
                       chipClassName,
                     )}
@@ -171,7 +171,7 @@ export const WriteTagInputField = ({
           ) : (
             <p
               className={cn(
-                "flex h-full items-center",
+                "flex h-full items-center text-label-06",
                 shouldShowInlineError
                   ? "text-error-03"
                   : "text-text-placeholder",
@@ -192,7 +192,7 @@ export const WriteTagInputField = ({
                 : undefined
             }
             className={cn(
-              "h-[55px] min-w-0 flex-1 rounded-xl border px-4 text-label-04 text-text-primary",
+              "h-[55px] min-w-0 flex-1 rounded-xl border px-4 text-label-06 text-text-primary",
               shouldShowInlineError
                 ? "placeholder:text-error-03"
                 : "placeholder:text-text-placeholder",
@@ -231,7 +231,7 @@ export const WriteTagInputField = ({
                 <li key={`available-${tag}`}>
                   <button
                     className={cn(
-                      "inline-flex items-center gap-0.5 rounded-sm bg-gray-50 px-2 py-1 text-caption-02 text-text-tertiary transition-colors",
+                      "inline-flex items-center gap-0.5 rounded-sm bg-gray-50 px-2 py-1 text-label-06 text-text-tertiary transition-colors",
                       "hover:bg-gray-100 disabled:cursor-not-allowed disabled:text-gray-300",
                       chipClassName,
                     )}
@@ -260,7 +260,7 @@ export const WriteTagInputField = ({
               <li key={tag}>
                 <div
                   className={cn(
-                    "inline-flex items-center gap-0.5 rounded-sm bg-gray-50 px-1 py-0.5 text-caption-02 text-text-tertiary",
+                    "inline-flex items-center gap-0.5 rounded-sm bg-gray-50 px-1 py-0.5 text-label-06 text-text-tertiary",
                     chipClassName,
                   )}
                 >
@@ -291,7 +291,7 @@ export const WriteTagInputField = ({
               <li key={`${tag}-${index}`}>
                 <div
                   className={cn(
-                    "inline-flex items-center gap-0.5 rounded-sm bg-gray-50 px-1 py-0.5 text-caption-02 text-text-tertiary",
+                    "inline-flex items-center gap-0.5 rounded-sm bg-gray-50 px-1 py-0.5 text-label-06 text-text-tertiary",
                     chipClassName,
                   )}
                 >

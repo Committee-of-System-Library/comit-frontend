@@ -33,7 +33,6 @@ const writePostFormSchema = z.object({
   content: z
     .string()
     .trim()
-    .min(10, "본문을 최소 10자 이상 입력해 주세요")
     .max(
       WRITE_POST_MAX_CONTENT_LENGTH,
       `본문은 최대 ${WRITE_POST_MAX_CONTENT_LENGTH}자까지 입력 가능합니다`,
@@ -235,8 +234,6 @@ const WritePage = () => {
               <WriteTextareaField
                 {...field}
                 className="h-60 min-h-60"
-                errorMessage={errors.content?.message}
-                inlineError
                 label="내용"
                 maxLength={WRITE_POST_MAX_CONTENT_LENGTH}
                 placeholder="게시판의 성격에 맞지 않는 글은 삭제될 수 있습니다"
