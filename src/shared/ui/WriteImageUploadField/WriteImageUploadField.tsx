@@ -180,9 +180,9 @@ export const WriteImageUploadField = ({
             errorMessage ? "text-error-01" : "text-text-tertiary",
           )}
           id={helperId}
-          role={errorMessage ? "alert" : undefined}
+          role={errorMessage && !shouldShowInlineError ? "alert" : undefined}
         >
-          {errorMessage ?? helperText}
+          {shouldShowInlineError ? helperText : (errorMessage ?? helperText)}
         </p>
       ) : null}
     </div>
