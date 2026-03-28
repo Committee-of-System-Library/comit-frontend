@@ -8,11 +8,11 @@ import {
 } from "@/shared/ui/MyPagePostItem/MyPagePostItem";
 import { cn } from "@/utils/cn";
 
-interface MyActivityItem extends MyPagePostItemProps {
+export interface MyActivityItem extends MyPagePostItemProps {
   id: string | number;
 }
 
-interface MyActivitySectionBoardProps {
+export interface MyActivitySectionBoardProps {
   title: string;
   icon?: ReactNode;
   count?: number;

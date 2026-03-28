@@ -1,10 +1,89 @@
-const MyPage = () => (
-  <section className="w-full rounded-xl border border-gray-200 bg-background-light p-8">
-    <h1 className="text-head-02 text-text-primary">마이페이지</h1>
-    <p className="mt-3 text-body-02 text-text-secondary">
-      마이페이지 기능 구현 전까지 사용하는 임시 페이지입니다.
-    </p>
-  </section>
-);
+import { FileText, Heart, MessageCircleMore } from "lucide-react";
+
+import { likedPosts } from "@/mocks/likedPosts";
+import { myComments } from "@/mocks/myComments";
+import { myPosts } from "@/mocks/myPosts";
+import { LogoutButton } from "@/shared/ui/LogoutButton/LogoutButton";
+import { MyActivitySectionBoard } from "@/widgets/mypage/MyActivitySectionBoard/MyActivitySectionBoard";
+import { ProfileWidget } from "@/widgets/mypage/ProfileWidget/ProfileWidget";
+
+const MyPage = () => {
+  const userData = {
+    name: "사용자명",
+    major: "전공",
+    studentId: "학번",
+    imgURL: null,
+  };
+
+  const handleProfileSave = (data: {
+    userName: string;
+    imageFile: File | null;
+  }) => {
+    console.log("프로필 저장:", data);
+  };
+
+  const handleLogout = () => {
+    console.log("로그아웃");
+  };
+
+  return (
+    <div className="flex flex-col gap-10">
+      <h1 className="text-head-02 text-text-primary px-1">마이페이지</h1>
+
+      <div className="flex gap-6 items-start">
+        <div className="flex flex-col gap-10 w-[384px]">
+          <section className="flex flex-col gap-3">
+            <h2 className="text-subtitle-01 text-text-secondary px-3">
+              프로필 관리
+            </h2>
+            <ProfileWidget
+              initialUserName={userData.name}
+              major={userData.major}
+              studentId={userData.studentId}
+              imgURL={userData.imgURL}
+              onSave={handleProfileSave}
+            />
+          </section>
+
+          <section className="flex flex-col gap-3">
+            <h2 className="text-subtitle-01 text-text-secondary px-3">
+              계정 관리
+            </h2>
+            <LogoutButton onClick={handleLogout} />
+          </section>
+        </div>
+
+        <div className="flex-1 flex flex-col gap-3">
+          <h2 className="text-subtitle-01 text-text-secondary px-3">내 활동</h2>
+          <div className="bg-white border border-border-deactivated rounded-2xl p-5 flex flex-col gap-10">
+            <MyActivitySectionBoard
+              title="내가 쓴 글"
+              count={32}
+              icon={<FileText size={18} />}
+              items={myPosts}
+              onMoreClick={() => console.log("내가 쓴 글 더보기")}
+            />
+
+            <MyActivitySectionBoard
+              title="내가 쓴 댓글"
+              count={64}
+              icon={<MessageCircleMore size={18} />}
+              items={myComments}
+              onMoreClick={() => console.log("내가 쓴 댓글 더보기")}
+            />
+
+            <MyActivitySectionBoard
+              title="좋아요"
+              count={10}
+              icon={<Heart size={18} />}
+              items={likedPosts}
+              onMoreClick={() => console.log("좋아요 더보기")}
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 export default MyPage;
