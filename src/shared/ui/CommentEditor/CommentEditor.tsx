@@ -55,7 +55,7 @@ export function CommentEditor({
           disabled={disabled}
           placeholder={mode === "reply" ? "답글을 남겨보세요" : ""}
           className={cn(
-            "w-full h-10 pl-4 pr-36 rounded-full bg-gray-100 outline-none placeholder:text-label-04 placeholder:text-text-deactivated",
+            "text-label-04 w-full h-10 pl-4 pr-36 rounded-full bg-gray-100 outline-none placeholder:text-label-04 placeholder:text-text-deactivated",
             isActivated && "text-text-primary",
             disabled && "cursor-not-allowed opacity-50",
           )}
