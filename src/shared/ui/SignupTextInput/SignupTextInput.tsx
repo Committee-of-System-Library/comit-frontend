@@ -62,7 +62,7 @@ export const SignupTextInput = forwardRef<
           "flex h-11 w-full items-center rounded-xl border bg-background-light px-4 transition-colors",
           actionLabel ? "pr-1.5" : "pr-4",
           disabled
-            ? "border-border-default bg-gray-100"
+            ? "border-border-deactivated bg-background-dark"
             : isActive
               ? "border-primary-600"
               : "border-border-deactivated",

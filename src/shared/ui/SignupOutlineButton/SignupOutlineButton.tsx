@@ -15,7 +15,7 @@ export const SignupOutlineButton = forwardRef<
       "inline-flex items-center justify-center rounded-lg border border-primary-600 bg-background-light px-3 py-1.5 text-label-04 text-primary-600 transition-colors",
       "hover:bg-primary-50 active:bg-gray-100",
       "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-200",
-      "disabled:cursor-not-allowed disabled:border-border-default disabled:bg-gray-100 disabled:text-text-deactivated",
+      "disabled:cursor-not-allowed disabled:border-border-deactivated disabled:bg-background-dark disabled:text-text-placeholder",
       className,
     )}
     {...props}
