@@ -28,7 +28,7 @@ const preview: Preview = {
     ),
   ],
   parameters: {
-    layout: "centered",
+    layout: "fullscreen",
     backgrounds: {
       default: "light",
       values: [
