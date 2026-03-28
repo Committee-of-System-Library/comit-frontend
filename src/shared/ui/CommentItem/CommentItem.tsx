@@ -138,7 +138,7 @@ export const CommentItem = ({
             {isMenuOpen && (
               <div className="absolute right-0 top-full z-10 mt-1">
                 <OptionList
-                  mode={isMine ? "mine" : "others"}
+                  mode={isMine ? "myComment" : "others"}
                   onEdit={() => {
                     setEditorMode("edit");
                     setIsMenuOpen(false);

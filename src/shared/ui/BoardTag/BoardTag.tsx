@@ -11,10 +11,10 @@ export const BoardTag = ({
 }: BoardTagProps) => {
   return (
     <div
-      className={`inline-flex items-center justify-center px-2 py-1 bg-gray-50 rounded-sm whitespace-nowrap ${className}`}
+      className={`inline-flex text-subtitle-04 text-text-tertiary items-center justify-center px-2 py-1 bg-gray-50 rounded-sm whitespace-nowrap ${className}`}
       {...props}
     >
-      <span className="text-subtitle-04 text-text-tertiary">{label}</span>
+      <span>{label}</span>
     </div>
   );
 };

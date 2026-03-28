@@ -9,6 +9,7 @@ import {
 } from "react";
 
 import { Share, Link } from "lucide-react";
+import toast from "react-hot-toast";
 
 import { cn } from "@/utils/cn";
 
@@ -59,7 +60,7 @@ export const ShareButton = forwardRef<HTMLButtonElement, ShareButtonProps>(
         onCopyClick(url);
       } else {
         navigator.clipboard.writeText(url);
-        alert("URL이 복사되었습니다.");
+        toast.success("URL이 복사되었습니다.");
       }
       setCurrentVariant("default");
     };
