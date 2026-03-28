@@ -1,6 +1,17 @@
 @import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css");
 @import "tailwindcss";
 
+@utility no-scrollbar {
+  /* IE, Edge, Firefox에서 스크롤바 숨기기 */
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+
+  /* Chrome, Safari, Opera에서 스크롤바 숨기기 */
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
 @theme {
   --font-sans: "Pretendard Variable", "Pretendard", system-ui, sans-serif;
 
