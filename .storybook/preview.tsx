@@ -72,9 +72,6 @@ const preview: Preview = {
         date: /Date$/i,
       },
     },
-    actions: {
-      argTypesRegex: "^on[A-Z].*",
-    },
     a11y: {
       // 'todo' - show a11y violations in the test UI only
       // 'error' - fail CI on a11y violations
