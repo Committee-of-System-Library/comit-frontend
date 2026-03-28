@@ -10,6 +10,7 @@ interface ProfileWidgetProps {
   studentId: string;
   imgURL?: string | null;
   className?: string;
+  onSave?: (data: { userName: string; imageFile: File | null }) => void;
 }
 
 export const ProfileWidget = ({
@@ -18,15 +19,18 @@ export const ProfileWidget = ({
   studentId,
   imgURL,
   className,
+  onSave,
 }: ProfileWidgetProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [userName, setUserName] = useState(initialUserName);
+  const [imageFile, setImageFile] = useState<File | null>(null);
 
   const handleEditToggle = () => {
     setIsEditing(true);
   };
 
   const handleSave = () => {
+    onSave?.({ userName, imageFile });
     setIsEditing(false);
   };
 
@@ -38,7 +42,11 @@ export const ProfileWidget = ({
       )}
     >
       <div className="flex flex-1 items-center gap-4 min-w-0">
-        <ProfilePicture imgURL={imgURL} isEditing={isEditing} />
+        <ProfilePicture
+          imgURL={imgURL}
+          isEditing={isEditing}
+          onImageChange={setImageFile}
+        />
         <div className="flex flex-col gap-1 min-w-0">
           {isEditing ? (
             <div className="w-[152px]">
