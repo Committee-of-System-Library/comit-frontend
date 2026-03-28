@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { ProfileWidget } from "./ProfileWidget";
 
 const meta = {
-  title: "Widgets/ProfileWidget",
+  title: "Widgets/mypage/ProfileWidget",
   component: ProfileWidget,
   tags: ["autodocs"],
   args: {
