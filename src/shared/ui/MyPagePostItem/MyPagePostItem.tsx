@@ -18,7 +18,7 @@ export const MyPagePostItem = ({
       type="button"
       onClick={onClick}
       className={cn(
-        "border-border-deactivated flex w-[547px] shrink-0 cursor-pointer items-center justify-between border-b px-4 py-3 text-left transition-colors hover:bg-gray-50 focus-visible:bg-gray-50 focus-visible:outline-none",
+        "border-border-deactivated flex w-full max-w-[547px] cursor-pointer items-center justify-between border-b px-4 py-3 text-left transition-colors hover:bg-gray-50 focus-visible:bg-gray-50 focus-visible:outline-none",
         className,
       )}
     >

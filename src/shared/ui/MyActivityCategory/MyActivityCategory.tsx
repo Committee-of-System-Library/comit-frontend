@@ -17,6 +17,8 @@ export const MyActivityCategory = ({
 }: MyActivityCategoryProps) => {
   return (
     <button
+      type="button"
+      aria-pressed={selected}
       className={cn(
         "flex w-[282px] h-[50px] shrink-0 items-center justify-between rounded-xl border transition-colors bg-transparent px-2",
         selected

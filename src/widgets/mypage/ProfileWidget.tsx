@@ -63,6 +63,7 @@ export const ProfileWidget = ({
       <div className="ml-4 shrink-0">
         {isEditing ? (
           <button
+            type="button"
             onClick={handleSave}
             className="text-info-02 text-label-03 cursor-pointer whitespace-nowrap font-bold hover:opacity-80 transition-all"
           >
@@ -70,6 +71,7 @@ export const ProfileWidget = ({
           </button>
         ) : (
           <button
+            type="button"
             onClick={handleEditToggle}
             className="text-info-02 text-label-03 cursor-pointer whitespace-nowrap font-bold hover:opacity-80 transition-all"
           >

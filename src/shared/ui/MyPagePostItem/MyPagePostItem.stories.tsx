@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { MyPagePostItem } from "./MyPagePostItem";
 
 const meta = {
-  title: "Shared/MyPagePostItem",
+  title: "Shared/UI/MyPagePostItem",
   component: MyPagePostItem,
   tags: ["autodocs"],
   argTypes: {

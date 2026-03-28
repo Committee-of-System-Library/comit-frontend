@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { ProfilePicture } from "./ProfilePicture";
 
 const meta = {
-  title: "Shared/ProfilePicture",
+  title: "Shared/UI/ProfilePicture",
   component: ProfilePicture,
   tags: ["autodocs"],
   argTypes: {
