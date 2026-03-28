@@ -21,7 +21,7 @@ type Story = StoryObj<typeof meta>;
 
 export const MineState: Story = {
   args: {
-    mode: "mine",
+    mode: "myComment",
   },
 };
 
