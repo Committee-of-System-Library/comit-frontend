@@ -1,4 +1,4 @@
-import { forwardRef, type ButtonHTMLAttributes } from "react";
+import { forwardRef, type ButtonHTMLAttributes, type MouseEvent } from "react";
 
 import { PencilLine, Trash2, Siren } from "lucide-react";
 
@@ -27,16 +27,27 @@ export interface OptionItemProps extends ButtonHTMLAttributes<HTMLButtonElement>
 
 export const OptionItem = forwardRef<HTMLButtonElement, OptionItemProps>(
   (
-    { className, type = "button", variant = "report", disabled, ...props },
+    {
+      className,
+      type = "button",
+      variant = "report",
+      disabled,
+      onClick,
+      ...props
+    },
     ref,
   ) => {
-    const handleClick = () => {
+    const handleClick = (e: MouseEvent<HTMLButtonElement>) => {
       const messages = {
         report: "신고 로직 실행 중...",
         delete: "삭제 로직 실행 중...",
         edit: "수정 로직 실행 중...",
       };
       console.info(messages[variant]);
+
+      if (onClick) {
+        onClick(e);
+      }
     };
 
     return (
@@ -56,21 +67,21 @@ export const OptionItem = forwardRef<HTMLButtonElement, OptionItemProps>(
       >
         {variant === "report" && (
           <>
-            <Siren className="w-6 h-6" />
+            <Siren className="w-5 h-5" />
             <p className="text-label-04 leading-none">신고</p>
           </>
         )}
 
         {variant === "delete" && (
           <>
-            <Trash2 className="w-6 h-6" />
+            <Trash2 className="w-5 h-5" />
             <p className="text-label-04 leading-none">삭제</p>
           </>
         )}
 
         {variant === "edit" && (
           <>
-            <PencilLine className="w-6 h-6" />
+            <PencilLine className="w-5 h-5" />
             <p className="text-label-04 leading-none">수정</p>
           </>
         )}
