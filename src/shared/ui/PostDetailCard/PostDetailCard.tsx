@@ -54,7 +54,7 @@ export const PostDetailCard = ({
 
   return (
     <article
-      className={`min-w-163.5 max-w-223.5 p-6 flex flex-col gap-4 rounded-3xl border border-border-deactivated bg-background-light shadow-sm transition-all duration-200 ${
+      className={`w-full p-6 flex flex-col gap-4 rounded-3xl border border-border-deactivated bg-background-light transition-all duration-200 ${
         disabled ? "opacity-50 pointer-events-none" : ""
       }`}
     >
