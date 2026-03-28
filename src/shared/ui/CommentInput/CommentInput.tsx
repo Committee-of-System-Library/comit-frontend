@@ -13,7 +13,7 @@ export function CommentInput({
 }: CommentInputProps) {
   const [comment, setComment] = useState("");
 
-  const isActivated = comment.length > 0 && !disabled;
+  const isActivated = comment.trim().length > 0 && !disabled;
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setComment(e.target.value);
@@ -21,8 +21,8 @@ export function CommentInput({
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!disabled && onSubmit) {
-      onSubmit(comment);
+    if (isActivated && onSubmit) {
+      onSubmit(comment.trim());
       setComment("");
     }
   };
