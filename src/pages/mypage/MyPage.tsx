@@ -1,4 +1,5 @@
 import { FileText, Heart, MessageCircleMore } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 import { likedPosts } from "@/mocks/likedPosts";
 import { myComments } from "@/mocks/myComments";
@@ -8,6 +9,7 @@ import { MyActivitySectionBoard } from "@/widgets/mypage/MyActivitySectionBoard/
 import { ProfileWidget } from "@/widgets/mypage/ProfileWidget/ProfileWidget";
 
 const MyPage = () => {
+  const navigate = useNavigate();
   const userData = {
     name: "사용자명",
     major: "전공",
@@ -24,6 +26,10 @@ const MyPage = () => {
 
   const handleLogout = () => {
     console.log("로그아웃");
+  };
+
+  const handleMoreClick = (category: "posts" | "comments" | "likes") => {
+    navigate("/mypage/activity", { state: { category } });
   };
 
   return (
@@ -61,7 +67,7 @@ const MyPage = () => {
               count={32}
               icon={<FileText size={18} />}
               items={myPosts}
-              onMoreClick={() => console.log("내가 쓴 글 더보기")}
+              onMoreClick={() => handleMoreClick("posts")}
             />
 
             <MyActivitySectionBoard
@@ -69,7 +75,7 @@ const MyPage = () => {
               count={64}
               icon={<MessageCircleMore size={18} />}
               items={myComments}
-              onMoreClick={() => console.log("내가 쓴 댓글 더보기")}
+              onMoreClick={() => handleMoreClick("comments")}
             />
 
             <MyActivitySectionBoard
@@ -77,7 +83,7 @@ const MyPage = () => {
               count={10}
               icon={<Heart size={18} />}
               items={likedPosts}
-              onMoreClick={() => console.log("좋아요 더보기")}
+              onMoreClick={() => handleMoreClick("likes")}
             />
           </div>
         </div>

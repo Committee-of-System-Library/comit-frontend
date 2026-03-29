@@ -12,6 +12,7 @@ import NoticeBoardPage from "@/pages/board/NoticeBoardPage";
 import QnABoardPage from "@/pages/board/QnABoardPage";
 import HomePage from "@/pages/home/HomePage";
 import LoginPage from "@/pages/login/LoginPage";
+import MyActivityPage from "@/pages/mypage/MyActivityPage";
 import MyPage from "@/pages/mypage/MyPage";
 import WritePage from "@/pages/write/WritePage";
 import { Banner } from "@/widgets/home/Banner/Banner";
@@ -33,7 +34,7 @@ interface AppContentProps {
 const AppContent = ({ isAuthenticated }: AppContentProps) => {
   const { pathname } = useLocation();
   const isWritePath = /^\/write\/?$/.test(pathname);
-  const isMyPage = pathname === "/mypage";
+  const isMyPage = pathname.startsWith("/mypage");
   const isMainPage = pathname === "/";
   const isTitleBoardPage =
     /^\/board\/(qna|info|free)\/?$/.test(pathname) ||
@@ -62,6 +63,7 @@ const AppContent = ({ isAuthenticated }: AppContentProps) => {
         <Route element={<EventBoardPage />} path="/event" />
         <Route element={<LoginPage />} path="/login" />
         <Route element={<MyPage />} path="/mypage" />
+        <Route element={<MyActivityPage />} path="/mypage/activity" />
       </Routes>
     </AppDesktopShell>
   );
