@@ -12,7 +12,7 @@ interface SearchLongProps {
 export function SearchLong({ disabled = false, onSearch }: SearchLongProps) {
   const [searchTerm, setSearchTerm] = useState("");
 
-  const isActivated = searchTerm.length > 0 && !disabled;
+  const isActivated = searchTerm.trim().length > 0 && !disabled;
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
@@ -20,8 +20,8 @@ export function SearchLong({ disabled = false, onSearch }: SearchLongProps) {
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!disabled && onSearch) {
-      onSearch(searchTerm);
+    if (isActivated && onSearch) {
+      onSearch(searchTerm.trim());
     }
   };
 
