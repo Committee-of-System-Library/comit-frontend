@@ -64,6 +64,11 @@ export const SignupGuideModal = ({
   }, [onClose, resetSignupState]);
 
   const modalMaxWidthClass = isCseStudent ? "max-w-[400px]" : "max-w-[447px]";
+  const bubblePositionClass = isCseStudent
+    ? step === 1
+      ? "absolute -right-[340px] top-[200px] inline-flex"
+      : "absolute -right-[295px] top-[370px] inline-flex"
+    : "absolute -right-[75px] top-[110px] inline-flex";
 
   useEffect(() => {
     if (!open) {
@@ -329,7 +334,7 @@ export const SignupGuideModal = ({
         )}
 
         <SignupMascotBubble
-          className="absolute -right-[110px] top-[130px] inline-flex"
+          className={bubblePositionClass}
           text={
             isCseStudent
               ? step === 1
