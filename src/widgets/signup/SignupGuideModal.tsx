@@ -1,6 +1,12 @@
-import { useCallback, useEffect, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type ChangeEvent,
+} from "react";
 
-import { ChevronLeft, Image as ImageIcon } from "lucide-react";
+import { ChevronLeft, Image as ImageIcon, X } from "lucide-react";
 
 import defaultMascotImage from "@/assets/Ori_defualt.svg";
 import greetingMascotImage from "@/assets/Ori_happy.svg";
@@ -13,6 +19,9 @@ import { WritingButton } from "@/shared/ui/WritingButton/WritingButton";
 import { cn } from "@/utils/cn";
 
 type SignupStep = 1 | 2;
+type NicknameValidationStatus = "idle" | "error" | "success";
+
+const DUPLICATED_NICKNAME_SET = new Set(["admin", "comit", "관리자", "운영자"]);
 
 export interface SignupGuideModalProps {
   className?: string;
@@ -35,6 +44,13 @@ export const SignupGuideModal = ({
   const [phoneMiddle, setPhoneMiddle] = useState("");
   const [phoneLast, setPhoneLast] = useState("");
   const [isPrivacyAgreed, setIsPrivacyAgreed] = useState(false);
+  const [nickname, setNickname] = useState("");
+  const [nicknameValidationStatus, setNicknameValidationStatus] =
+    useState<NicknameValidationStatus>("idle");
+  const [nicknameValidationMessage, setNicknameValidationMessage] =
+    useState("");
+  const [profileImageUrl, setProfileImageUrl] = useState<string | null>(null);
+  const profileImageInputRef = useRef<HTMLInputElement>(null);
 
   const isStep1Valid =
     name.trim().length > 0 &&
@@ -42,6 +58,7 @@ export const SignupGuideModal = ({
     phoneMiddle.length === 4 &&
     phoneLast.length === 4 &&
     isPrivacyAgreed;
+  const isStep2Valid = nicknameValidationStatus === "success";
 
   const handlePhoneChange =
     (setter: (value: string) => void, maxLength: number) => (value: string) => {
@@ -56,6 +73,10 @@ export const SignupGuideModal = ({
     setPhoneMiddle("");
     setPhoneLast("");
     setIsPrivacyAgreed(false);
+    setNickname("");
+    setNicknameValidationStatus("idle");
+    setNicknameValidationMessage("");
+    setProfileImageUrl(null);
   }, [defaultStep]);
 
   const handleCloseModal = useCallback(() => {
@@ -75,18 +96,74 @@ export const SignupGuideModal = ({
       return;
     }
 
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        onClose();
-      }
-    };
+    const previousBodyOverflow = document.body.style.overflow;
+    const previousHtmlOverflow = document.documentElement.style.overflow;
 
-    window.addEventListener("keydown", handleKeyDown);
+    document.body.style.overflow = "hidden";
+    document.documentElement.style.overflow = "hidden";
 
     return () => {
-      window.removeEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = previousBodyOverflow;
+      document.documentElement.style.overflow = previousHtmlOverflow;
     };
-  }, [onClose, open]);
+  }, [open]);
+
+  useEffect(() => {
+    return () => {
+      if (profileImageUrl) {
+        URL.revokeObjectURL(profileImageUrl);
+      }
+    };
+  }, [profileImageUrl]);
+
+  const handleNicknameChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setNickname(event.target.value);
+
+    if (nicknameValidationStatus !== "idle") {
+      setNicknameValidationStatus("idle");
+      setNicknameValidationMessage("");
+    }
+  };
+
+  const handleNicknameDuplicateCheck = () => {
+    const trimmedNickname = nickname.trim();
+
+    if (!trimmedNickname) {
+      setNicknameValidationStatus("error");
+      setNicknameValidationMessage("닉네임을 입력해 주세요");
+      return;
+    }
+
+    const normalizedNickname = trimmedNickname.toLowerCase();
+
+    if (DUPLICATED_NICKNAME_SET.has(normalizedNickname)) {
+      setNicknameValidationStatus("error");
+      setNicknameValidationMessage("이미 존재하는 닉네임입니다");
+      return;
+    }
+
+    setNicknameValidationStatus("success");
+    setNicknameValidationMessage("사용 가능한 닉네임입니다");
+  };
+
+  const handleProfileImageUploadClick = () => {
+    profileImageInputRef.current?.click();
+  };
+
+  const handleProfileImageChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+
+    if (!file || !file.type.startsWith("image/")) {
+      return;
+    }
+
+    setProfileImageUrl(URL.createObjectURL(file));
+    event.target.value = "";
+  };
+
+  const handleProfileImageRemove = () => {
+    setProfileImageUrl(null);
+  };
 
   if (!open) {
     return null;
@@ -99,12 +176,7 @@ export const SignupGuideModal = ({
         className,
       )}
     >
-      <button
-        aria-label="회원가입 안내 모달 닫기"
-        className="absolute inset-0"
-        onClick={handleCloseModal}
-        type="button"
-      />
+      <div aria-hidden className="absolute inset-0" />
       <div
         aria-modal
         className={cn(
@@ -249,8 +321,41 @@ export const SignupGuideModal = ({
               프로필 정보를 입력해 주세요
             </p>
 
-            <div className="flex size-20 items-center justify-center rounded-full border border-border-deactivated bg-background-dark">
-              <ImageIcon className="size-6 text-text-placeholder" />
+            <div className="relative">
+              <button
+                className="flex size-20 items-center justify-center overflow-hidden rounded-full border border-border-deactivated bg-background-dark"
+                onClick={handleProfileImageUploadClick}
+                type="button"
+              >
+                {profileImageUrl ? (
+                  <img
+                    alt="프로필 이미지 미리보기"
+                    className="size-full object-cover"
+                    src={profileImageUrl}
+                  />
+                ) : (
+                  <ImageIcon className="size-6 text-text-placeholder" />
+                )}
+              </button>
+
+              {profileImageUrl ? (
+                <button
+                  aria-label="프로필 이미지 삭제"
+                  className="absolute -top-1 -right-1 inline-flex size-5 items-center justify-center rounded-full border border-border-deactivated bg-background-light text-text-deactivated transition-colors hover:text-text-primary"
+                  onClick={handleProfileImageRemove}
+                  type="button"
+                >
+                  <X className="size-3" />
+                </button>
+              ) : null}
+
+              <input
+                ref={profileImageInputRef}
+                accept="image/png,image/jpeg,image/jpg,image/webp"
+                className="hidden"
+                onChange={handleProfileImageChange}
+                type="file"
+              />
             </div>
 
             <div className="w-full space-y-6">
@@ -264,8 +369,24 @@ export const SignupGuideModal = ({
                 <SignupTextInput
                   actionLabel="중복 확인"
                   id="signup-nickname"
+                  onActionClick={handleNicknameDuplicateCheck}
+                  onChange={handleNicknameChange}
                   placeholder="닉네임을 입력해 주세요"
+                  value={nickname}
                 />
+
+                {nicknameValidationStatus !== "idle" ? (
+                  <p
+                    className={cn(
+                      "pl-2 text-caption-02",
+                      nicknameValidationStatus === "error"
+                        ? "text-error-01"
+                        : "text-success-01",
+                    )}
+                  >
+                    {nicknameValidationMessage}
+                  </p>
+                ) : null}
               </div>
 
               <div className="space-y-2">
@@ -298,9 +419,18 @@ export const SignupGuideModal = ({
             </div>
 
             <WritingButton
-              className="bg-primary-200 hover:bg-primary-300 active:bg-primary-400"
+              className={cn(
+                isStep2Valid
+                  ? "bg-primary-600 hover:bg-primary-1000 active:bg-primary-800"
+                  : "bg-primary-200 hover:bg-primary-200 active:bg-primary-200",
+              )}
+              disabled={!isStep2Valid}
               icon={null}
-              onClick={handleCloseModal}
+              onClick={() => {
+                if (isStep2Valid) {
+                  handleCloseModal();
+                }
+              }}
               variant="action"
             >
               Comit의 세계로 빠져들기
