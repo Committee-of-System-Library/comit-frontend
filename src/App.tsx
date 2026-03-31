@@ -13,6 +13,7 @@ import NoticeBoardPage from "@/pages/board/NoticeBoardPage";
 import QnABoardPage from "@/pages/board/QnABoardPage";
 import HomePage from "@/pages/home/HomePage";
 import LoginPage from "@/pages/login/LoginPage";
+import MyActivityPage from "@/pages/mypage/MyActivityPage";
 import MyPage from "@/pages/mypage/MyPage";
 import PostPage from "@/pages/PostPage";
 import WritePage from "@/pages/write/WritePage";
@@ -35,17 +36,23 @@ interface AppContentProps {
 const AppContent = ({ isAuthenticated }: AppContentProps) => {
   const { pathname } = useLocation();
   const isWritePath = /^\/write\/?$/.test(pathname);
+  const isMyPage = pathname.startsWith("/mypage");
   const isMainPage = pathname === "/";
   const isTitleBoardPage =
     /^\/board\/(qna|info|free)\/?$/.test(pathname) ||
     /^\/(notice|event)\/?$/.test(pathname);
-
   return (
     <AppDesktopShell
       isAuthenticated={isAuthenticated}
-      mainClassName={isWritePath ? "max-w-[792px] pt-10 pb-20" : undefined}
+      mainClassName={
+        isWritePath
+          ? "max-w-[792px] pt-10 pb-20"
+          : isMyPage
+            ? "max-w-[1200px] pt-10 pb-20"
+            : undefined
+      }
       rightRailClassName={isTitleBoardPage ? "pt-[90px]" : undefined}
-      rightRail={isWritePath ? null : undefined}
+      rightRail={isWritePath || isMyPage ? null : undefined}
       topBanner={isMainPage ? <Banner items={mockBannerItems} /> : undefined}
     >
       <Routes>
@@ -59,6 +66,7 @@ const AppContent = ({ isAuthenticated }: AppContentProps) => {
         <Route element={<PostPage />} path="/post" />
         <Route element={<LoginPage />} path="/login" />
         <Route element={<MyPage />} path="/mypage" />
+        <Route element={<MyActivityPage />} path="/mypage/activity" />
       </Routes>
     </AppDesktopShell>
   );

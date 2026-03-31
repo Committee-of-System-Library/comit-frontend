@@ -1,6 +1,6 @@
 import { cn } from "@/utils/cn";
 
-interface MyPagePostItemProps {
+export interface MyPagePostItemProps {
   title: string;
   createdAt: string;
   className?: string;
