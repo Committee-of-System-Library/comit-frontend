@@ -63,6 +63,8 @@ export const SignupGuideModal = ({
     onClose();
   }, [onClose, resetSignupState]);
 
+  const modalMaxWidthClass = isCseStudent ? "max-w-[400px]" : "max-w-[447px]";
+
   useEffect(() => {
     if (!open) {
       return;
@@ -100,7 +102,10 @@ export const SignupGuideModal = ({
       />
       <div
         aria-modal
-        className="relative z-10 w-full max-w-[400px] rounded-xl bg-background-light p-8 shadow-[0px_4px_20px_0px_rgba(0,0,0,0.12)]"
+        className={cn(
+          "relative z-10 w-full rounded-xl bg-background-light p-8 shadow-[0px_4px_20px_0px_rgba(0,0,0,0.12)]",
+          modalMaxWidthClass,
+        )}
         role="dialog"
       >
         {isCseStudent && step === 1 ? (
@@ -299,9 +304,12 @@ export const SignupGuideModal = ({
         ) : (
           <div className="flex flex-col items-center gap-8">
             <p className="text-center text-subtitle-01 text-text-primary">
-              컴퓨터학부 학생이 아니면
-              <br />
-              아직 Comit 서비스 회원가입이 불가능해요ㅜㅜ
+              <span className="block whitespace-nowrap">
+                컴퓨터학부 학생이 아니면
+              </span>
+              <span className="block whitespace-nowrap">
+                아직 Comit 서비스 회원가입이 불가능해요ㅜㅜ
+              </span>
             </p>
 
             <img
