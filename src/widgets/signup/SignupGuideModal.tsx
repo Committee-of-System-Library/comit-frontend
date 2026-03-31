@@ -321,7 +321,7 @@ export const SignupGuideModal = ({
         )}
 
         <SignupMascotBubble
-          className="absolute -right-[250px] top-[110px] hidden min-[1200px]:inline-flex"
+          className="absolute -right-[110px] top-[130px] inline-flex"
           text={
             isCseStudent
               ? step === 1
@@ -333,7 +333,7 @@ export const SignupGuideModal = ({
         {isCseStudent ? (
           <img
             alt="Comit 마스코트"
-            className="absolute -right-[140px] bottom-[-40px] hidden h-[287px] w-[205px] object-contain min-[1200px]:block"
+            className="absolute -right-[140px] bottom-[-40px] block h-[287px] w-[205px] object-contain"
             src={step === 1 ? defaultMascotImage : greetingMascotImage}
           />
         ) : null}
