@@ -28,6 +28,8 @@ export const Header = ({
   isAuthenticated = false,
   navItems = defaultNavItems,
 }: HeaderProps) => {
+  const authButtonClassName = "h-9 px-3";
+
   const currentPath = (() => {
     const normalizedPath = window.location.pathname.replace(/\/+$/, "");
     return normalizedPath.length > 0 ? normalizedPath : "/";
@@ -103,19 +105,21 @@ export const Header = ({
           <div className="flex items-center">
             {isAuthenticated ? (
               <Button
-                className="h-9 px-3 text-label-04 font-normal"
+                className={authButtonClassName}
                 onClick={handleAuthActionClick}
                 variant="secondary"
               >
-                마이페이지
+                <span className="text-label-04 font-normal">마이페이지</span>
               </Button>
             ) : (
               <Button
-                className="h-9 px-3 text-label-04 text-text-inverse font-normal"
+                className={authButtonClassName}
                 onClick={handleAuthActionClick}
                 variant="primary"
               >
-                로그인/회원가입
+                <span className="text-label-04 font-normal">
+                  로그인/회원가입
+                </span>
               </Button>
             )}
           </div>
