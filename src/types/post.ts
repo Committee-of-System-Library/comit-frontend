@@ -5,4 +5,7 @@ export interface Post {
   heart: number;
   comment: number;
   createdAt: string;
+  view?: number;
+  image?: string[];
+  tag?: string[];
 }

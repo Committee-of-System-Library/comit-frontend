@@ -22,9 +22,7 @@ const preview: Preview = {
     (Story) => (
       <QueryClientProvider client={queryClient}>
         <MemoryRouter>
-          <div className="min-h-screen bg-[#121212] px-6 py-6 text-white">
-            <Story />
-          </div>
+          <Story />
         </MemoryRouter>
       </QueryClientProvider>
     ),
@@ -32,10 +30,10 @@ const preview: Preview = {
   parameters: {
     layout: "fullscreen",
     backgrounds: {
-      default: "comit-dark",
+      default: "light",
       values: [
-        { name: "comit-dark", value: "#121212" },
-        { name: "comit-card", value: "#18181b" },
+        { name: "light", value: "#ffffff" },
+        { name: "dark", value: "#121212" },
       ],
     },
     viewport: {
@@ -72,13 +70,7 @@ const preview: Preview = {
         date: /Date$/i,
       },
     },
-    actions: {
-      argTypesRegex: "^on[A-Z].*",
-    },
     a11y: {
-      // 'todo' - show a11y violations in the test UI only
-      // 'error' - fail CI on a11y violations
-      // 'off' - skip a11y checks entirely
       test: "todo",
     },
   },

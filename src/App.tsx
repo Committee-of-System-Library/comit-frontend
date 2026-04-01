@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Toaster } from "react-hot-toast";
 
 import {
   BrowserRouter,
@@ -18,7 +19,9 @@ import NoticeBoardPage from "@/pages/board/NoticeBoardPage";
 import QnABoardPage from "@/pages/board/QnABoardPage";
 import HomePage from "@/pages/home/HomePage";
 import LoginPage from "@/pages/login/LoginPage";
+import MyActivityPage from "@/pages/mypage/MyActivityPage";
 import MyPage from "@/pages/mypage/MyPage";
+import PostPage from "@/pages/PostPage";
 import WritePage from "@/pages/write/WritePage";
 import { Banner } from "@/widgets/home/Banner/Banner";
 import { SignupGuideModal } from "@/widgets/signup/SignupGuideModal";
@@ -57,6 +60,7 @@ const AppContent = ({ isCseStudent, isAuthenticated }: AppContentProps) => {
   const { pathname, search } = useLocation();
   const navigate = useNavigate();
   const isWritePath = /^\/write\/?$/.test(pathname);
+  const isMyPage = pathname.startsWith("/mypage");
   const isMainPage = pathname === "/";
   const isTitleBoardPage =
     /^\/board\/(qna|info|free)\/?$/.test(pathname) ||
@@ -82,9 +86,15 @@ const AppContent = ({ isCseStudent, isAuthenticated }: AppContentProps) => {
   return (
     <AppDesktopShell
       isAuthenticated={isAuthenticated}
-      mainClassName={isWritePath ? "max-w-[792px] pt-10 pb-20" : undefined}
+      mainClassName={
+        isWritePath
+          ? "max-w-[792px] pt-10 pb-20"
+          : isMyPage
+            ? "max-w-[1200px] pt-10 pb-20"
+            : undefined
+      }
       rightRailClassName={isTitleBoardPage ? "pt-[90px]" : undefined}
-      rightRail={isWritePath ? null : undefined}
+      rightRail={isWritePath || isMyPage ? null : undefined}
       topBanner={isMainPage ? <Banner items={mockBannerItems} /> : undefined}
     >
       <>
@@ -96,8 +106,10 @@ const AppContent = ({ isCseStudent, isAuthenticated }: AppContentProps) => {
           <Route element={<FreeBoardPage />} path="/board/free" />
           <Route element={<NoticeBoardPage />} path="/notice" />
           <Route element={<EventBoardPage />} path="/event" />
+          <Route element={<PostPage />} path="/post" />
           <Route element={<LoginPage />} path="/login" />
           <Route element={<MyPage />} path="/mypage" />
+          <Route element={<MyActivityPage />} path="/mypage/activity" />
         </Routes>
         {shouldShowSignupGuideModal ? (
           <SignupGuideModal
@@ -143,6 +155,26 @@ function App() {
 
   return (
     <>
+      <Toaster
+        position="top-center"
+        toastOptions={{
+          className:
+            "!bg-gray-800 !text-white !rounded-xl !px-4 !py-2 !text-caption-02 !shadow-md",
+          success: {
+            iconTheme: {
+              primary: "#30D158",
+              secondary: "#FFFFFF",
+            },
+          },
+          error: {
+            iconTheme: {
+              primary: "#FF4245",
+              secondary: "#FFFFFF",
+            },
+          },
+          duration: 3000,
+        }}
+      />
       <BrowserRouter>
         <AppContent
           isAuthenticated={isAuthenticated}
