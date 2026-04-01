@@ -13,7 +13,7 @@ const variantClassMap: Record<WritingButtonVariant, string> = {
   writing:
     "group h-12 gap-2 bg-primary-600 py-3.25 text-text-inverse hover:bg-primary-1000 disabled:cursor-not-allowed disabled:opacity-50",
   action:
-    "group h-[50px] px-[86px] text-text-inverse bg-primary-600 hover:bg-primary-1000 active:bg-primary-800 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-500",
+    "group h-[50px] bg-primary-600 px-[86px] text-text-inverse hover:bg-primary-1000 active:bg-primary-800 disabled:cursor-not-allowed disabled:bg-primary-200 disabled:text-text-inverse disabled:hover:bg-primary-200 disabled:active:bg-primary-200",
 };
 
 export interface WritingButtonProps extends Omit<
