@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { Toaster } from "react-hot-toast";
 
+import { Toaster } from "react-hot-toast";
 import {
   BrowserRouter,
   Route,
