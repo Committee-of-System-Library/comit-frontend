@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 
+import { AdminDevAuthPanel } from "@/shared/ui/AdminDevAuthPanel/AdminDevAuthPanel";
 import { LogoutButton } from "@/shared/ui/LogoutButton/LogoutButton";
 import { cn } from "@/utils/cn";
 
@@ -71,6 +72,8 @@ export const AdminShell = ({ children }: AdminShellProps) => {
               );
             })}
           </nav>
+
+          <AdminDevAuthPanel />
 
           <div className="mt-6 border-t border-border-deactivated pt-4">
             <LogoutButton

@@ -46,7 +46,7 @@ const buildQueryString = (params?: QueryParams) => {
   return queryString ? `?${queryString}` : "";
 };
 
-const buildUrl = (path: string, params?: QueryParams) => {
+export const resolveApiUrl = (path: string, params?: QueryParams) => {
   const normalizedPath = path.startsWith("/") ? path : `/${path}`;
   return `${API_BASE_URL}${normalizedPath}${buildQueryString(params)}`;
 };
@@ -71,7 +71,7 @@ const parseErrorMessage = async (response: Response) => {
 async function request<T>(path: string, options: RequestOptions = {}) {
   const { body, headers, method = "GET", params, signal } = options;
 
-  const response = await fetch(buildUrl(path, params), {
+  const response = await fetch(resolveApiUrl(path, params), {
     method,
     signal,
     credentials: "include",
