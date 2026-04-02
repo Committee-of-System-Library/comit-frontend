@@ -12,6 +12,7 @@ import {
 import { AuthStateDevTool } from "@/app/devtools/AuthStateDevTool";
 import { AppDesktopShell } from "@/app/layout/AppDesktopShell";
 import { mockBannerItems } from "@/mocks/bannerItems";
+import AdminApp from "@/pages/admin/AdminApp";
 import EventBoardPage from "@/pages/board/EventBoardPage";
 import FreeBoardPage from "@/pages/board/FreeBoardPage";
 import InfoBoardPage from "@/pages/board/InfoBoardPage";
@@ -176,10 +177,18 @@ function App() {
         }}
       />
       <BrowserRouter>
-        <AppContent
-          isAuthenticated={isAuthenticated}
-          isCseStudent={isCseStudent}
-        />
+        <Routes>
+          <Route element={<AdminApp />} path="/admin/*" />
+          <Route
+            element={
+              <AppContent
+                isAuthenticated={isAuthenticated}
+                isCseStudent={isCseStudent}
+              />
+            }
+            path="*"
+          />
+        </Routes>
       </BrowserRouter>
 
       {import.meta.env.DEV ? (
