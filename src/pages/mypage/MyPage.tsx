@@ -1,32 +1,22 @@
 import { FileText, Heart, MessageCircleMore } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
+import { useMyProfileQuery } from "@/features/member/model/useMyProfileQuery";
 import { likedPosts } from "@/mocks/likedPosts";
 import { myComments } from "@/mocks/myComments";
 import { myPosts } from "@/mocks/myPosts";
 import { LogoutButton } from "@/shared/ui/LogoutButton/LogoutButton";
+import { StudentNumberVisibilityToggle } from "@/shared/ui/StudentNumberVisibilityToggle/StudentNumberVisibilityToggle";
 import { MyActivitySectionBoard } from "@/widgets/mypage/MyActivitySectionBoard/MyActivitySectionBoard";
 import { ProfileWidget } from "@/widgets/mypage/ProfileWidget/ProfileWidget";
 
 const MyPage = () => {
   const navigate = useNavigate();
-  const userData = {
-    name: "사용자명",
-    major: "전공",
-    studentId: "학번",
-    imgURL: null,
-  };
+  const { data: profile } = useMyProfileQuery();
 
-  const handleProfileSave = (data: {
-    userName: string;
-    imageFile: File | null;
-  }) => {
-    console.log("프로필 저장:", data);
-  };
+  const handleProfileSave = () => {};
 
-  const handleLogout = () => {
-    console.log("로그아웃");
-  };
+  const handleLogout = () => {};
 
   const handleMoreClick = (category: "posts" | "comments" | "likes") => {
     navigate("/mypage/activity", { state: { category } });
@@ -43,11 +33,17 @@ const MyPage = () => {
               프로필 관리
             </h2>
             <ProfileWidget
-              initialUserName={userData.name}
-              major={userData.major}
-              studentId={userData.studentId}
-              imgURL={userData.imgURL}
+              initialUserName={profile?.nickname ?? ""}
+              major="전공"
+              studentId={profile?.studentNumber ?? ""}
+              imgURL={null}
               onSave={handleProfileSave}
+            />
+            <StudentNumberVisibilityToggle
+              key={profile?.id}
+              studentNumber={profile?.studentNumber ?? ""}
+              initialVisible={profile?.studentNumberVisible ?? false}
+              onToggle={() => {}}
             />
           </section>
 
