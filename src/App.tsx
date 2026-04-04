@@ -106,7 +106,7 @@ const AppContent = ({ isCseStudent, isAuthenticated }: AppContentProps) => {
           <Route element={<FreeBoardPage />} path="/board/free" />
           <Route element={<NoticeBoardPage />} path="/notice" />
           <Route element={<EventBoardPage />} path="/event" />
-          <Route element={<PostPage />} path="/post" />
+          <Route element={<PostPage />} path="/post/:postId" />
           <Route element={<LoginPage />} path="/login" />
           <Route element={<MyPage />} path="/mypage" />
           <Route element={<MyActivityPage />} path="/mypage/activity" />
