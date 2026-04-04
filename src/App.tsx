@@ -9,7 +9,7 @@ import {
   useNavigate,
 } from "react-router-dom";
 
-import { AuthStateDevTool } from "@/app/devtools/AuthStateDevTool";
+import { DevToolDock } from "@/app/devtools/DevToolDock";
 import { AppDesktopShell } from "@/app/layout/AppDesktopShell";
 import { mockBannerItems } from "@/mocks/bannerItems";
 import AdminApp from "@/pages/admin/AdminApp";
@@ -189,17 +189,17 @@ function App() {
             path="*"
           />
         </Routes>
-      </BrowserRouter>
 
-      {import.meta.env.DEV ? (
-        <AuthStateDevTool
-          isAuthenticated={isAuthenticated}
-          onChange={setIsAuthenticated}
-          isCseStudent={isCseStudent}
-          onCseStudentChange={setIsCseStudent}
-          onPreviewSignupGuide={handlePreviewSignupGuide}
-        />
-      ) : null}
+        {import.meta.env.DEV ? (
+          <DevToolDock
+            isAuthenticated={isAuthenticated}
+            onChange={setIsAuthenticated}
+            isCseStudent={isCseStudent}
+            onCseStudentChange={setIsCseStudent}
+            onPreviewSignupGuide={handlePreviewSignupGuide}
+          />
+        ) : null}
+      </BrowserRouter>
     </>
   );
 }
