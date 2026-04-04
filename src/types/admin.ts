@@ -29,6 +29,7 @@ export interface AdminPostSummary {
   authorNickname: string;
   boardType: BoardType;
   createdAt: string;
+  contentPreview?: string | null;
   hiddenByAdmin: boolean;
   id: number;
   likeCount: number;

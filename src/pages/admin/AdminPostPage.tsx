@@ -16,6 +16,7 @@ import { Button } from "@/shared/ui/button/Button";
 import { DeleteModal } from "@/shared/ui/DeleteModal/DeleteModal";
 import { Pagination } from "@/shared/ui/Pagination/Pagination";
 import type { BoardType } from "@/types/admin";
+import { resolveContentPreview } from "@/utils/contentPreview";
 import { formatDateTime } from "@/utils/formatDateTime";
 
 const PAGE_SIZE = 8;
@@ -187,7 +188,7 @@ const AdminPostPage = () => {
 
                   <div className="mt-4">
                     <AdminPostCard
-                      content={`${boardLabels[post.boardType]} 게시판 운영 대상`}
+                      content={resolveContentPreview(post.contentPreview)}
                       createdAt={post.createdAt}
                       metaItems={[
                         {
