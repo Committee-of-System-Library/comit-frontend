@@ -17,13 +17,17 @@ export const AdminPostCard = ({
   comment,
   createdAt,
   disabled = false,
+  onClick,
 }: AdminPostCardProps) => {
   return (
-    <article
+    <button
       className={cn(
-        "w-full px-4 py-3.5 flex items-start justify-between rounded-xl border border-border-deactivated bg-background-light hover:bg-background-dark transition-colors duration-200",
+        "w-full px-4 py-3.5 flex items-start justify-between rounded-xl border border-border-deactivated bg-background-light hover:bg-background-dark transition-colors duration-200 text-left",
         disabled && "opacity-50 pointer-events-none",
       )}
+      disabled={disabled}
+      onClick={onClick}
+      type="button"
     >
       <div className="flex flex-1 flex-col gap-2 overflow-hidden pr-4">
         <div className="flex flex-col gap-1">
@@ -52,6 +56,6 @@ export const AdminPostCard = ({
       <p className="text-caption-02 text-text-placeholder shrink-0">
         {formatTimeAgo(createdAt)}
       </p>
-    </article>
+    </button>
   );
 };
