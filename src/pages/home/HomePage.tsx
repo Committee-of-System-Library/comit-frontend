@@ -34,6 +34,7 @@ const HomePage = () => {
       <SectionBoard
         title="Q&A"
         posts={qnaPosts}
+        onPostClick={(post) => navigate(`/post/${post.postId}`)}
         onViewAll={() => navigate("/board/qna")}
       />
 
@@ -42,6 +43,7 @@ const HomePage = () => {
           <SectionBoard
             title="정보게시판"
             posts={infoPosts}
+            onPostClick={(post) => navigate(`/post/${post.postId}`)}
             onViewAll={() => navigate("/board/info")}
           />
         </div>
@@ -49,6 +51,7 @@ const HomePage = () => {
           <SectionBoard
             title="자유게시판"
             posts={freePosts}
+            onPostClick={(post) => navigate(`/post/${post.postId}`)}
             onViewAll={() => navigate("/board/free")}
           />
         </div>

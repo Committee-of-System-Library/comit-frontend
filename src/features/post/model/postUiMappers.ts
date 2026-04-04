@@ -18,6 +18,7 @@ export interface BoardPostCardItem extends Post {
 }
 
 export interface SectionBoardPostItem {
+  postId: number;
   author: string;
   comments: number;
   content: string;
@@ -62,6 +63,7 @@ export const mapPostSummaryToSectionBoardPostItem = (
   post: PostSummary,
 ): SectionBoardPostItem => {
   return {
+    postId: post.id,
     author: post.authorNickname,
     comments: post.commentCount,
     content: resolveContentPreview(post.contentPreview),
