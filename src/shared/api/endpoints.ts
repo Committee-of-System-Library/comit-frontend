@@ -18,9 +18,11 @@ export const API_ENDPOINTS = {
   },
   post: {
     base: "/posts",
+    delete: (postId: number) => `/posts/${postId}`,
     detail: (postId: number) => `/posts/${postId}`,
     hot: "/posts/hot",
     like: (postId: number) => `/posts/${postId}/like`,
     report: (postId: number) => `/posts/${postId}/reports`,
+    update: (postId: number) => `/posts/${postId}`,
   },
 } as const;
