@@ -11,6 +11,14 @@ export interface PostSummary {
   title: string;
 }
 
+export interface HotPostSummary extends PostSummary {
+  rank: number;
+}
+
+export interface HotPostsResponse {
+  posts: HotPostSummary[];
+}
+
 export interface PostListResponse {
   hasNext: boolean;
   nextCursorId: number | null;
@@ -23,6 +31,7 @@ export interface PostDetail {
   content: string;
   createdAt: string;
   id: number;
+  imageUrls?: string[];
   likeCount: number;
   likedByMe: boolean;
   tags: string[];
@@ -40,13 +49,14 @@ export interface PostListQuery {
 export interface CreatePostRequest {
   boardType: BoardType;
   content: string;
-  tags: string[];
+  imageUrls?: string[];
+  tags?: string[];
   title: string;
 }
 
 export interface UpdatePostRequest {
   content: string;
-  tags: string[];
+  tags?: string[] | null;
   title: string;
 }
 
