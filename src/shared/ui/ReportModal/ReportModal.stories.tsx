@@ -28,8 +28,8 @@ const meta: Meta<typeof ReportModal> = {
     disabled: false,
     user: "냠냠",
     contents: "야식메뉴 추천받을게요. 어제 마라샹궈랑 계란초밥 먹음",
+    commentId: 123,
     onClose: fn(() => console.info("모달 닫기")),
-    onConfirm: fn((reason) => console.info("신고 접수 사유:", reason)),
   },
 } satisfies Meta<typeof ReportModal>;
 
