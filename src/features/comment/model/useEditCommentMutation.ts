@@ -25,7 +25,6 @@ export const useEditCommentMutation = () => {
         queryKey: queryKeys.comment.byPost(postId),
       });
     },
-
     onError: () => {
       toast.error("댓글 수정 중 오류가 발생했습니다.");
     },

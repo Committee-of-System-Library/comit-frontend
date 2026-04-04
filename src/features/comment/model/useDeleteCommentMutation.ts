@@ -17,11 +17,14 @@ export const useDeleteCommentMutation = () => {
       deleteComment(commentId),
 
     onSuccess: async (_, { postId }) => {
-      toast.success("댓글이 성공적으로 작성되었습니다.");
+      toast.success("댓글이 삭제되었습니다.");
 
       await queryClient.invalidateQueries({
         queryKey: queryKeys.comment.byPost(postId),
       });
+    },
+    onError: () => {
+      toast.error("댓글 삭제 중 오류가 발생했습니다.");
     },
   });
 };

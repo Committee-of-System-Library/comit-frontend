@@ -22,11 +22,14 @@ export const useCreateCommentMutation = () => {
 
     onSuccess: async (data: CreateCommentResponse, { postId }) => {
       console.info("댓글 작성 완료/새로 생성된 댓글 ID:", data);
-      toast.success("댓글이 성공적으로 작성되었습니다.");
+      toast.success("댓글이 작성되었습니다.");
 
       await queryClient.invalidateQueries({
         queryKey: queryKeys.comment.byPost(postId),
       });
+    },
+    onError: () => {
+      toast.error("댓글 작성 중 오류가 발생했습니다.");
     },
   });
 };
