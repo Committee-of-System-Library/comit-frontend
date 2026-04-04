@@ -4,6 +4,7 @@ export interface PostSummary {
   authorNickname: string;
   boardType: BoardType;
   commentCount: number;
+  contentPreview?: string | null;
   createdAt: string;
   id: number;
   likeCount: number;
