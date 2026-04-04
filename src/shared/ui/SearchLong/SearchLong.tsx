@@ -20,7 +20,7 @@ export function SearchLong({ disabled = false, onSearch }: SearchLongProps) {
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (isActivated && onSearch) {
+    if (!disabled && onSearch) {
       onSearch(searchTerm.trim());
     }
   };
