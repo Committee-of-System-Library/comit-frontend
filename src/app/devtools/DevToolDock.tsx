@@ -31,8 +31,7 @@ export const DevToolDock = ({
   const [requestedTab, setRequestedTab] = useState<DevToolTab>(
     isAdminRoute ? "admin" : "auth",
   );
-  const activeTab =
-    !isAdminRoute && requestedTab === "admin" ? "auth" : requestedTab;
+  const activeTab = requestedTab;
 
   if (!isOpen) {
     return (
@@ -90,24 +89,22 @@ export const DevToolDock = ({
         >
           인증 상태
         </button>
-        {isAdminRoute ? (
-          <button
-            className={cn(
-              "rounded-xl px-3 py-2 text-label-06 transition-colors",
-              activeTab === "admin"
-                ? "bg-primary-600 text-text-inverse"
-                : "bg-background-dark text-text-secondary hover:text-text-primary",
-            )}
-            onClick={() => setRequestedTab("admin")}
-            type="button"
-          >
-            관리자 로그인
-          </button>
-        ) : null}
+        <button
+          className={cn(
+            "rounded-xl px-3 py-2 text-label-06 transition-colors",
+            activeTab === "admin"
+              ? "bg-primary-600 text-text-inverse"
+              : "bg-background-dark text-text-secondary hover:text-text-primary",
+          )}
+          onClick={() => setRequestedTab("admin")}
+          type="button"
+        >
+          관리자 로그인
+        </button>
       </div>
 
       <div className="mt-4 rounded-2xl border border-border-deactivated bg-white p-4">
-        {activeTab === "admin" && isAdminRoute ? (
+        {activeTab === "admin" ? (
           <AdminDevAuthPanel />
         ) : (
           <AuthStateDevTool
