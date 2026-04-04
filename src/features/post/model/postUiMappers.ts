@@ -107,6 +107,7 @@ export const mapPostDetailToPost = (post: PostDetail): Post => {
     createdAt: formatTimeAgo(post.createdAt),
     heart: post.likeCount,
     image: post.imageUrls ?? [],
+    likedByMe: post.likedByMe,
     tag: post.tags,
     title: post.title,
     user: post.authorNickname,
