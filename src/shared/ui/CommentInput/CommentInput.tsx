@@ -52,7 +52,7 @@ export function CommentInput({
           aria-label="댓글 등록"
           className="absolute right-3 px-4 py-2 rounded-[100px] text-label-03 text-text-inverse disabled:bg-primary-300 bg-primary-600 hover:bg-primary-1000 flex items-center justify-center disabled:cursor-not-allowed transition-colors duration-200"
         >
-          등록하기
+          {disabled ? "등록 중" : "등록하기"}
         </button>
       </form>
     </div>

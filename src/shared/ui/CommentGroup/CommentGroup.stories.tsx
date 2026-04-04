@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { fn } from "@storybook/test";
 
 import { CommentGroup } from "./CommentGroup";
 
@@ -6,6 +7,12 @@ const meta = {
   title: "Shared/UI/CommentGroup",
   component: CommentGroup,
   tags: ["autodocs"],
+  args: {
+    postId: 1,
+    onReport: fn((id, name, content) =>
+      console.info("신고하기:", id, name, content),
+    ),
+  },
   parameters: {
     docs: {
       description: {
@@ -31,10 +38,6 @@ export const Default: Story = {
       isEdited: false,
       replies: [],
     },
-    onReplySubmit: (parentId, content) =>
-      alert(`[답글 등록] 부모ID: ${parentId}, 내용: ${content}`),
-    onEditSubmit: (id, content) =>
-      alert(`[수정 등록] 댓글ID: ${id}, 내용: ${content}`),
   },
 };
 
@@ -70,10 +73,6 @@ export const WithReplies: Story = {
         },
       ],
     },
-    onReplySubmit: (parentId, content) =>
-      alert(`[답글 등록] 부모ID: ${parentId}, 내용: ${content}`),
-    onEditSubmit: (id, content) =>
-      alert(`[수정 등록] 댓글ID: ${id}, 내용: ${content}`),
   },
 };
 
