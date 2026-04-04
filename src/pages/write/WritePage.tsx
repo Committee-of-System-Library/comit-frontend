@@ -1,8 +1,12 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm, useWatch } from "react-hook-form";
+import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 import { z } from "zod";
 
 import { WRITE_POST_PRESET_TAGS } from "@/constants/writeTags";
+import type { BoardType } from "@/entities/post/model/types";
+import { useCreatePostMutation } from "@/features/post/model/useCreatePostMutation";
 import {
   WRITE_POST_MAX_CONTENT_LENGTH,
   WRITE_POST_MAX_IMAGE_COUNT,
@@ -60,6 +64,12 @@ const writePostFormSchema = z.object({
 
 type WritePostFormValues = z.infer<typeof writePostFormSchema>;
 
+const BOARD_TYPE_MAP: Record<string, BoardType> = {
+  free: "FREE",
+  info: "INFO",
+  qna: "QNA",
+};
+
 const createUploadItems = (selectedFiles: File[]) =>
   selectedFiles.map<WriteImageUploadItem>((file) => ({
     id: `${file.name}-${file.lastModified}-${file.size}`,
@@ -68,6 +78,9 @@ const createUploadItems = (selectedFiles: File[]) =>
   }));
 
 const WritePage = () => {
+  const navigate = useNavigate();
+  const { mutateAsync: createPost, isPending: isCreatingPost } =
+    useCreatePostMutation();
   const {
     control,
     clearErrors,
@@ -169,8 +182,36 @@ const WritePage = () => {
     clearErrors("images");
   };
 
-  const onSubmit = () => {
-    // API 연결 이슈에서 등록 요청 로직을 연결합니다.
+  const onSubmit = async (values: WritePostFormValues) => {
+    const boardType = BOARD_TYPE_MAP[values.board];
+
+    if (!boardType) {
+      setError("board", {
+        message: "게시판은 반드시 선택해야 합니다",
+        type: "manual",
+      });
+      return;
+    }
+
+    try {
+      const postId = await createPost({
+        boardType,
+        // 이미지 업로드 API가 연결되기 전까지는 URL 배열을 비워 요청합니다.
+        imageUrls: [],
+        tags: values.tags,
+        title: values.title.trim(),
+        content: values.content.trim(),
+      });
+
+      toast.success("게시글이 등록되었습니다.");
+      navigate(`/post/${postId}`);
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "게시글 등록에 실패했습니다. 잠시 후 다시 시도해 주세요.";
+      toast.error(message);
+    }
   };
 
   return (
@@ -277,7 +318,7 @@ const WritePage = () => {
         </div>
 
         <WritingButton
-          disabled={isSubmitting}
+          disabled={isSubmitting || isCreatingPost}
           form="write-post-form"
           icon={null}
           type="submit"
