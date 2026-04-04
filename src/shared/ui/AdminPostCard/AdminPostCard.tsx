@@ -1,12 +1,26 @@
-import { UserRound, Heart, MessageCircleMore } from "lucide-react";
+import {
+  Heart,
+  MessageCircleMore,
+  UserRound,
+  type LucideIcon,
+} from "lucide-react";
 
-import type { Post } from "@/types/post";
 import { cn } from "@/utils/cn";
 import { formatTimeAgo } from "@/utils/formatTime";
 
-interface AdminPostCardProps extends Post {
+interface AdminPostCardProps {
+  comment?: number;
+  content: string;
+  createdAt: string;
   disabled?: boolean;
+  heart?: number;
+  metaItems?: Array<{
+    icon: LucideIcon;
+    value: number | string;
+  }>;
   onClick?: () => void;
+  title: string;
+  user?: string;
 }
 
 export const AdminPostCard = ({
@@ -18,7 +32,15 @@ export const AdminPostCard = ({
   createdAt,
   disabled = false,
   onClick,
+  metaItems,
 }: AdminPostCardProps) => {
+  const defaultMetaItems: NonNullable<AdminPostCardProps["metaItems"]> = [
+    { icon: UserRound, value: user ?? "-" },
+    { icon: Heart, value: heart ?? 0 },
+    { icon: MessageCircleMore, value: comment ?? 0 },
+  ];
+  const resolvedMetaItems = metaItems ?? defaultMetaItems;
+
   return (
     <button
       className={cn(
@@ -39,18 +61,19 @@ export const AdminPostCard = ({
           </p>
         </div>
         <div className="flex gap-2 text-text-placeholder text-caption-02">
-          <div className="flex items-center gap-1">
-            <UserRound className="w-4 h-4" />
-            <span className="leading-none">{user}</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <Heart className="w-4 h-4" />
-            <span className="leading-none">{heart}</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <MessageCircleMore className="w-4 h-4" />
-            <span className="leading-none">{comment}</span>
-          </div>
+          {resolvedMetaItems.map((item, index) => {
+            const Icon = item.icon;
+
+            return (
+              <div
+                key={`${item.value}-${index}`}
+                className="flex items-center gap-1"
+              >
+                <Icon className="w-4 h-4" />
+                <span className="leading-none">{item.value}</span>
+              </div>
+            );
+          })}
         </div>
       </div>
       <p className="text-caption-02 text-text-placeholder shrink-0">
