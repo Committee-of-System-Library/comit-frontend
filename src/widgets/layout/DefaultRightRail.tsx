@@ -2,6 +2,13 @@ import type { HTMLAttributes } from "react";
 
 import { useNavigate } from "react-router-dom";
 
+import {
+  mapHotPostSummaryToHotPost,
+  mapPostSummaryToRecentEvent,
+  mapPostSummaryToRecentNotice,
+} from "@/features/post/model/postUiMappers";
+import { useHotPostsQuery } from "@/features/post/model/useHotPostsQuery";
+import { usePostListQuery } from "@/features/post/model/usePostListQuery";
 import { mockHotPosts, type HotPost } from "@/mocks/hotPosts";
 import { mockRecentEvents, type RecentEvent } from "@/mocks/recentEvents";
 import { mockRecentNotices, type RecentNotice } from "@/mocks/recentNotices";
@@ -20,13 +27,34 @@ interface DefaultRightRailProps extends HTMLAttributes<HTMLDivElement> {
 
 export const DefaultRightRail = ({
   className,
-  events = mockRecentEvents,
-  hotPosts = mockHotPosts,
-  notices = mockRecentNotices,
+  events,
+  hotPosts,
+  notices,
   onWriteClick,
   ...props
 }: DefaultRightRailProps) => {
   const navigate = useNavigate();
+  const { data: noticeData } = usePostListQuery({
+    boardType: "NOTICE",
+    size: 3,
+  });
+  const { data: eventData } = usePostListQuery({
+    boardType: "EVENT",
+    size: 3,
+  });
+  const { data: hotPostData } = useHotPostsQuery();
+  const resolvedNotices: RecentNotice[] =
+    notices ??
+    noticeData?.posts?.map(mapPostSummaryToRecentNotice) ??
+    mockRecentNotices;
+  const resolvedEvents: RecentEvent[] =
+    events ??
+    eventData?.posts?.map(mapPostSummaryToRecentEvent) ??
+    mockRecentEvents;
+  const resolvedHotPosts: HotPost[] =
+    hotPosts ??
+    hotPostData?.posts?.map(mapHotPostSummaryToHotPost) ??
+    mockHotPosts;
 
   const handleWriteClick = () => {
     if (onWriteClick) {
@@ -47,9 +75,9 @@ export const DefaultRightRail = ({
       >
         글 작성하기
       </WritingButton>
-      <NoticeSideBoard notices={notices} />
-      <HotPostSideBoard posts={hotPosts} />
-      <EventSideBoard events={events} />
+      <NoticeSideBoard notices={resolvedNotices} />
+      <HotPostSideBoard posts={resolvedHotPosts} />
+      <EventSideBoard events={resolvedEvents} />
     </div>
   );
 };
