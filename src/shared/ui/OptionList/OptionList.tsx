@@ -10,6 +10,8 @@ type OptionVariant = NonNullable<OptionItemProps["variant"]>;
 interface OptionListProps {
   mode: OptionType;
   onEdit?: () => void;
+  onDelete?: () => void;
+  onReport?: () => void;
 }
 
 const Type_MAP: Record<OptionType, OptionVariant[]> = {
@@ -18,7 +20,12 @@ const Type_MAP: Record<OptionType, OptionVariant[]> = {
   others: ["report"],
 };
 
-export const OptionList = ({ mode, onEdit }: OptionListProps) => {
+export const OptionList = ({
+  mode,
+  onEdit,
+  onDelete,
+  onReport,
+}: OptionListProps) => {
   const options = Type_MAP[mode];
   return (
     <div className="w-fit flex flex-col rounded-xl overflow-hidden shadow-sm">
@@ -29,6 +36,10 @@ export const OptionList = ({ mode, onEdit }: OptionListProps) => {
           onClick={() => {
             if (opt === "edit" && onEdit) {
               onEdit();
+            } else if (opt === "delete" && onDelete) {
+              onDelete();
+            } else if (opt === "report" && onReport) {
+              onReport();
             }
           }}
         />
