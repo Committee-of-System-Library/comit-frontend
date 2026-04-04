@@ -7,6 +7,7 @@ import type { HotPost } from "@/mocks/hotPosts";
 import type { RecentEvent } from "@/mocks/recentEvents";
 import type { RecentNotice } from "@/mocks/recentNotices";
 import type { Post } from "@/types/post";
+import { resolveContentPreview } from "@/utils/contentPreview";
 import { formatTimeAgo } from "@/utils/formatTime";
 
 export interface BoardPostCardItem extends Post {
@@ -25,8 +26,6 @@ export interface SectionBoardPostItem {
   time: string;
   title: string;
 }
-
-const LIST_CONTENT_FALLBACK = "본문 미리보기는 상세 페이지에서 확인해 주세요.";
 
 const formatDateLabel = (dateString: string) => {
   const date = new Date(dateString);
@@ -47,7 +46,7 @@ export const mapPostSummaryToBoardPostCardItem = (
 ): BoardPostCardItem => {
   return {
     comment: post.commentCount,
-    content: LIST_CONTENT_FALLBACK,
+    content: resolveContentPreview(post.contentPreview),
     createdAt: post.createdAt,
     heart: post.likeCount,
     id: post.id,
@@ -65,7 +64,7 @@ export const mapPostSummaryToSectionBoardPostItem = (
   return {
     author: post.authorNickname,
     comments: post.commentCount,
-    content: LIST_CONTENT_FALLBACK,
+    content: resolveContentPreview(post.contentPreview),
     imageUrl: undefined,
     likes: post.likeCount,
     time: formatTimeAgo(post.createdAt),
