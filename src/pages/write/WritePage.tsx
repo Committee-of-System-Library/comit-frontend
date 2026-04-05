@@ -1,3 +1,5 @@
+import { useEffect, useRef } from "react";
+
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import toast from "react-hot-toast";
@@ -6,6 +8,10 @@ import { z } from "zod";
 
 import { WRITE_POST_PRESET_TAGS } from "@/constants/writeTags";
 import type { BoardType } from "@/entities/post/model/types";
+import {
+  uploadImagesWithPresignedUrl,
+  validateImageFiles,
+} from "@/features/image/model/imageUpload";
 import { normalizePostDomainError } from "@/features/post/model/postDomainError";
 import { resolvePostDomainErrorMessage } from "@/features/post/model/postDomainErrorMessage";
 import { useCreatePostMutation } from "@/features/post/model/useCreatePostMutation";
@@ -51,14 +57,7 @@ const writePostFormSchema = z.object({
       `태그는 최대 ${WRITE_POST_MAX_TAG_COUNT}개까지 입력 가능합니다`,
     ),
   images: z
-    .array(
-      z.object({
-        id: z.string(),
-        name: z.string(),
-        sizeLabel: z.string().optional(),
-        thumbnailUrl: z.string().optional(),
-      }),
-    )
+    .array(z.custom<WriteImageUploadItem>())
     .max(
       WRITE_POST_MAX_IMAGE_COUNT,
       `이미지는 최대 ${WRITE_POST_MAX_IMAGE_COUNT}장까지 업로드 가능합니다`,
@@ -85,10 +84,18 @@ const BOARD_TYPE_MAP: Record<string, BoardType> = {
 
 const createUploadItems = (selectedFiles: File[]) =>
   selectedFiles.map<WriteImageUploadItem>((file) => ({
+    file,
     id: `${file.name}-${file.lastModified}-${file.size}`,
     name: file.name,
     sizeLabel: `${Math.max(1, Math.ceil(file.size / 1024))}KB`,
+    thumbnailUrl: URL.createObjectURL(file),
   }));
+
+const revokePreviewUrl = (thumbnailUrl?: string) => {
+  if (thumbnailUrl?.startsWith("blob:")) {
+    URL.revokeObjectURL(thumbnailUrl);
+  }
+};
 
 const WritePage = () => {
   const navigate = useNavigate();
@@ -119,6 +126,19 @@ const WritePage = () => {
     name: "images",
     defaultValue: [],
   });
+  const imageItemsRef = useRef<WriteImageUploadItem[]>(currentImages);
+
+  useEffect(() => {
+    imageItemsRef.current = currentImages;
+  }, [currentImages]);
+
+  useEffect(() => {
+    return () => {
+      imageItemsRef.current.forEach((image) =>
+        revokePreviewUrl(image.thumbnailUrl),
+      );
+    };
+  }, []);
 
   const handleToggleTag = (tag: string) => {
     const previousTags = getValues("tags");
@@ -165,6 +185,16 @@ const WritePage = () => {
       return;
     }
 
+    const invalidImageMessage = validateImageFiles(selectedFiles);
+
+    if (invalidImageMessage) {
+      setError("images", {
+        type: "manual",
+        message: invalidImageMessage,
+      });
+      return;
+    }
+
     const acceptedFiles = selectedFiles.slice(0, remainCount);
     const nextImages = [...previousImages, ...createUploadItems(acceptedFiles)];
 
@@ -185,7 +215,11 @@ const WritePage = () => {
   };
 
   const handleRemoveImage = (id: string) => {
-    const nextImages = getValues("images").filter((image) => image.id !== id);
+    const previousImages = getValues("images");
+    const removedImage = previousImages.find((image) => image.id === id);
+    const nextImages = previousImages.filter((image) => image.id !== id);
+
+    revokePreviewUrl(removedImage?.thumbnailUrl);
 
     setValue("images", nextImages, {
       shouldDirty: true,
@@ -207,19 +241,40 @@ const WritePage = () => {
     }
 
     try {
+      const imageUrls =
+        values.images.length > 0
+          ? await uploadImagesWithPresignedUrl(
+              values.images.map((image) => image.file),
+              "posts",
+            )
+          : [];
+
       const postId = await createPost({
         boardType,
-        // 이미지 업로드 API가 연결되기 전까지는 URL 배열을 비워 요청합니다.
-        imageUrls: [],
+        imageUrls,
         tags: values.tags,
         title: values.title.trim(),
         content: values.content.trim(),
       });
 
+      values.images.forEach((image) => revokePreviewUrl(image.thumbnailUrl));
       toast.success("게시글이 등록되었습니다.");
       navigate(`/post/${postId}`);
     } catch (error) {
       const normalizedError = normalizePostDomainError(error);
+
+      if (
+        normalizedError.code === "FILE_SIZE_EXCEEDED" ||
+        normalizedError.code === "UNSUPPORTED_FILE_TYPE" ||
+        normalizedError.message ===
+          "이미지 업로드에 실패했습니다. 잠시 후 다시 시도해 주세요."
+      ) {
+        setError("images", {
+          message: normalizedError.message,
+          type: "server",
+        });
+        return;
+      }
 
       if (normalizedError.kind === "validation") {
         let hasMappedField = false;
@@ -347,7 +402,8 @@ const WritePage = () => {
 
         <div className="w-full">
           <WriteImageUploadField
-            countText={`${currentImages.length}/최대 업로드 용량`}
+            countText={`${currentImages.length}/${WRITE_POST_MAX_IMAGE_COUNT}`}
+            disabled={isSubmitting || isCreatingPost}
             errorMessage={errors.images?.message}
             files={currentImages}
             inlineError

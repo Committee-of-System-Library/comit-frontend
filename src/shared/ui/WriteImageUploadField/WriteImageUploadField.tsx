@@ -5,6 +5,7 @@ import { Image as ImageIcon, Trash2, Upload } from "lucide-react";
 import { cn } from "@/utils/cn";
 
 export interface WriteImageUploadItem {
+  file: File;
   id: string;
   name: string;
   sizeLabel?: string;
@@ -39,7 +40,7 @@ export const WriteImageUploadField = ({
   files = [],
   maxFiles = 5,
   disabled = false,
-  accept = "image/png,image/jpeg,image/webp",
+  accept = "image/png,image/jpeg,image/webp,image/gif",
   className,
   countText,
   uploadButtonText = "이미지를 드래그하거나 업로드하세요 (PNG, JPG ...)",

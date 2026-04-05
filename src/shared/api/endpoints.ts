@@ -12,6 +12,10 @@ export const API_ENDPOINTS = {
     helpful: (commentId: number) => `/comments/${commentId}/helpful`,
     report: (commentId: number) => `/comments/${commentId}/reports`,
   },
+  image: {
+    base: "/images",
+    presigned: "/images/presigned",
+  },
   member: {
     me: "/members/me",
     studentNumberVisibility: "/members/me/student-number-visibility",
