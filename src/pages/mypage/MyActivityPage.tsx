@@ -1,50 +1,98 @@
-import { useState } from "react";
-
 import { useLocation, useNavigate } from "react-router-dom";
 
-import { MOCK_QNA_POSTS, type MockPostData } from "@/mocks/mockPosts";
+import { useMyCommentsQuery } from "@/features/member/model/useMyCommentsQuery";
+import { useMyLikesQuery } from "@/features/member/model/useMyLikesQuery";
+import { useMyPostsQuery } from "@/features/member/model/useMyPostsQuery";
 import { MyActivityCategory } from "@/shared/ui/MyActivityCategory/MyActivityCategory";
-import { Pagination } from "@/shared/ui/Pagination/Pagination";
 import { PostPreviewItem } from "@/shared/ui/PostPreviewItem/PostPreviewItem";
 import { formatTimeAgo } from "@/utils/formatTime";
 
 type CategoryType = "posts" | "comments" | "likes";
 
-interface ActivityCategoryInfo {
-  label: string;
-  data: MockPostData[];
-}
-
-const categoryMap: Record<CategoryType, ActivityCategoryInfo> = {
-  posts: { label: "내가 쓴 글", data: MOCK_QNA_POSTS },
-  comments: { label: "내가 쓴 댓글", data: MOCK_QNA_POSTS },
-  likes: { label: "내가 좋아요한 댓글", data: MOCK_QNA_POSTS },
-};
-
-const ITEMS_PER_PAGE = 10;
-
 const MyActivityPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const [currentPage, setCurrentPage] = useState(1);
 
   const selectedCategory =
     (location.state?.category as CategoryType) || "posts";
-  const currentCategoryData = categoryMap[selectedCategory];
 
-  const totalItems = currentCategoryData.data.length;
-  const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
+  const {
+    data: postsData,
+    isLoading: isPostsLoading,
+    isError: isPostsError,
+  } = useMyPostsQuery();
+  const {
+    data: commentsData,
+    isLoading: isCommentsLoading,
+    isError: isCommentsError,
+  } = useMyCommentsQuery();
+  const {
+    data: likesData,
+    isLoading: isLikesLoading,
+    isError: isLikesError,
+  } = useMyLikesQuery();
 
-  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const currentItems = currentCategoryData.data.slice(
-    startIndex,
-    startIndex + ITEMS_PER_PAGE,
-  );
+  const isLoadingMap = {
+    posts: isPostsLoading,
+    comments: isCommentsLoading,
+    likes: isLikesLoading,
+  };
+  const isErrorMap = {
+    posts: isPostsError,
+    comments: isCommentsError,
+    likes: isLikesError,
+  };
+
+  const isLoading = isLoadingMap[selectedCategory];
+  const isError = isErrorMap[selectedCategory];
 
   const handleCategoryChange = (category: CategoryType) => {
     navigate("/mypage/activity", { state: { category } });
-    setCurrentPage(1);
   };
+
+  const categoryConfig = {
+    posts: {
+      label: "내가 쓴 글",
+      totalCount: postsData?.totalCount ?? 0,
+      items: (postsData?.items ?? []).map((post) => ({
+        id: post.postId,
+        title: post.title,
+        content: post.content ?? "",
+        likes: post.likeCount ?? 0,
+        comments: post.commentCount ?? 0,
+        time: formatTimeAgo(post.createdAt),
+        onClick: () => navigate(`/post/${post.postId}`),
+      })),
+    },
+    comments: {
+      label: "내가 쓴 댓글",
+      totalCount: commentsData?.totalCount ?? 0,
+      items: (commentsData?.items ?? []).map((comment) => ({
+        id: comment.commentId,
+        title: comment.postTitle,
+        content: comment.content,
+        likes: comment.likeCount ?? 0,
+        comments: comment.commentCount ?? 0,
+        time: formatTimeAgo(comment.createdAt),
+        onClick: () => navigate(`/post/${comment.postId}`),
+      })),
+    },
+    likes: {
+      label: "내가 좋아요한 글",
+      totalCount: likesData?.totalCount ?? 0,
+      items: (likesData?.items ?? []).map((like) => ({
+        id: like.postId,
+        title: like.title,
+        content: like.content ?? "",
+        likes: like.likeCount ?? 0,
+        comments: like.commentCount ?? 0,
+        time: formatTimeAgo(like.createdAt),
+        onClick: () => navigate(`/post/${like.postId}`),
+      })),
+    },
+  };
+
+  const current = categoryConfig[selectedCategory];
 
   return (
     <div className="flex gap-6 items-start">
@@ -62,7 +110,7 @@ const MyActivityPage = () => {
             onClick={() => handleCategoryChange("comments")}
           />
           <MyActivityCategory
-            label="내가 좋아요한 댓글"
+            label="내가 좋아요한 글"
             selected={selectedCategory === "likes"}
             onClick={() => handleCategoryChange("likes")}
           />
@@ -71,31 +119,42 @@ const MyActivityPage = () => {
 
       <div className="flex-1 flex flex-col gap-10">
         <header className="flex items-center gap-3 text-head-02">
-          <h2 className="text-text-primary">{currentCategoryData.label}</h2>
-          <span className="text-text-deactivated">{totalItems}개</span>
+          <h2 className="text-text-primary">{current.label}</h2>
+          <span className="text-text-deactivated">{current.totalCount}개</span>
         </header>
 
-        <div className="flex flex-col gap-10 items-center">
-          <div className="flex flex-col gap-4 w-full">
-            {currentItems.map((item) => (
+        <div className="flex flex-col">
+          {isLoading ? (
+            <div className="flex h-40 items-center justify-center">
+              <span className="text-body-03 text-text-secondary font-medium">
+                로딩 중...
+              </span>
+            </div>
+          ) : isError ? (
+            <div className="flex h-40 items-center justify-center">
+              <span className="text-body-03 text-text-secondary font-medium">
+                데이터를 불러오지 못했습니다.
+              </span>
+            </div>
+          ) : current.items.length > 0 ? (
+            current.items.map((item) => (
               <PostPreviewItem
                 key={item.id}
                 title={item.title}
                 content={item.content}
-                author={item.user}
-                likes={item.heart}
-                comments={item.comment}
-                time={formatTimeAgo(item.createdAt)}
-                imageUrl={item.postImage?.[0]}
+                likes={item.likes}
+                comments={item.comments}
+                time={item.time}
+                onClick={item.onClick}
               />
-            ))}
-          </div>
-
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={setCurrentPage}
-          />
+            ))
+          ) : (
+            <div className="flex h-40 items-center justify-center">
+              <span className="text-body-03 text-text-secondary font-medium">
+                내역이 없습니다.
+              </span>
+            </div>
+          )}
         </div>
       </div>
     </div>

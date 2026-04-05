@@ -19,6 +19,9 @@ export const API_ENDPOINTS = {
   member: {
     me: "/members/me",
     studentNumberVisibility: "/members/me/student-number-visibility",
+    myPosts: "/members/me/posts",
+    myComments: "/members/me/comments",
+    myLikes: "/members/me/likes",
   },
   post: {
     base: "/posts",

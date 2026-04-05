@@ -1,36 +1,79 @@
 import { FileText, Heart, MessageCircleMore } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
-import { likedPosts } from "@/mocks/likedPosts";
-import { myComments } from "@/mocks/myComments";
-import { myPosts } from "@/mocks/myPosts";
+import { useLogoutMutation } from "@/features/auth/model/useLogoutMutation";
+import { useMyCommentsQuery } from "@/features/member/model/useMyCommentsQuery";
+import { useMyLikesQuery } from "@/features/member/model/useMyLikesQuery";
+import { useMyPostsQuery } from "@/features/member/model/useMyPostsQuery";
+import { useMyProfileQuery } from "@/features/member/model/useMyProfileQuery";
+import { useUpdateNicknameMutation } from "@/features/member/model/useUpdateNicknameMutation";
+import { useUpdateStudentNumberVisibilityMutation } from "@/features/member/model/useUpdateStudentNumberVisibilityMutation";
 import { LogoutButton } from "@/shared/ui/LogoutButton/LogoutButton";
+import { StudentNumberVisibilityToggle } from "@/shared/ui/StudentNumberVisibilityToggle/StudentNumberVisibilityToggle";
+import { formatTimeAgo } from "@/utils/formatTime";
 import { MyActivitySectionBoard } from "@/widgets/mypage/MyActivitySectionBoard/MyActivitySectionBoard";
 import { ProfileWidget } from "@/widgets/mypage/ProfileWidget/ProfileWidget";
 
 const MyPage = () => {
   const navigate = useNavigate();
-  const userData = {
-    name: "사용자명",
-    major: "전공",
-    studentId: "학번",
-    imgURL: null,
-  };
+  const { data: profile } = useMyProfileQuery();
+  const { mutate: updateNickname } = useUpdateNicknameMutation();
+  const { mutate: updateStudentNumberVisibility } =
+    useUpdateStudentNumberVisibilityMutation();
+  const { mutate: logoutMutate } = useLogoutMutation();
+  const {
+    data: postsData,
+    isLoading: isPostsLoading,
+    isError: isPostsError,
+  } = useMyPostsQuery();
+  const {
+    data: commentsData,
+    isLoading: isCommentsLoading,
+    isError: isCommentsError,
+  } = useMyCommentsQuery();
+  const {
+    data: likesData,
+    isLoading: isLikesLoading,
+    isError: isLikesError,
+  } = useMyLikesQuery();
 
-  const handleProfileSave = (data: {
+  const handleProfileSave = ({
+    userName,
+  }: {
     userName: string;
     imageFile: File | null;
   }) => {
-    console.log("프로필 저장:", data);
+    updateNickname(userName);
   };
 
   const handleLogout = () => {
-    console.log("로그아웃");
+    logoutMutate();
   };
 
   const handleMoreClick = (category: "posts" | "comments" | "likes") => {
     navigate("/mypage/activity", { state: { category } });
   };
+
+  const myPostItems = (postsData?.items ?? []).map((post) => ({
+    id: post.postId,
+    title: post.title,
+    createdAt: formatTimeAgo(post.createdAt),
+    onClick: () => navigate(`/post/${post.postId}`),
+  }));
+
+  const myCommentItems = (commentsData?.items ?? []).map((comment) => ({
+    id: comment.commentId,
+    title: comment.postTitle,
+    createdAt: formatTimeAgo(comment.createdAt),
+    onClick: () => navigate(`/post/${comment.postId}`),
+  }));
+
+  const myLikeItems = (likesData?.items ?? []).map((like) => ({
+    id: like.postId,
+    title: like.title,
+    createdAt: formatTimeAgo(like.createdAt),
+    onClick: () => navigate(`/post/${like.postId}`),
+  }));
 
   return (
     <div className="flex flex-col gap-10">
@@ -43,11 +86,16 @@ const MyPage = () => {
               프로필 관리
             </h2>
             <ProfileWidget
-              initialUserName={userData.name}
-              major={userData.major}
-              studentId={userData.studentId}
-              imgURL={userData.imgURL}
+              initialUserName={profile?.nickname ?? ""}
+              major="전공"
+              studentId={profile?.studentNumber ?? ""}
+              imgURL={null}
               onSave={handleProfileSave}
+            />
+            <StudentNumberVisibilityToggle
+              studentNumber={profile?.studentNumber ?? ""}
+              visible={profile?.studentNumberVisible ?? false}
+              onToggle={updateStudentNumberVisibility}
             />
           </section>
 
@@ -64,26 +112,47 @@ const MyPage = () => {
           <div className="bg-white border border-border-deactivated rounded-2xl p-5 flex flex-col gap-10">
             <MyActivitySectionBoard
               title="내가 쓴 글"
-              count={32}
+              count={postsData?.totalCount ?? 0}
               icon={<FileText size={18} />}
-              items={myPosts}
+              items={isPostsLoading || isPostsError ? [] : myPostItems}
               onMoreClick={() => handleMoreClick("posts")}
+              statusMessage={
+                isPostsLoading
+                  ? "로딩 중..."
+                  : isPostsError
+                    ? "데이터를 불러오지 못했습니다."
+                    : undefined
+              }
             />
 
             <MyActivitySectionBoard
               title="내가 쓴 댓글"
-              count={64}
+              count={commentsData?.totalCount ?? 0}
               icon={<MessageCircleMore size={18} />}
-              items={myComments}
+              items={isCommentsLoading || isCommentsError ? [] : myCommentItems}
               onMoreClick={() => handleMoreClick("comments")}
+              statusMessage={
+                isCommentsLoading
+                  ? "로딩 중..."
+                  : isCommentsError
+                    ? "데이터를 불러오지 못했습니다."
+                    : undefined
+              }
             />
 
             <MyActivitySectionBoard
               title="좋아요"
-              count={10}
+              count={likesData?.totalCount ?? 0}
               icon={<Heart size={18} />}
-              items={likedPosts}
+              items={isLikesLoading || isLikesError ? [] : myLikeItems}
               onMoreClick={() => handleMoreClick("likes")}
+              statusMessage={
+                isLikesLoading
+                  ? "로딩 중..."
+                  : isLikesError
+                    ? "데이터를 불러오지 못했습니다."
+                    : undefined
+              }
             />
           </div>
         </div>

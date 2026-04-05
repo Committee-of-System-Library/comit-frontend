@@ -5,7 +5,7 @@ import { UserRound, Heart, MessageCircleMore } from "lucide-react";
 interface PostPreviewItemProps extends HTMLAttributes<HTMLDivElement> {
   title: string;
   content: string;
-  author: string;
+  author?: string;
   likes: number | string;
   comments: number | string;
   time: string;
@@ -39,12 +39,14 @@ export const PostPreviewItem = ({
         </div>
 
         <div className="flex flex-row items-center gap-2 h-4.25 w-full min-w-0">
-          <div className="flex flex-row text-text-placeholder items-center gap-1 shrink-0">
-            <UserRound className="w-4 h-4" />
-            <span className="text-caption-02 leading-[1.4] whitespace-nowrap">
-              {author}
-            </span>
-          </div>
+          {author !== undefined && (
+            <div className="flex flex-row text-text-placeholder items-center gap-1 shrink-0">
+              <UserRound className="w-4 h-4" />
+              <span className="text-caption-02 leading-[1.4] whitespace-nowrap">
+                {author}
+              </span>
+            </div>
+          )}
           <div className="flex flex-row items-center gap-2 min-w-0">
             <div className="flex flex-row text-text-placeholder items-center gap-0.5 shrink-0">
               <Heart className="w-4 h-4" />

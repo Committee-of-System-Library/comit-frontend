@@ -19,6 +19,7 @@ export interface MyActivitySectionBoardProps {
   items: MyActivityItem[];
   onMoreClick?: () => void;
   className?: string;
+  statusMessage?: string;
 }
 
 export const MyActivitySectionBoard = ({
@@ -28,6 +29,7 @@ export const MyActivitySectionBoard = ({
   items,
   onMoreClick,
   className,
+  statusMessage,
 }: MyActivitySectionBoardProps) => {
   return (
     <div className={cn("flex w-[752px] flex-col gap-[11px]", className)}>
@@ -59,7 +61,13 @@ export const MyActivitySectionBoard = ({
 
       <section className="bg-background-light border-border-deactivated h-[122px] overflow-hidden rounded-xl border shadow-sm">
         <div className="flex flex-col py-1">
-          {items.length > 0 ? (
+          {statusMessage ? (
+            <div className="flex h-[122px] items-center justify-center p-4">
+              <span className="text-body-03 text-text-secondary font-medium">
+                {statusMessage}
+              </span>
+            </div>
+          ) : items.length > 0 ? (
             items
               .slice(0, 3)
               .map((item) => (
@@ -72,7 +80,7 @@ export const MyActivitySectionBoard = ({
                 />
               ))
           ) : (
-            <div className="text-text-tertiary flex h-[122px] items-center justify-center p-4">
+            <div className="flex h-[122px] items-center justify-center p-4">
               <span className="text-body-03 text-text-secondary font-medium">
                 내역이 없습니다.
               </span>
