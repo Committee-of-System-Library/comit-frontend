@@ -1,3 +1,9 @@
+import {
+  createApiHttpError,
+  isAbortFetchError,
+  readResponsePayload,
+} from "@/shared/api/problem-detail";
+
 type QueryValue = string | number | boolean | null | undefined;
 
 type QueryParams = object;
@@ -7,12 +13,6 @@ interface ApiResponse<T> {
   data: T;
   code?: string | null;
   message?: string | null;
-}
-
-interface ProblemDetailLike {
-  detail?: string;
-  title?: string;
-  message?: string;
 }
 
 interface RequestOptions {
@@ -55,40 +55,48 @@ export const resolveApiUrl = (path: string, params?: QueryParams) => {
   return `${API_BASE_URL}${normalizedPath}${buildQueryString(params)}`;
 };
 
-const parseErrorMessage = async (response: Response) => {
-  const contentType = response.headers.get("content-type") ?? "";
-
-  if (!contentType.includes("application/json")) {
-    return `${response.status} ${response.statusText}`;
-  }
-
-  const payload = (await response.json()) as ProblemDetailLike;
-
-  return (
-    payload.detail ??
-    payload.message ??
-    payload.title ??
-    `${response.status} ${response.statusText}`
-  );
-};
-
 async function request<T>(path: string, options: RequestOptions = {}) {
   const { body, headers, method = "GET", params, signal } = options;
+  const requestUrl = resolveApiUrl(path, params);
 
-  const response = await fetch(resolveApiUrl(path, params), {
-    method,
-    signal,
-    credentials: "include",
-    headers: {
-      Accept: "application/json",
-      ...(body !== undefined ? { "Content-Type": "application/json" } : {}),
-      ...headers,
-    },
-    body: body !== undefined ? JSON.stringify(body) : undefined,
-  });
+  let response: Response;
+
+  try {
+    response = await fetch(requestUrl, {
+      method,
+      signal,
+      credentials: "include",
+      headers: {
+        Accept: "application/json",
+        ...(body !== undefined ? { "Content-Type": "application/json" } : {}),
+        ...headers,
+      },
+      body: body !== undefined ? JSON.stringify(body) : undefined,
+    });
+  } catch (error) {
+    if (isAbortFetchError(error)) {
+      throw error;
+    }
+
+    throw createApiHttpError({
+      method,
+      payload: error,
+      status: 0,
+      statusText: "Network Error",
+      url: requestUrl,
+    });
+  }
 
   if (!response.ok) {
-    throw new Error(await parseErrorMessage(response));
+    const payload = await readResponsePayload(response);
+
+    throw createApiHttpError({
+      method,
+      payload,
+      status: response.status,
+      statusText: response.statusText,
+      url: requestUrl,
+    });
   }
 
   if (response.status === 204) {

@@ -6,6 +6,8 @@ import { z } from "zod";
 
 import { WRITE_POST_PRESET_TAGS } from "@/constants/writeTags";
 import type { BoardType } from "@/entities/post/model/types";
+import { normalizePostDomainError } from "@/features/post/model/postDomainError";
+import { resolvePostDomainErrorMessage } from "@/features/post/model/postDomainErrorMessage";
 import { useCreatePostMutation } from "@/features/post/model/useCreatePostMutation";
 import {
   WRITE_POST_MAX_CONTENT_LENGTH,
@@ -63,6 +65,16 @@ const writePostFormSchema = z.object({
 });
 
 type WritePostFormValues = z.infer<typeof writePostFormSchema>;
+
+const API_FIELD_TO_FORM_FIELD: Partial<
+  Record<string, keyof WritePostFormValues>
+> = {
+  boardType: "board",
+  content: "content",
+  imageUrls: "images",
+  tags: "tags",
+  title: "title",
+};
 
 const BOARD_TYPE_MAP: Record<string, BoardType> = {
   free: "FREE",
@@ -206,11 +218,37 @@ const WritePage = () => {
       toast.success("게시글이 등록되었습니다.");
       navigate(`/post/${postId}`);
     } catch (error) {
-      const message =
-        error instanceof Error
-          ? error.message
-          : "게시글 등록에 실패했습니다. 잠시 후 다시 시도해 주세요.";
-      toast.error(message);
+      const normalizedError = normalizePostDomainError(error);
+
+      if (normalizedError.kind === "validation") {
+        let hasMappedField = false;
+
+        normalizedError.invalidFields?.forEach((invalidField) => {
+          const fieldName = API_FIELD_TO_FORM_FIELD[invalidField.field];
+
+          if (!fieldName) {
+            return;
+          }
+
+          hasMappedField = true;
+          setError(fieldName, {
+            message: invalidField.reason,
+            type: "server",
+          });
+        });
+
+        if (hasMappedField) {
+          return;
+        }
+      }
+
+      toast.error(
+        resolvePostDomainErrorMessage(normalizedError, {
+          auth: "로그인 후 게시글을 작성할 수 있어요.",
+          default: "게시글 등록에 실패했습니다. 잠시 후 다시 시도해 주세요.",
+          forbidden: "게시글을 작성할 권한이 없습니다.",
+        }),
+      );
     }
   };
 

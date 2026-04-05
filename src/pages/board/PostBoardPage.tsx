@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 
 import { NoSearchResult } from "@/components/common/NoSearchResult";
 import type { BoardType } from "@/entities/post/model/types";
+import { resolvePostDomainErrorMessage } from "@/features/post/model/postDomainErrorMessage";
 import { mapPostSummaryToBoardPostCardItem } from "@/features/post/model/postUiMappers";
 import { usePostListQuery } from "@/features/post/model/usePostListQuery";
 import { AdminPostCard } from "@/shared/ui/AdminPostCard/AdminPostCard";
@@ -28,7 +29,7 @@ export const PostBoardPage = ({
   const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
-  const { data, isError, isLoading } = usePostListQuery({
+  const { data, error, isError, isLoading } = usePostListQuery({
     boardType,
     size: FETCH_SIZE,
   });
@@ -81,7 +82,13 @@ export const PostBoardPage = ({
           </div>
         ) : isError ? (
           <div className="rounded-xl border border-border-deactivated bg-background-light px-4 py-10 text-center text-body-02 text-error-03">
-            게시글을 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.
+            {resolvePostDomainErrorMessage(error, {
+              auth: "로그인 후 게시글을 확인할 수 있어요.",
+              default:
+                "게시글을 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.",
+              forbidden: "이 게시판을 볼 권한이 없습니다.",
+              notFound: "게시글을 찾을 수 없습니다.",
+            })}
           </div>
         ) : currentPosts.length > 0 ? (
           currentPosts.map((post) =>

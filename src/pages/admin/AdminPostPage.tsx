@@ -9,6 +9,7 @@ import {
   useDeletePost,
   usePatchPostVisibility,
 } from "@/apis/modules/admin-post";
+import { resolvePostDomainErrorMessage } from "@/features/post/model/postDomainErrorMessage";
 import { AdminEmptyState } from "@/shared/ui/AdminEmptyState/AdminEmptyState";
 import { AdminPostCard } from "@/shared/ui/AdminPostCard/AdminPostCard";
 import { AdminStatusBadge } from "@/shared/ui/AdminStatusBadge/AdminStatusBadge";
@@ -35,6 +36,18 @@ const boardLabels: Record<BoardType, string> = {
 const parsePage = (pageParam: string | null) => {
   const numericPage = Number(pageParam);
   return Number.isFinite(numericPage) && numericPage > 0 ? numericPage : 1;
+};
+
+const resolveAdminPostErrorMessage = (
+  error: unknown,
+  fallbackMessage: string,
+) => {
+  return resolvePostDomainErrorMessage(error, {
+    auth: "로그인 후 관리자 기능을 사용할 수 있어요.",
+    default: fallbackMessage,
+    forbidden: "관리자 권한이 필요합니다.",
+    notFound: "대상 게시글을 찾을 수 없습니다.",
+  });
 };
 
 const AdminPostPage = () => {
@@ -93,9 +106,10 @@ const AdminPostPage = () => {
       toast.success(hidden ? "게시글을 숨겼습니다." : "게시글을 복원했습니다.");
     } catch (error) {
       toast.error(
-        error instanceof Error
-          ? error.message
-          : "게시글 상태를 업데이트하지 못했습니다.",
+        resolveAdminPostErrorMessage(
+          error,
+          "게시글 상태를 업데이트하지 못했습니다.",
+        ),
       );
     }
   };
@@ -111,9 +125,7 @@ const AdminPostPage = () => {
       setDeleteTargetId(null);
     } catch (error) {
       toast.error(
-        error instanceof Error
-          ? error.message
-          : "게시글을 삭제하지 못했습니다.",
+        resolveAdminPostErrorMessage(error, "게시글을 삭제하지 못했습니다."),
       );
     }
   };
@@ -149,9 +161,10 @@ const AdminPostPage = () => {
 
       {postsQuery.isError ? (
         <div className="rounded-3xl border border-error-03/30 bg-error-03/10 px-6 py-10 text-center text-body-02 text-error-02">
-          {postsQuery.error instanceof Error
-            ? postsQuery.error.message
-            : "게시글 목록을 불러오지 못했습니다."}
+          {resolveAdminPostErrorMessage(
+            postsQuery.error,
+            "게시글 목록을 불러오지 못했습니다.",
+          )}
         </div>
       ) : isEmpty ? (
         <AdminEmptyState
