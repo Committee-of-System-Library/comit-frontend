@@ -2,6 +2,7 @@ import { FileText, Heart, MessageCircleMore } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 import { useMyProfileQuery } from "@/features/member/model/useMyProfileQuery";
+import { useUpdateNicknameMutation } from "@/features/member/model/useUpdateNicknameMutation";
 import { likedPosts } from "@/mocks/likedPosts";
 import { myComments } from "@/mocks/myComments";
 import { myPosts } from "@/mocks/myPosts";
@@ -13,8 +14,16 @@ import { ProfileWidget } from "@/widgets/mypage/ProfileWidget/ProfileWidget";
 const MyPage = () => {
   const navigate = useNavigate();
   const { data: profile } = useMyProfileQuery();
+  const { mutate: updateNickname } = useUpdateNicknameMutation();
 
-  const handleProfileSave = () => {};
+  const handleProfileSave = ({
+    userName,
+  }: {
+    userName: string;
+    imageFile: File | null;
+  }) => {
+    updateNickname(userName);
+  };
 
   const handleLogout = () => {};
 
