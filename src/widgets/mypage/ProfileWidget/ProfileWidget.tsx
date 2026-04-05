@@ -22,15 +22,16 @@ export const ProfileWidget = ({
   onSave,
 }: ProfileWidgetProps) => {
   const [isEditing, setIsEditing] = useState(false);
-  const [userName, setUserName] = useState(initialUserName);
+  const [editingName, setEditingName] = useState(initialUserName);
   const [imageFile, setImageFile] = useState<File | null>(null);
 
   const handleEditToggle = () => {
+    setEditingName(initialUserName);
     setIsEditing(true);
   };
 
   const handleSave = () => {
-    onSave?.({ userName, imageFile });
+    onSave?.({ userName: editingName, imageFile });
     setIsEditing(false);
   };
 
@@ -51,13 +52,13 @@ export const ProfileWidget = ({
           {isEditing ? (
             <div className="w-[152px]">
               <UserNameInput
-                value={userName}
-                onChange={(e) => setUserName(e.target.value)}
+                value={editingName}
+                onChange={(e) => setEditingName(e.target.value)}
               />
             </div>
           ) : (
             <span className="text-text-primary text-label-01 h-[34px] flex items-center px-1 truncate font-bold">
-              {userName}
+              {initialUserName}
             </span>
           )}
           <div className="text-text-secondary text-label-04 flex items-center gap-1 px-1 whitespace-nowrap">
