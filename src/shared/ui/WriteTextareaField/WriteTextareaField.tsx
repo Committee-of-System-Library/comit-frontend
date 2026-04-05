@@ -90,11 +90,7 @@ export const WriteTextareaField = forwardRef<
             ref={ref}
             id={textareaId}
             aria-invalid={Boolean(errorMessage)}
-            aria-describedby={
-              helperText || (errorMessage && !shouldShowInlineError)
-                ? helperId
-                : undefined
-            }
+            aria-describedby={helperText || errorMessage ? helperId : undefined}
             className={cn(
               "min-h-60 w-full resize-none rounded-xl border bg-background-light p-4 text-body-01 text-text-primary transition-colors",
               shouldShowInlineError
@@ -116,14 +112,19 @@ export const WriteTextareaField = forwardRef<
           />
 
           {showCount ? (
-            <p className="pointer-events-none absolute right-4 bottom-5 text-caption-02 text-text-placeholder">
-              {currentLength}자
-              {typeof maxLength === "number" ? "/최대글자수" : null}
+            <p
+              className={cn(
+                "pointer-events-none absolute right-4 bottom-5 text-caption-02",
+                errorMessage ? "text-error-01" : "text-text-placeholder",
+              )}
+            >
+              {currentLength}
+              {typeof maxLength === "number" ? `/${maxLength}` : null}
             </p>
           ) : null}
         </div>
 
-        {helperText || (errorMessage && !shouldShowInlineError) ? (
+        {helperText || errorMessage ? (
           <p
             className={cn(
               "text-label-06",

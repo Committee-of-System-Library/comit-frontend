@@ -43,7 +43,7 @@ describe("resolvePostDomainErrorMessage", () => {
       invalidFields: [
         {
           field: "title",
-          reason: "required",
+          message: "제목은 필수입니다.",
         },
       ],
       kind: "validation",
@@ -57,8 +57,8 @@ describe("resolvePostDomainErrorMessage", () => {
       resolvePostDomainErrorMessage(error, {
         default: "기본 메시지",
         validation: (normalizedError) =>
-          normalizedError.invalidFields?.[0]?.reason ?? "검증 실패",
+          normalizedError.invalidFields?.[0]?.message ?? "검증 실패",
       }),
-    ).toBe("required");
+    ).toBe("제목은 필수입니다.");
   });
 });

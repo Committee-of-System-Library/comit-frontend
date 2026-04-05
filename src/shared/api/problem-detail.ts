@@ -45,15 +45,16 @@ const normalizeInvalidFields = (
       }
 
       const field = asNonEmptyString(item.field);
-      const reason = asNonEmptyString(item.reason);
+      const message =
+        asNonEmptyString(item.message) ?? asNonEmptyString(item.reason);
 
-      if (!field || !reason) {
+      if (!field || !message) {
         return null;
       }
 
       const normalizedField: ApiInvalidField = {
         field,
-        reason,
+        message,
       };
 
       const rejectedValue = asNonEmptyString(item.rejectedValue);

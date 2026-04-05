@@ -17,7 +17,7 @@ describe("problem-detail normalization", () => {
         invalidFields: [
           {
             field: "title",
-            reason: "required",
+            message: "제목은 필수입니다.",
           },
         ],
         status: 400,
@@ -39,7 +39,7 @@ describe("problem-detail normalization", () => {
     expect(error.invalidFields).toEqual([
       {
         field: "title",
-        reason: "required",
+        message: "제목은 필수입니다.",
       },
     ]);
     expect(error.isRetryable).toBe(false);

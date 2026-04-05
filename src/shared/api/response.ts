@@ -5,7 +5,7 @@ export interface ApiSuccessResponse<TData = unknown> {
 
 export interface ApiInvalidField {
   field: string;
-  reason: string;
+  message: string;
   rejectedValue?: string;
 }
 

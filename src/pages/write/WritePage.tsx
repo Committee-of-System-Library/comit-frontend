@@ -39,6 +39,7 @@ const writePostFormSchema = z.object({
   content: z
     .string()
     .trim()
+    .min(1, "내용은 필수로 입력해야 합니다")
     .max(
       WRITE_POST_MAX_CONTENT_LENGTH,
       `본문은 최대 ${WRITE_POST_MAX_CONTENT_LENGTH}자까지 입력 가능합니다`,
@@ -232,7 +233,7 @@ const WritePage = () => {
 
           hasMappedField = true;
           setError(fieldName, {
-            message: invalidField.reason,
+            message: invalidField.message,
             type: "server",
           });
         });
@@ -300,6 +301,7 @@ const WritePage = () => {
                 }
                 maxLength={WRITE_POST_MAX_TITLE_LENGTH}
                 placeholder="제목을 입력하세요"
+                showCount
               />
             )}
           />
@@ -313,6 +315,8 @@ const WritePage = () => {
               <WriteTextareaField
                 {...field}
                 className="h-60 min-h-60"
+                errorMessage={errors.content?.message}
+                inlineError
                 label="내용"
                 maxLength={WRITE_POST_MAX_CONTENT_LENGTH}
                 placeholder="게시판의 성격에 맞지 않는 글은 삭제될 수 있습니다"
