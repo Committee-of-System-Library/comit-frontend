@@ -6,11 +6,11 @@ import {
   mapPostSummaryToRecentEvent,
   mapPostSummaryToRecentNotice,
 } from "@/features/post/model/postUiMappers";
-import { useCachedBoardPostList } from "@/features/post/model/useCachedBoardPostList";
 import { useHotPostsQuery } from "@/features/post/model/useHotPostsQuery";
-import { mockHotPosts, type HotPost } from "@/mocks/hotPosts";
-import { mockRecentEvents, type RecentEvent } from "@/mocks/recentEvents";
-import { mockRecentNotices, type RecentNotice } from "@/mocks/recentNotices";
+import { usePostListQuery } from "@/features/post/model/usePostListQuery";
+import type { HotPost } from "@/mocks/hotPosts";
+import type { RecentEvent } from "@/mocks/recentEvents";
+import type { RecentNotice } from "@/mocks/recentNotices";
 import { WritingButton } from "@/shared/ui/WritingButton/WritingButton";
 import { cn } from "@/utils/cn";
 import { EventSideBoard } from "@/widgets/sideBoard/EventSideBoard/EventSideBoard";
@@ -33,26 +33,24 @@ export const DefaultRightRail = ({
   ...props
 }: DefaultRightRailProps) => {
   const navigate = useNavigate();
-  const { data: cachedNoticePosts } = useCachedBoardPostList({
+  const { data: noticePosts } = usePostListQuery({
     boardType: "NOTICE",
-    size: 100,
+    enabled: notices === undefined,
+    size: 5,
   });
-  const { data: cachedEventPosts } = useCachedBoardPostList({
+  const { data: eventPosts } = usePostListQuery({
     boardType: "EVENT",
-    size: 100,
+    enabled: events === undefined,
+    size: 5,
   });
   const { data: hotPostData } = useHotPostsQuery({
     enabled: hotPosts === undefined,
   });
   const resolvedNotices: RecentNotice[] =
-    notices ??
-    cachedNoticePosts?.posts.slice(0, 5).map(mapPostSummaryToRecentNotice) ??
-    mockRecentNotices;
+    notices ?? noticePosts?.posts.map(mapPostSummaryToRecentNotice) ?? [];
   const resolvedEvents: RecentEvent[] =
-    events ??
-    cachedEventPosts?.posts.slice(0, 5).map(mapPostSummaryToRecentEvent) ??
-    mockRecentEvents;
-  const resolvedHotPosts: HotPost[] = hotPosts ?? hotPostData ?? mockHotPosts;
+    events ?? eventPosts?.posts.map(mapPostSummaryToRecentEvent) ?? [];
+  const resolvedHotPosts: HotPost[] = hotPosts ?? hotPostData ?? [];
 
   const handleWriteClick = () => {
     if (onWriteClick) {

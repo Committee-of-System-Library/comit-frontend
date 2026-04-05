@@ -95,7 +95,6 @@ const AppContent = ({ isCseStudent, isAuthenticated }: AppContentProps) => {
             : undefined
       }
       rightRailClassName={isTitleBoardPage ? "pt-[90px]" : undefined}
-      rightRail={isWritePath || isMyPage ? null : undefined}
       topBanner={isMainPage ? <Banner items={mockBannerItems} /> : undefined}
     >
       <>
