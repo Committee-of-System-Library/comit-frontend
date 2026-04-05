@@ -3,7 +3,6 @@ import { useState } from "react";
 import { Reply } from "lucide-react";
 
 import { useCreateCommentMutation } from "@/features/comment/model/useCreateCommentMutation";
-import { useDeleteCommentMutation } from "@/features/comment/model/useDeleteCommentMutation";
 import { useEditCommentMutation } from "@/features/comment/model/useEditCommentMutation";
 import { CommentEditor } from "@/shared/ui/CommentEditor/CommentEditor";
 import { DetailButton } from "@/shared/ui/DetailButton/DetailButton";
@@ -15,6 +14,7 @@ import { formatTimeAgo } from "@/utils/formatTime";
 interface CommentItemProps extends Omit<CommentData, "replies"> {
   postId: number;
   onReport: (id: number, name: string, content: string) => void;
+  onDelete: (id: number) => void;
 }
 
 const baseClass =
@@ -49,6 +49,7 @@ export const CommentItem = ({
   name,
   profileImageUrl,
   onReport,
+  onDelete,
 }: CommentItemProps) => {
   type EditorMode = "none" | "edit" | "reply";
   const [editorMode, setEditorMode] = useState<EditorMode>("none");
@@ -57,7 +58,6 @@ export const CommentItem = ({
   const { mutate: createReply } = useCreateCommentMutation();
   const { mutate: editComment, isPending: isEditing } =
     useEditCommentMutation();
-  const { mutate: deleteComment } = useDeleteCommentMutation();
 
   if (variant === "deleted" || variant === "deletedReply") {
     return (
@@ -169,10 +169,7 @@ export const CommentItem = ({
                     setIsMenuOpen(false);
                   }}
                   onDelete={() => {
-                    deleteComment({
-                      commentId: Number(id),
-                      postId: postId,
-                    });
+                    onDelete(Number(id));
                     setIsMenuOpen(false);
                   }}
                   onReport={() => {

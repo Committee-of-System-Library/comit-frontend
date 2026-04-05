@@ -4,9 +4,11 @@ import { useParams } from "react-router-dom";
 
 import { useCommentsQuery } from "@/features/comment/model/useCommentsQuery";
 import { useCreateCommentMutation } from "@/features/comment/model/useCreateCommentMutation";
+import { useDeleteCommentMutation } from "@/features/comment/model/useDeleteCommentMutation";
 import { MOCK_POST_DATA } from "@/mocks/detailPost";
 import { CommentGroup } from "@/shared/ui/CommentGroup/CommentGroup";
 import { CommentInput } from "@/shared/ui/CommentInput/CommentInput";
+import { DeleteModal } from "@/shared/ui/DeleteModal/DeleteModal";
 import { PostDetailCard } from "@/shared/ui/PostDetailCard/PostDetailCard";
 import { ReportModal } from "@/shared/ui/ReportModal/ReportModal";
 
@@ -20,12 +22,15 @@ const PostPage = () => {
     content: string;
   } | null>(null);
 
+  const [deleteTargetId, setDeleteTargetId] = useState<number | null>(null);
+
   const { data, isLoading } = useCommentsQuery({ postId: currentPostId });
 
   const comments = data?.comments ?? [];
 
   const { mutate: createComment, isPending: isCreating } =
     useCreateCommentMutation();
+  const { mutate: deleteComment } = useDeleteCommentMutation();
 
   const handleCommentSubmit = (value: string) => {
     createComment({
@@ -89,6 +94,7 @@ const PostPage = () => {
                 onReport={(id, name, content) =>
                   setReportTarget({ id, name, content })
                 }
+                onDelete={(id) => setDeleteTargetId(id)}
               />
             ))
           )}
@@ -100,6 +106,22 @@ const PostPage = () => {
           contents={reportTarget.content}
           commentId={reportTarget.id}
           onClose={() => setReportTarget(null)}
+        />
+      )}
+      {deleteTargetId !== null && (
+        <DeleteModal
+          target="comment"
+          onClose={() => setDeleteTargetId(null)}
+          onConfirm={() => {
+            deleteComment(
+              { commentId: deleteTargetId, postId: currentPostId },
+              {
+                onSuccess: () => {
+                  setDeleteTargetId(null); // 삭제 성공 시 모달 닫기
+                },
+              },
+            );
+          }}
         />
       )}
     </main>
