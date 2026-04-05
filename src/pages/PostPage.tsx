@@ -13,7 +13,6 @@ import { mapPostDetailToPost } from "@/features/post/model/postUiMappers";
 import { usePostDetailQuery } from "@/features/post/model/usePostDetailQuery";
 import { useTogglePostLikeMutation } from "@/features/post/model/useTogglePostLikeMutation";
 import { buildPostShareUrl } from "@/shared/lib/share-url";
-
 import { CommentGroup } from "@/shared/ui/CommentGroup/CommentGroup";
 import { CommentInput } from "@/shared/ui/CommentInput/CommentInput";
 import { DeleteModal } from "@/shared/ui/DeleteModal/DeleteModal";
