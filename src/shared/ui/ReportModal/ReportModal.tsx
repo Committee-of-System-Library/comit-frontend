@@ -2,25 +2,28 @@ import { useState, type ChangeEvent } from "react";
 
 import { createPortal } from "react-dom";
 
+import { useReportCommentMutation } from "@/features/comment/model/useReportCommentMutation";
+
 interface ReportModalProps {
   user?: string;
   contents?: string;
+  commentId: number;
   disabled?: boolean;
   onClose: () => void;
-  onConfirm: (reason: string) => void;
 }
 
 export const ReportModal = ({
   user = "",
   contents = "",
+  commentId,
   disabled = false,
   onClose,
-  onConfirm,
 }: ReportModalProps) => {
   const [reason, setReason] = useState("");
   const MAX_LENGTH = 30;
 
-  const isActivated = reason.trim().length > 0 && !disabled;
+  const { mutate: report, isPending } = useReportCommentMutation();
+  const isActivated = reason.trim().length > 0 && !disabled && !isPending;
 
   const portalRoot = document.getElementById("modal-portal");
   if (!portalRoot) return null;
@@ -29,6 +32,22 @@ export const ReportModal = ({
     if (e.target.value.length <= MAX_LENGTH) {
       setReason(e.target.value);
     }
+  };
+
+  const handleConfirm = () => {
+    if (!isActivated) return;
+
+    report(
+      {
+        commentId,
+        payload: { message: reason.trim() },
+      },
+      {
+        onSuccess: () => {
+          onClose();
+        },
+      },
+    );
   };
 
   return createPortal(
@@ -62,10 +81,10 @@ export const ReportModal = ({
           <button
             type="button"
             disabled={!isActivated}
-            onClick={() => onConfirm(reason.trim())}
+            onClick={handleConfirm}
             className="flex items-center justify-center rounded-xl h-11 w-34 border bg-info-01 transition-colors duration-200 hover:bg-[#006DCC] disabled:bg-info-03 disabled:cursor-not-allowed text-label-04 text-text-inverse"
           >
-            확인
+            {isPending ? "처리 중" : "확인"}
           </button>
         </div>
       </section>

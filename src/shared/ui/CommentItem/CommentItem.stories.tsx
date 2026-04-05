@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { fn } from "@storybook/test";
 
 import { CommentItem } from "./CommentItem";
 
@@ -6,6 +7,12 @@ const meta = {
   title: "Shared/UI/CommentItem",
   component: CommentItem,
   tags: ["autodocs"],
+  args: {
+    id: "1", // 추가
+    postId: 100, // 추가
+    onReport: fn(), // 추가
+    onDelete: fn(),
+  },
   parameters: {
     docs: {
       description: {

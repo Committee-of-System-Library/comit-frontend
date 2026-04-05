@@ -25,9 +25,9 @@
     "noUncheckedSideEffectImports": true,
 
     /* Linting */
-    "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["./src/*"],
+      "@components/*": ["./src/components/*"]
     }
   },
   "include": ["src"]

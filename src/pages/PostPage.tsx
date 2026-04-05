@@ -1,51 +1,91 @@
-import { useMemo } from "react";
+import { useState, useMemo } from "react";
 
 import toast from "react-hot-toast";
 import { useNavigate, useParams } from "react-router-dom";
 
+import { useCommentsQuery } from "@/features/comment/model/useCommentsQuery";
+import { useCreateCommentMutation } from "@/features/comment/model/useCreateCommentMutation";
+import { useDeleteCommentMutation } from "@/features/comment/model/useDeleteCommentMutation";
 import { useMyProfileQuery } from "@/features/member/model/useMyProfileQuery";
 import { normalizePostDomainError } from "@/features/post/model/postDomainError";
 import { resolvePostDomainErrorMessage } from "@/features/post/model/postDomainErrorMessage";
 import { mapPostDetailToPost } from "@/features/post/model/postUiMappers";
 import { usePostDetailQuery } from "@/features/post/model/usePostDetailQuery";
 import { useTogglePostLikeMutation } from "@/features/post/model/useTogglePostLikeMutation";
-import { MOCK_COMMENTS } from "@/mocks/detailPost";
 import { buildPostShareUrl } from "@/shared/lib/share-url";
 import { CommentGroup } from "@/shared/ui/CommentGroup/CommentGroup";
 import { CommentInput } from "@/shared/ui/CommentInput/CommentInput";
+import { DeleteModal } from "@/shared/ui/DeleteModal/DeleteModal";
 import { PostDetailCard } from "@/shared/ui/PostDetailCard/PostDetailCard";
+import { ReportModal } from "@/shared/ui/ReportModal/ReportModal";
 
 const PostPage = () => {
   const navigate = useNavigate();
   const { postId } = useParams<{ postId: string }>();
   const parsedPostId = Number(postId);
   const isValidPostId = Number.isInteger(parsedPostId) && parsedPostId > 0;
+
+  // -- 댓글 모달 상태 --
+  const [reportTarget, setReportTarget] = useState<{
+    id: number;
+    name: string;
+    content: string;
+  } | null>(null);
+  const [deleteTargetId, setDeleteTargetId] = useState<number | null>(null);
+
+  // -- API Queries & Mutations --
+  const { data: myProfile } = useMyProfileQuery();
+
   const {
-    data,
+    data: postData,
     error: detailError,
-    isError,
-    isLoading,
+    isError: isPostError,
+    isLoading: isPostLoading,
   } = usePostDetailQuery({
     postId: parsedPostId,
     enabled: isValidPostId,
   });
-  const togglePostLikeMutation = useTogglePostLikeMutation();
-  const { data: myProfile } = useMyProfileQuery();
 
+  const togglePostLikeMutation = useTogglePostLikeMutation();
+
+  const { data: commentsData, isLoading: isCommentsLoading } = useCommentsQuery({ 
+    postId: parsedPostId 
+  });
+  
+  const comments = commentsData?.comments ?? [];
+  const { mutate: createComment, isPending: isCreating } = useCreateCommentMutation();
+  const { mutate: deleteComment } = useDeleteCommentMutation();
+
+  // -- 데이터 가공 (Memos) --
   const mappedPost = useMemo(() => {
-    if (!data) {
+    if (!postData) {
       return null;
     }
+    const isMine = !!myProfile && myProfile.nickname === postData.authorNickname;
+    return { ...mapPostDetailToPost(postData), isMine };
+  }, [postData, myProfile]);
 
-    const isMine = !!myProfile && myProfile.nickname === data.authorNickname;
-    return { ...mapPostDetailToPost(data), isMine };
-  }, [data, myProfile]);
+  const uiComments = comments.map((item) => ({
+    id: String(item.id),
+    content: item.content,
+    createdAt: item.createdAt,
+    name: item.authorNickname,
+    isMine: item.mine,
+    variant: "base" as const,
+    isEdited: item.updatedAt !== null,
+    replies:
+      item.replies?.map((reply) => ({
+        id: String(reply.id),
+        content: reply.content,
+        createdAt: reply.createdAt,
+        name: reply.authorNickname,
+        isMine: reply.mine,
+        variant: "reply" as const,
+        isEdited: reply.updatedAt !== null,
+      })) || [],
+  }));
 
-  // 💡 댓글 등록 핸들러 (API 연동 전 테스트용)
-  const handleCommentSubmit = (value: string) => {
-    console.info("새 댓글 등록:", value);
-  };
-
+  // -- 이벤트 핸들러 --
   const handleTogglePostLike = async () => {
     try {
       await togglePostLikeMutation.mutateAsync(parsedPostId);
@@ -61,7 +101,15 @@ const PostPage = () => {
     }
   };
 
-  const resolvedDetailError = isError
+  const handleCommentSubmit = (value: string) => {
+    createComment({
+      postId: parsedPostId,
+      payload: { content: value },
+    });
+  };
+
+  // -- 예외 및 로딩 처리 (Early Returns) --
+  const resolvedDetailError = isPostError
     ? normalizePostDomainError(detailError)
     : null;
 
@@ -75,7 +123,7 @@ const PostPage = () => {
     );
   }
 
-  if (isLoading) {
+  if (isPostLoading) {
     return (
       <main className="flex w-full max-w-223.5 flex-col items-center gap-8 pb-10">
         <div className="w-full rounded-xl border border-border-deactivated bg-background-light px-4 py-10 text-center text-body-02 text-text-tertiary">
@@ -85,7 +133,7 @@ const PostPage = () => {
     );
   }
 
-  if (isError || !mappedPost) {
+  if (isPostError || !mappedPost) {
     const detailErrorMessage = resolvePostDomainErrorMessage(
       resolvedDetailError,
       {
@@ -105,6 +153,7 @@ const PostPage = () => {
     );
   }
 
+  // -- 메인 렌더링 --
   return (
     <main className="min-w-163.5 max-w-223.5 flex flex-col items-center pb-10 gap-8">
       <PostDetailCard
@@ -118,20 +167,65 @@ const PostPage = () => {
         tag={mappedPost.tag ?? []}
       />
       <div className="w-full flex flex-col gap-4">
-        <CommentInput onSubmit={handleCommentSubmit} />
+        <CommentInput onSubmit={handleCommentSubmit} disabled={isCreating} />
         <div className="flex gap-2 items-center">
           <p className="text-subtitle-02 text-text-tertiary pl-3">댓글</p>
-          <p className="text-subtitle-03 text-text-placeholder">
-            {MOCK_COMMENTS.length}
+          <p className="text-subtitle-02 text-text-placeholder">
+            {comments.length}
           </p>
         </div>
 
         <div className="flex flex-col border border-border-deactivated rounded-xl overflow-hidden">
-          {MOCK_COMMENTS.map((item) => (
-            <CommentGroup key={item.id} comment={item} />
-          ))}
+          {isCommentsLoading ? (
+            <div className="p-8 text-center text-text-secondary">
+              댓글을 불러오는 중입니다...
+            </div>
+          ) : comments.length === 0 ? (
+            <div className="p-8 text-center text-text-secondary bg-white">
+              아직 댓글이 없습니다. 첫 댓글을 남겨보세요!
+            </div>
+          ) : (
+            uiComments.map((item) => (
+              <CommentGroup
+                key={item.id}
+                comment={item}
+                postId={parsedPostId}
+                onReport={(id, name, content) =>
+                  setReportTarget({ id, name, content })
+                }
+                onDelete={(id) => setDeleteTargetId(Number(id))}
+              />
+            ))
+          )}
         </div>
       </div>
+      
+      {/* 모달 렌더링 */}
+      {reportTarget && (
+        <ReportModal
+          user={reportTarget.name}
+          contents={reportTarget.content}
+          commentId={reportTarget.id}
+          onClose={() => setReportTarget(null)}
+        />
+      )}
+      
+      {deleteTargetId !== null && (
+        <DeleteModal
+          target="comment"
+          onClose={() => setDeleteTargetId(null)}
+          onConfirm={() => {
+            deleteComment(
+              { commentId: deleteTargetId, postId: parsedPostId },
+              {
+                onSuccess: () => {
+                  setDeleteTargetId(null);
+                },
+              },
+            );
+          }}
+        />
+      )}
     </main>
   );
 };

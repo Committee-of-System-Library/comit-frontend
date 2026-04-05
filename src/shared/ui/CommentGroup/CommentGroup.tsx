@@ -3,21 +3,24 @@ import { type CommentData } from "@/types/comment";
 
 interface CommentGroupProps {
   comment: CommentData;
-  onReplySubmit?: (parentId: string, content: string) => void;
-  onEditSubmit?: (commentId: string, content: string) => void;
+  postId: number;
+  onReport: (id: number, name: string, content: string) => void;
+  onDelete: (id: number) => void;
 }
 
 export const CommentGroup = ({
   comment,
-  onReplySubmit,
-  onEditSubmit,
+  postId,
+  onReport,
+  onDelete,
 }: CommentGroupProps) => {
   return (
     <div className="flex flex-col w-full border-b border-border-deactivated last:border-none">
       <CommentItem
         {...comment}
-        onReplySubmit={(content) => onReplySubmit?.(comment.id, content)}
-        onEditSubmit={(content) => onEditSubmit?.(comment.id, content)}
+        postId={postId}
+        onReport={onReport}
+        onDelete={onDelete}
       />
 
       {comment.replies && comment.replies.length > 0 && (
@@ -26,7 +29,9 @@ export const CommentGroup = ({
             <CommentItem
               key={reply.id}
               {...reply}
-              onEditSubmit={(content) => onEditSubmit?.(reply.id, content)}
+              postId={postId}
+              onReport={onReport}
+              onDelete={onDelete}
             />
           ))}
         </div>

@@ -1,6 +1,7 @@
 # Comit FE 공통 API 구조 가이드
 
 ## 1) 목적
+
 - 팀원이 병렬로 작업해도 API 호출 방식, 에러 처리, 캐싱 정책이 섞이지 않도록 기준점을 통일합니다.
 - 피그마/UI 구현 코드와 API 코드를 분리해서 유지보수 비용을 낮춥니다.
 - 백엔드 명세 변경 시 수정 범위를 최소화합니다.
@@ -82,9 +83,11 @@ fetch("/posts?board=qna&pageSize=50");
 - 400 에러 또는 fallback 동작으로 잘못된 데이터 노출
 
 ## 2) 참고 명세
+
 - 백엔드 API 문서: `https://committee-of-system-library.github.io/knu-cse-comit-server/`
 
 ## 3) 폴더 구조
+
 ```text
 src/
   shared/
@@ -118,6 +121,7 @@ src/
 ## 4) 응답/에러 규칙
 
 ### 성공 응답
+
 백엔드 성공 응답은 공통적으로 아래 형태를 사용합니다.
 
 ```json
@@ -131,6 +135,7 @@ src/
 - `data`가 없는 성공 응답(`{ "result": "SUCCESS" }`)은 `void`로 처리합니다.
 
 ### 에러 응답
+
 에러는 Problem Details 확장 형태를 사용합니다.
 
 ```json
@@ -149,11 +154,13 @@ src/
 - UI/feature 레벨에서는 `errorCode`, `status`, `invalidFields`를 우선 사용합니다.
 
 ## 5) endpoint 구성 원칙
+
 - 문자열 하드코딩 대신 `shared/api/endpoints.ts`를 사용합니다.
 - path parameter는 함수형 endpoint로 관리합니다.
   - 예: `API_ENDPOINTS.post.detail(postId)`
 
 ## 6) React Query 기준
+
 - 전역 기본값:
   - `refetchOnWindowFocus: false`
   - `staleTime: 30s`
@@ -164,17 +171,20 @@ src/
 ## 7) 도메인별 1차 연결 범위
 
 ### Auth
+
 - `GET /auth/register/prefill`
 - `POST /auth/register`
 - `POST /auth/sso/logout`
 - `GET /auth/sso/login`은 URL 이동 목적이므로 helper URL 함수로 사용
 
 ### Member
+
 - `GET /members/me`
 - `PATCH /members/me`
 - `PATCH /members/me/student-number-visibility`
 
 ### Post
+
 - `GET /posts` (cursor 기반)
 - `GET /posts/hot` (인기글 상위 5개)
 - `GET /posts/{postId}`
@@ -185,8 +195,12 @@ src/
 - `POST /posts/{postId}/reports`
 
 ### Comment
+
+- `POST /posts/{postId}/comments`
+- `DELETE /comments/{commentId}`
+- `PATCH /comments/{commentId}`
 - `GET /posts/{postId}/comments`
-- `POST /comments/{commentId}/helpful`
+- `POST /comments/{commentId}/like` (1차 구현 생략)
 - `POST /comments/{commentId}/reports`
 
 ## 8) 게시글 목록 조회 예시 (공통 구조 적용)
@@ -202,7 +216,10 @@ src/
 
 ```ts
 // src/entities/post/api/getPosts.ts
-import type { PostListQuery, PostListResponse } from "@/entities/post/model/types";
+import type {
+  PostListQuery,
+  PostListResponse,
+} from "@/entities/post/model/types";
 import { apiClient } from "@/shared/api/client";
 import { API_ENDPOINTS } from "@/shared/api/endpoints";
 
@@ -271,6 +288,7 @@ const QnABoardPage = () => {
 이렇게 하면 페이지는 API 세부사항(`baseURL`, `credentials`, `result/data`, 에러 파싱)을 알 필요가 없습니다.
 
 ## 9) 간단 사용 예시
+
 ```ts
 import { useQuery } from "@tanstack/react-query";
 
@@ -286,11 +304,13 @@ export const useQnaPostsQuery = () => {
 ```
 
 ## 10) 환경 변수
+
 - `.env.local`
   - `VITE_API_BASE_URL=http://localhost:8080` (백엔드 서버 주소)
 - 값이 비어 있으면 같은 origin 기준 상대 경로(`/posts` 등)로 호출합니다.
 
 ## 11) 팀 공통 작업 규칙
+
 - API 호출은 컴포넌트에서 직접 `fetch`하지 않고 `entities/*/api`만 사용합니다.
 - 페이지/위젯에서는 가능하면 `features/*/model`의 훅만 사용합니다.
 - 서버 명세 변경 시 순서:
@@ -300,6 +320,7 @@ export const useQnaPostsQuery = () => {
   4. 화면 컴포넌트 수정
 
 ## 12) 추가 학습 추천
+
 - React Query: query key 설계, mutation 후 invalidation 전략
 - API 에러 UX: 도메인 에러코드(`errorCode`) 기반 메시지 매핑
 - DTO ↔ UI ViewModel 분리

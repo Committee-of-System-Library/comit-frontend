@@ -2,6 +2,8 @@ import { useState } from "react";
 
 import { Reply } from "lucide-react";
 
+import { useCreateCommentMutation } from "@/features/comment/model/useCreateCommentMutation";
+import { useEditCommentMutation } from "@/features/comment/model/useEditCommentMutation";
 import { CommentEditor } from "@/shared/ui/CommentEditor/CommentEditor";
 import { DetailButton } from "@/shared/ui/DetailButton/DetailButton";
 import { OptionList } from "@/shared/ui/OptionList/OptionList";
@@ -9,9 +11,10 @@ import { type CommentData, type CommentVariant } from "@/types/comment";
 import { cn } from "@/utils/cn";
 import { formatTimeAgo } from "@/utils/formatTime";
 
-interface CommentItemProps extends Omit<CommentData, "replies" | "id"> {
-  onReplySubmit?: (content: string) => void;
-  onEditSubmit?: (content: string) => void;
+interface CommentItemProps extends Omit<CommentData, "replies"> {
+  postId: number;
+  onReport: (id: number, name: string, content: string) => void;
+  onDelete: (id: number) => void;
 }
 
 const baseClass =
@@ -36,22 +39,25 @@ const ReplyIcon = () => (
 );
 
 export const CommentItem = ({
+  id,
+  postId,
   variant,
   content,
   createdAt,
   isMine,
   isEdited = false,
-  onReplySubmit,
-  onEditSubmit,
   name,
   profileImageUrl,
+  onReport,
+  onDelete,
 }: CommentItemProps) => {
   type EditorMode = "none" | "edit" | "reply";
   const [editorMode, setEditorMode] = useState<EditorMode>("none");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  const [currentContent, setCurrentContent] = useState(content);
-  const [currentIsEdited, setCurrentIsEdited] = useState(isEdited);
+  const { mutate: createReply } = useCreateCommentMutation();
+  const { mutate: editComment, isPending: isEditing } =
+    useEditCommentMutation();
 
   if (variant === "deleted" || variant === "deletedReply") {
     return (
@@ -68,13 +74,22 @@ export const CommentItem = ({
         <div className="mt-2 w-full">
           <CommentEditor
             mode="edit"
-            originContent={currentContent}
+            originContent={content}
+            disabled={isEditing}
             onCancel={() => setEditorMode("none")}
             onEdit={(newContent) => {
-              onEditSubmit?.(newContent);
-              setCurrentContent(newContent);
-              setCurrentIsEdited(true);
-              setEditorMode("none");
+              editComment(
+                {
+                  commentId: Number(id),
+                  postId: postId,
+                  payload: { content: newContent },
+                },
+                {
+                  onSuccess: () => {
+                    setEditorMode("none");
+                  },
+                },
+              );
             }}
           />
         </div>
@@ -85,15 +100,25 @@ export const CommentItem = ({
       return (
         <>
           <p className="mt-2 text-text-primary text-label-04 whitespace-pre-wrap">
-            {currentContent}
+            {content}
           </p>
           <div className="mt-3 w-full">
             <CommentEditor
               mode="reply"
               onCancel={() => setEditorMode("none")}
               onReply={(replyContent) => {
-                onReplySubmit?.(replyContent);
-                setEditorMode("none");
+                createReply(
+                  {
+                    postId: postId,
+                    payload: {
+                      content: replyContent,
+                      parentCommentId: Number(id),
+                    },
+                  },
+                  {
+                    onSuccess: () => setEditorMode("none"),
+                  },
+                );
               }}
             />
           </div>
@@ -103,7 +128,7 @@ export const CommentItem = ({
 
     return (
       <p className="mt-2 text-text-primary text-label-04 whitespace-pre-wrap">
-        {currentContent}
+        {content}
       </p>
     );
   };
@@ -128,7 +153,7 @@ export const CommentItem = ({
               <span className="text-label-03">{name}</span>
               <span className="text-caption-02">
                 {formatTimeAgo(createdAt)}
-                {currentIsEdited && " · 수정됨"}
+                {isEdited && " · 수정됨"}
               </span>
             </div>
           </div>
@@ -141,6 +166,14 @@ export const CommentItem = ({
                   mode={isMine ? "myComment" : "others"}
                   onEdit={() => {
                     setEditorMode("edit");
+                    setIsMenuOpen(false);
+                  }}
+                  onDelete={() => {
+                    onDelete(Number(id));
+                    setIsMenuOpen(false);
+                  }}
+                  onReport={() => {
+                    onReport(Number(id), name, content);
                     setIsMenuOpen(false);
                   }}
                 />

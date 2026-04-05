@@ -9,7 +9,7 @@ export const API_ENDPOINTS = {
   comment: {
     byPost: (postId: number) => `/posts/${postId}/comments`,
     detail: (commentId: number) => `/comments/${commentId}`,
-    helpful: (commentId: number) => `/comments/${commentId}/helpful`,
+    like: (commentId: number) => `/comments/${commentId}/like`,
     report: (commentId: number) => `/comments/${commentId}/reports`,
   },
   image: {
