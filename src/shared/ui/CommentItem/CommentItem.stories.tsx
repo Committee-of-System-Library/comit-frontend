@@ -11,6 +11,7 @@ const meta = {
     id: "1", // 추가
     postId: 100, // 추가
     onReport: fn(), // 추가
+    onDelete: fn(),
   },
   parameters: {
     docs: {

@@ -12,6 +12,7 @@ const meta = {
     onReport: fn((id, name, content) =>
       console.info("신고하기:", id, name, content),
     ),
+    onDelete: fn(),
   },
   parameters: {
     docs: {
