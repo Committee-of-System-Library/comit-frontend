@@ -1,6 +1,7 @@
 import { FileText, Heart, MessageCircleMore } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
+import { useLogoutMutation } from "@/features/auth/model/useLogoutMutation";
 import { useMyProfileQuery } from "@/features/member/model/useMyProfileQuery";
 import { useUpdateNicknameMutation } from "@/features/member/model/useUpdateNicknameMutation";
 import { useUpdateStudentNumberVisibilityMutation } from "@/features/member/model/useUpdateStudentNumberVisibilityMutation";
@@ -18,6 +19,7 @@ const MyPage = () => {
   const { mutate: updateNickname } = useUpdateNicknameMutation();
   const { mutate: updateStudentNumberVisibility } =
     useUpdateStudentNumberVisibilityMutation();
+  const { mutate: logoutMutate } = useLogoutMutation();
 
   const handleProfileSave = ({
     userName,
@@ -28,7 +30,9 @@ const MyPage = () => {
     updateNickname(userName);
   };
 
-  const handleLogout = () => {};
+  const handleLogout = () => {
+    logoutMutate();
+  };
 
   const handleMoreClick = (category: "posts" | "comments" | "likes") => {
     navigate("/mypage/activity", { state: { category } });
