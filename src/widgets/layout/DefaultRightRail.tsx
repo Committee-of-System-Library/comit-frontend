@@ -2,9 +2,15 @@ import type { HTMLAttributes } from "react";
 
 import { useNavigate } from "react-router-dom";
 
-import { mockHotPosts, type HotPost } from "@/mocks/hotPosts";
-import { mockRecentEvents, type RecentEvent } from "@/mocks/recentEvents";
-import { mockRecentNotices, type RecentNotice } from "@/mocks/recentNotices";
+import {
+  mapPostSummaryToRecentEvent,
+  mapPostSummaryToRecentNotice,
+} from "@/features/post/model/postUiMappers";
+import { useHotPostsQuery } from "@/features/post/model/useHotPostsQuery";
+import { usePostListQuery } from "@/features/post/model/usePostListQuery";
+import type { HotPost } from "@/mocks/hotPosts";
+import type { RecentEvent } from "@/mocks/recentEvents";
+import type { RecentNotice } from "@/mocks/recentNotices";
 import { WritingButton } from "@/shared/ui/WritingButton/WritingButton";
 import { cn } from "@/utils/cn";
 import { EventSideBoard } from "@/widgets/sideBoard/EventSideBoard/EventSideBoard";
@@ -20,13 +26,31 @@ interface DefaultRightRailProps extends HTMLAttributes<HTMLDivElement> {
 
 export const DefaultRightRail = ({
   className,
-  events = mockRecentEvents,
-  hotPosts = mockHotPosts,
-  notices = mockRecentNotices,
+  events,
+  hotPosts,
+  notices,
   onWriteClick,
   ...props
 }: DefaultRightRailProps) => {
   const navigate = useNavigate();
+  const { data: noticePosts } = usePostListQuery({
+    boardType: "NOTICE",
+    enabled: notices === undefined,
+    size: 5,
+  });
+  const { data: eventPosts } = usePostListQuery({
+    boardType: "EVENT",
+    enabled: events === undefined,
+    size: 5,
+  });
+  const { data: hotPostData } = useHotPostsQuery({
+    enabled: hotPosts === undefined,
+  });
+  const resolvedNotices: RecentNotice[] =
+    notices ?? noticePosts?.posts.map(mapPostSummaryToRecentNotice) ?? [];
+  const resolvedEvents: RecentEvent[] =
+    events ?? eventPosts?.posts.map(mapPostSummaryToRecentEvent) ?? [];
+  const resolvedHotPosts: HotPost[] = hotPosts ?? hotPostData ?? [];
 
   const handleWriteClick = () => {
     if (onWriteClick) {
@@ -47,9 +71,18 @@ export const DefaultRightRail = ({
       >
         글 작성하기
       </WritingButton>
-      <NoticeSideBoard notices={notices} />
-      <HotPostSideBoard posts={hotPosts} />
-      <EventSideBoard events={events} />
+      <NoticeSideBoard
+        notices={resolvedNotices}
+        onItemClick={(id) => navigate(`/post/${id}`)}
+      />
+      <HotPostSideBoard
+        posts={resolvedHotPosts}
+        onItemClick={(id) => navigate(`/post/${id}`)}
+      />
+      <EventSideBoard
+        events={resolvedEvents}
+        onItemClick={(id) => navigate(`/post/${id}`)}
+      />
     </div>
   );
 };

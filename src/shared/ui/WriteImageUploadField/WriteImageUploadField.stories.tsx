@@ -8,13 +8,18 @@ import {
   type WriteImageUploadItem,
 } from "./WriteImageUploadField";
 
+const createMockFile = (name: string, type = "image/png") =>
+  new File(["storybook"], name, { type });
+
 const initialFiles: WriteImageUploadItem[] = [
   {
+    file: createMockFile("예시 이미지.png"),
     id: "1",
     name: "예시 이미지.png",
     sizeLabel: "1.2MB",
   },
   {
+    file: createMockFile("배너 시안.jpg", "image/jpeg"),
     id: "2",
     name: "배너 시안.jpg",
     sizeLabel: "850KB",
@@ -32,6 +37,7 @@ const InteractiveWriteImageUploadField = (args: WriteImageUploadFieldProps) => {
         files={files}
         onFilesSelect={(selectedFiles) => {
           const nextFiles = [...selectedFiles].map((file, index) => ({
+            file,
             id: `${file.name}-${index}`,
             name: file.name,
             sizeLabel: `${Math.ceil(file.size / 1024)}KB`,
@@ -76,6 +82,9 @@ export const EdgeCase: Story = {
   args: {
     files: [
       {
+        file: createMockFile(
+          "아주_길고_복잡한_파일명_테스트_이미지_데이터_입니다_레이아웃_확인용.png",
+        ),
         id: "long-file-name",
         name: "아주_길고_복잡한_파일명_테스트_이미지_데이터_입니다_레이아웃_확인용.png",
         sizeLabel: "9.9MB",

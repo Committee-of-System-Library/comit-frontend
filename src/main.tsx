@@ -6,7 +6,6 @@ import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
 
 import { queryClient } from "@/shared/api/query-client";
-
 import "./index.css";
 
 createRoot(document.getElementById("root")!).render(

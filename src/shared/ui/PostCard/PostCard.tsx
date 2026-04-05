@@ -22,10 +22,14 @@ export const PostCard = ({
   postImage = [],
   tags = [],
   disabled = false,
+  onClick,
 }: PostCardProps) => {
   return (
-    <article
-      className={`w-full px-4 py-3.5 flex items-start justify-between rounded-xl border border-border-deactivated bg-background-light hover:bg-background-dark transition-colors duration-200 ${disabled ? "opacity-50 pointer-events-none" : ""}`}
+    <button
+      className={`w-full px-4 py-3.5 flex items-start justify-between rounded-xl border border-border-deactivated bg-background-light hover:bg-background-dark transition-colors duration-200 text-left ${disabled ? "opacity-50 pointer-events-none" : ""}`}
+      disabled={disabled}
+      onClick={onClick}
+      type="button"
     >
       <div className="flex flex-1 flex-col gap-2 overflow-hidden pr-4">
         <div className="flex gap-2">
@@ -96,6 +100,6 @@ export const PostCard = ({
       <p className="text-caption-02 text-text-placeholder shrink-0">
         {formatTimeAgo(createdAt)}
       </p>
-    </article>
+    </button>
   );
 };

@@ -16,6 +16,7 @@ const meta = {
     createdAt: "2026.03.22 15:58",
     disabled: false,
     isMine: false,
+    shareUrl: "https://comit.example.com/post/1",
     userImage: "https://picsum.photos/100",
     image: [
       "https://picsum.photos/id/10/400/400",

@@ -1,4 +1,5 @@
 export interface RecentNotice {
+  id?: number;
   title: string;
   date: string;
 }

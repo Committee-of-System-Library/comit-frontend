@@ -7,11 +7,13 @@ import { HotPostItem } from "@/shared/ui/HotPostItem/HotPostItem";
 
 interface HotPostSideBoardProps extends HTMLAttributes<HTMLDivElement> {
   posts: HotPost[];
+  onItemClick?: (id: number) => void;
 }
 
 export const HotPostSideBoard = ({
   posts,
   className = "",
+  onItemClick,
   ...props
 }: HotPostSideBoardProps) => {
   return (
@@ -36,6 +38,9 @@ export const HotPostSideBoard = ({
             time={post.time}
             className={
               index === Math.min(posts.length, 5) - 1 ? "border-b-0" : ""
+            }
+            onClick={
+              post.id !== undefined ? () => onItemClick?.(post.id!) : undefined
             }
           />
         ))}

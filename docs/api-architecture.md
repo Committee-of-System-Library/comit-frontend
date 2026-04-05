@@ -186,8 +186,11 @@ src/
 ### Post
 
 - `GET /posts` (cursor 기반)
+- `GET /posts/hot` (인기글 상위 5개)
 - `GET /posts/{postId}`
 - `POST /posts`
+- `PATCH /posts/{postId}`
+- `DELETE /posts/{postId}`
 - `POST /posts/{postId}/like`
 - `POST /posts/{postId}/reports`
 

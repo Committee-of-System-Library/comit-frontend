@@ -24,7 +24,10 @@ type Story = StoryObj<typeof meta>;
 export const QnABoard: Story = {
   args: {
     title: "Q&A",
-    posts: mockQnAPosts.slice(0, 5),
+    posts: mockQnAPosts.slice(0, 5).map((post, index) => ({
+      ...post,
+      postId: index + 1,
+    })),
   },
   decorators: [
     (Story) => (
@@ -38,7 +41,10 @@ export const QnABoard: Story = {
 export const InformationBoard: Story = {
   args: {
     title: "정보게시판",
-    posts: mockInfoPosts.slice(0, 3),
+    posts: mockInfoPosts.slice(0, 3).map((post, index) => ({
+      ...post,
+      postId: index + 101,
+    })),
   },
   decorators: [
     (Story) => (
@@ -52,7 +58,10 @@ export const InformationBoard: Story = {
 export const FreeBoard: Story = {
   args: {
     title: "자유게시판",
-    posts: mockFreePosts.slice(0, 3),
+    posts: mockFreePosts.slice(0, 3).map((post, index) => ({
+      ...post,
+      postId: index + 201,
+    })),
   },
   decorators: [
     (Story) => (

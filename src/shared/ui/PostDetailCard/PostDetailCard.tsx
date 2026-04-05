@@ -12,6 +12,10 @@ interface PostDetailCardProps extends Post {
   disabled?: boolean;
   isMine?: boolean;
   onClick?: () => void;
+  onEdit?: () => void;
+  onLikeClick?: () => void;
+  isLikePending?: boolean;
+  shareUrl?: string;
 }
 
 export const PostDetailCard = ({
@@ -19,6 +23,7 @@ export const PostDetailCard = ({
   content,
   user,
   heart,
+  likedByMe = false,
   createdAt,
   view,
   image = [],
@@ -26,6 +31,10 @@ export const PostDetailCard = ({
   userImage,
   disabled = false,
   isMine = false,
+  onEdit,
+  onLikeClick,
+  isLikePending = false,
+  shareUrl,
 }: PostDetailCardProps) => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [scrollProgress, setScrollProgress] = useState(0);
@@ -75,7 +84,7 @@ export const PostDetailCard = ({
           <DetailButton onClick={() => setIsMenuOpen(!isMenuOpen)} />
           {isMenuOpen && (
             <div className="absolute right-0 top-full z-10 mt-1">
-              <OptionList mode={isMine ? "myPost" : "others"} />
+              <OptionList mode={isMine ? "myPost" : "others"} onEdit={onEdit} />
             </div>
           )}
         </div>
@@ -142,8 +151,13 @@ export const PostDetailCard = ({
       </div>
 
       <div className="flex gap-2">
-        <HeartButton count={heart} />
-        <ShareButton url={`https://yourdomain.com/post/${title}`} />
+        <HeartButton
+          count={heart}
+          disabled={disabled || isLikePending}
+          onClick={onLikeClick}
+          variant={likedByMe ? "liked" : "unLiked"}
+        />
+        <ShareButton url={shareUrl} />
       </div>
     </article>
   );

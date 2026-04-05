@@ -1,4 +1,5 @@
 export interface HotPost {
+  id?: number;
   title: string;
   author: string;
   views: number | string;
