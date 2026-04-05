@@ -16,7 +16,6 @@ import { queryKeys } from "@/shared/api/query-keys";
 type PostLikeSnapshot = readonly [QueryKey, PostLikeCacheData | undefined];
 
 type TogglePostLikeMutationContext = {
-  detailQueryKey: QueryKey;
   snapshots: PostLikeSnapshot[];
 };
 
@@ -26,15 +25,14 @@ export const useTogglePostLikeMutation = () => {
   return useMutation({
     mutationFn: (postId: number) => togglePostLike(postId),
     onMutate: async (postId): Promise<TogglePostLikeMutationContext> => {
-      const detailQueryKey = queryKeys.post.detail(postId);
-
       await queryClient.cancelQueries({ queryKey: queryKeys.post.all });
 
       const previousPost =
-        queryClient.getQueryData<PostDetail>(detailQueryKey) ?? null;
+        queryClient.getQueryData<PostDetail>(queryKeys.post.detail(postId)) ??
+        null;
 
       if (!previousPost) {
-        return { detailQueryKey, snapshots: [] };
+        return { snapshots: [] };
       }
 
       const nextLiked = !previousPost.likedByMe;
@@ -47,7 +45,7 @@ export const useTogglePostLikeMutation = () => {
         (current) => applyOptimisticPostLikeUpdate(current, postId, nextLiked),
       );
 
-      return { detailQueryKey, snapshots };
+      return { snapshots };
     },
     onError: (_error, _postId, context) => {
       if (!context?.snapshots.length) {
@@ -56,16 +54,6 @@ export const useTogglePostLikeMutation = () => {
 
       context.snapshots.forEach(([queryKey, data]) => {
         queryClient.setQueryData(queryKey, data);
-      });
-    },
-    onSuccess: async (_data, _postId, context) => {
-      if (!context) {
-        return;
-      }
-
-      await queryClient.invalidateQueries({
-        exact: true,
-        queryKey: context.detailQueryKey,
       });
     },
   });
