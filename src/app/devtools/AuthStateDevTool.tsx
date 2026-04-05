@@ -15,8 +15,8 @@ export const AuthStateDevTool = ({
   onCseStudentChange,
   onPreviewSignupGuide,
 }: AuthStateDevToolProps) => (
-  <aside className="fixed right-4 bottom-4 z-50 rounded-xl border border-gray-200 bg-white/95 p-3 shadow-[0px_8px_24px_0px_rgba(0,0,0,0.12)] backdrop-blur-sm">
-    <p className="text-label-06 text-text-tertiary">Auth DevTool</p>
+  <section>
+    <p className="text-caption-01 text-text-placeholder">Auth DevTool</p>
     <div className="mt-2 flex items-center gap-2">
       <button
         className={cn(
@@ -73,11 +73,11 @@ export const AuthStateDevTool = ({
     </div>
 
     <button
-      className="mt-3 w-full rounded-lg bg-primary-600 px-3 py-2 text-label-06 text-text-inverse transition-colors hover:bg-primary-1000"
+      className="mt-3 w-full rounded-xl bg-primary-600 px-3 py-2 text-label-06 text-text-inverse transition-colors hover:bg-primary-1000"
       onClick={onPreviewSignupGuide}
       type="button"
     >
       회원가입 모달 보기
     </button>
-  </aside>
+  </section>
 );

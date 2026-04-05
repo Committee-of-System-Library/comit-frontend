@@ -1,8 +1,9 @@
-import { ApiHttpError } from "@/shared/api/http-error";
 import {
-  isApiErrorResponse,
-  isApiSuccessResponse,
-} from "@/shared/api/response";
+  createApiHttpError,
+  isAbortFetchError,
+  readResponsePayload,
+} from "@/shared/api/problem-detail";
+import { isApiSuccessResponse } from "@/shared/api/response";
 
 type HttpMethod = "DELETE" | "GET" | "PATCH" | "POST" | "PUT";
 
@@ -99,20 +100,6 @@ const isJsonBody = (body: unknown): body is object => {
   return typeof body === "object";
 };
 
-const parseResponsePayload = async (response: Response) => {
-  if (response.status === 204) {
-    return undefined;
-  }
-
-  const contentType = response.headers.get("content-type") ?? "";
-
-  if (contentType.includes("application/json")) {
-    return response.json();
-  }
-
-  return response.text();
-};
-
 const request = async <TResponse = unknown>(
   path: string,
   options: ApiRequestOptions = {},
@@ -133,42 +120,45 @@ const request = async <TResponse = unknown>(
     normalizedHeaders.set("Content-Type", "application/json");
   }
 
-  const response = await fetch(requestUrl, {
-    ...init,
-    body:
-      body === undefined
-        ? undefined
-        : body === null
-          ? null
-          : isJsonBody(body)
-            ? JSON.stringify(body)
-            : body,
-    credentials: "include",
-    headers: normalizedHeaders,
-    method,
-  });
-  const payload = await parseResponsePayload(response);
+  let response: Response;
 
-  if (!response.ok) {
-    if (isApiErrorResponse(payload)) {
-      throw new ApiHttpError({
-        detail: payload.detail,
-        errorCode: payload.errorCode,
-        invalidFields: payload.invalidFields,
-        message: payload.title,
-        method,
-        payload,
-        status: response.status,
-        trackingId: payload.errorTrackingId,
-        url: requestUrl,
-      });
+  try {
+    response = await fetch(requestUrl, {
+      ...init,
+      body:
+        body === undefined
+          ? undefined
+          : body === null
+            ? null
+            : isJsonBody(body)
+              ? JSON.stringify(body)
+              : body,
+      credentials: "include",
+      headers: normalizedHeaders,
+      method,
+    });
+  } catch (error) {
+    if (isAbortFetchError(error)) {
+      throw error;
     }
 
-    throw new ApiHttpError({
-      message: `${method} ${requestUrl} failed with status ${response.status}`,
+    throw createApiHttpError({
+      method,
+      payload: error,
+      status: 0,
+      statusText: "Network Error",
+      url: requestUrl,
+    });
+  }
+
+  const payload = await readResponsePayload(response);
+
+  if (!response.ok) {
+    throw createApiHttpError({
       method,
       payload,
       status: response.status,
+      statusText: response.statusText,
       url: requestUrl,
     });
   }

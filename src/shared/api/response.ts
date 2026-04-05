@@ -5,18 +5,21 @@ export interface ApiSuccessResponse<TData = unknown> {
 
 export interface ApiInvalidField {
   field: string;
-  reason: string;
+  message: string;
   rejectedValue?: string;
 }
 
 export interface ApiErrorResponse {
   type?: string;
-  title: string;
+  title?: string;
   status: number;
   detail?: string;
   instance?: string;
+  code?: string;
   errorCode?: string;
+  message?: string;
   invalidFields?: ApiInvalidField[];
+  trackingId?: string;
   errorTrackingId?: string;
   timestamp?: string;
 }
@@ -43,8 +46,11 @@ export const isApiErrorResponse = (
   }
 
   return (
-    typeof value.title === "string" &&
     typeof value.status === "number" &&
-    typeof value.errorCode === "string"
+    (typeof value.title === "string" ||
+      typeof value.message === "string" ||
+      typeof value.detail === "string" ||
+      typeof value.errorCode === "string" ||
+      typeof value.code === "string")
   );
 };

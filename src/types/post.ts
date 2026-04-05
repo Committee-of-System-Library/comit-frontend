@@ -3,6 +3,7 @@ export interface Post {
   content: string;
   user: string;
   heart: number;
+  likedByMe?: boolean;
   comment: number;
   createdAt: string;
   view?: number;

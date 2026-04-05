@@ -6,7 +6,7 @@ export const writeBoardOptions: BoardSelectOption[] = [
   { label: "자유게시판", value: "free" },
 ];
 
-export const WRITE_POST_MAX_TITLE_LENGTH = 100;
+export const WRITE_POST_MAX_TITLE_LENGTH = 30;
 export const WRITE_POST_MAX_CONTENT_LENGTH = 500;
 export const WRITE_POST_MAX_TAG_COUNT = 5;
 export const WRITE_POST_MAX_IMAGE_COUNT = 5;

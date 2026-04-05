@@ -1,4 +1,5 @@
 export interface RecentEvent {
+  id?: number;
   title: string;
   date: string;
 }

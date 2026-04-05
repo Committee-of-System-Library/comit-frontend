@@ -3,6 +3,7 @@ import { ChevronRight } from "lucide-react";
 import { PostPreviewItem } from "@/shared/ui/PostPreviewItem/PostPreviewItem";
 
 interface Post {
+  postId: number;
   title: string;
   content: string;
   author: string;
@@ -16,12 +17,14 @@ interface SectionBoardProps {
   title: string;
   posts: Post[];
   onViewAll?: () => void;
+  onPostClick?: (post: Post) => void;
 }
 
 export const SectionBoard = ({
   title,
   posts,
   onViewAll,
+  onPostClick,
 }: SectionBoardProps) => {
   return (
     <section className="flex flex-col gap-3 w-full">
@@ -38,9 +41,10 @@ export const SectionBoard = ({
       <div className="flex flex-col border border-border-deactivated rounded-xl overflow-hidden bg-white">
         {posts.map((post, index) => (
           <PostPreviewItem
-            key={index}
+            key={post.postId ?? index}
             {...post}
             className="border-0 border-b border-border-deactivated last:border-b-0 rounded-none max-w-none shadow-none"
+            onClick={onPostClick ? () => onPostClick(post) : undefined}
           />
         ))}
       </div>

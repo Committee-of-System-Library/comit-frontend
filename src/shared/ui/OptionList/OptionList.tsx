@@ -13,7 +13,7 @@ interface OptionListProps {
 }
 
 const Type_MAP: Record<OptionType, OptionVariant[]> = {
-  myPost: ["delete"],
+  myPost: ["edit", "delete"],
   myComment: ["edit", "delete"],
   others: ["report"],
 };

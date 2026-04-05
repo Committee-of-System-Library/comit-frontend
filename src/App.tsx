@@ -9,9 +9,10 @@ import {
   useNavigate,
 } from "react-router-dom";
 
-import { AuthStateDevTool } from "@/app/devtools/AuthStateDevTool";
+import { DevToolDock } from "@/app/devtools/DevToolDock";
 import { AppDesktopShell } from "@/app/layout/AppDesktopShell";
 import { mockBannerItems } from "@/mocks/bannerItems";
+import AdminApp from "@/pages/admin/AdminApp";
 import EventBoardPage from "@/pages/board/EventBoardPage";
 import FreeBoardPage from "@/pages/board/FreeBoardPage";
 import InfoBoardPage from "@/pages/board/InfoBoardPage";
@@ -94,7 +95,6 @@ const AppContent = ({ isCseStudent, isAuthenticated }: AppContentProps) => {
             : undefined
       }
       rightRailClassName={isTitleBoardPage ? "pt-[90px]" : undefined}
-      rightRail={isWritePath || isMyPage ? null : undefined}
       topBanner={isMainPage ? <Banner items={mockBannerItems} /> : undefined}
     >
       <>
@@ -106,7 +106,7 @@ const AppContent = ({ isCseStudent, isAuthenticated }: AppContentProps) => {
           <Route element={<FreeBoardPage />} path="/board/free" />
           <Route element={<NoticeBoardPage />} path="/notice" />
           <Route element={<EventBoardPage />} path="/event" />
-          <Route element={<PostPage />} path="/post" />
+          <Route element={<PostPage />} path="/post/:postId" />
           <Route element={<LoginPage />} path="/login" />
           <Route element={<MyPage />} path="/mypage" />
           <Route element={<MyActivityPage />} path="/mypage/activity" />
@@ -176,21 +176,29 @@ function App() {
         }}
       />
       <BrowserRouter>
-        <AppContent
-          isAuthenticated={isAuthenticated}
-          isCseStudent={isCseStudent}
-        />
-      </BrowserRouter>
+        <Routes>
+          <Route element={<AdminApp />} path="/admin/*" />
+          <Route
+            element={
+              <AppContent
+                isAuthenticated={isAuthenticated}
+                isCseStudent={isCseStudent}
+              />
+            }
+            path="*"
+          />
+        </Routes>
 
-      {import.meta.env.DEV ? (
-        <AuthStateDevTool
-          isAuthenticated={isAuthenticated}
-          onChange={setIsAuthenticated}
-          isCseStudent={isCseStudent}
-          onCseStudentChange={setIsCseStudent}
-          onPreviewSignupGuide={handlePreviewSignupGuide}
-        />
-      ) : null}
+        {import.meta.env.DEV ? (
+          <DevToolDock
+            isAuthenticated={isAuthenticated}
+            onChange={setIsAuthenticated}
+            isCseStudent={isCseStudent}
+            onCseStudentChange={setIsCseStudent}
+            onPreviewSignupGuide={handlePreviewSignupGuide}
+          />
+        ) : null}
+      </BrowserRouter>
     </>
   );
 }

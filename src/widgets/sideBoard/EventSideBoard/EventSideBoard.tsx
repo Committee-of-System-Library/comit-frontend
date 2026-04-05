@@ -7,11 +7,13 @@ import { NoticePreviewItem } from "@/shared/ui/NoticePreviewItem/NoticePreviewIt
 
 interface EventSideBoardProps extends HTMLAttributes<HTMLDivElement> {
   events: RecentEvent[];
+  onItemClick?: (id: number) => void;
 }
 
 export const EventSideBoard = ({
   events,
   className = "",
+  onItemClick,
   ...props
 }: EventSideBoardProps) => {
   return (
@@ -32,6 +34,11 @@ export const EventSideBoard = ({
             title={event.title}
             date={event.date}
             className={index === events.length - 1 ? "border-b-0" : ""}
+            onClick={
+              event.id !== undefined
+                ? () => onItemClick?.(event.id!)
+                : undefined
+            }
           />
         ))}
       </div>
