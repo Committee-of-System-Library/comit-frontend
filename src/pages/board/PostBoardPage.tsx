@@ -50,7 +50,6 @@ export const PostBoardPage = ({
 
     return (
       post.title.toLowerCase().includes(normalizedSearchTerm) ||
-      post.content.toLowerCase().includes(normalizedSearchTerm) ||
       post.user.toLowerCase().includes(normalizedSearchTerm) ||
       (post.tags ?? []).some((tag) =>
         tag.toLowerCase().includes(normalizedSearchTerm),

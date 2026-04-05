@@ -200,7 +200,6 @@ export const createApiHttpError = ({
     errorCode: normalized.errorCode,
     instance: normalized.instance,
     invalidFields: normalized.invalidFields,
-    isRetryable: kind === "network" || kind === "server",
     kind,
     message,
     method,

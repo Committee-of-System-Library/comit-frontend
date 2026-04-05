@@ -28,6 +28,7 @@ const requestDevAuth = async (nickname: string, role: DevRole) => {
     {
       method: "POST",
       credentials: "include",
+      headers: { Accept: "application/json" },
     },
   );
 
@@ -56,6 +57,7 @@ const requestDevLogout = async () => {
   const response = await fetch(resolveApiUrl("/auth/dev/logout"), {
     method: "POST",
     credentials: "include",
+    headers: { Accept: "application/json" },
   });
 
   if (!response.ok) {

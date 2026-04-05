@@ -52,15 +52,19 @@ const getHiddenPostCount = async () => {
     (_, index) => index + 1,
   );
 
-  const responses = await Promise.all(
-    remainingPages.map((page) =>
-      getAdminPosts({ page, size: HIDDEN_POST_COUNT_PAGE_SIZE }),
-    ),
-  );
+  const BATCH_SIZE = 5;
 
-  responses.forEach((response) => {
-    hiddenCount += response.posts.filter((post) => post.hiddenByAdmin).length;
-  });
+  for (let i = 0; i < remainingPages.length; i += BATCH_SIZE) {
+    const batch = remainingPages.slice(i, i + BATCH_SIZE);
+    const responses = await Promise.all(
+      batch.map((page) =>
+        getAdminPosts({ page, size: HIDDEN_POST_COUNT_PAGE_SIZE }),
+      ),
+    );
+    responses.forEach((response) => {
+      hiddenCount += response.posts.filter((post) => post.hiddenByAdmin).length;
+    });
+  }
 
   return hiddenCount;
 };
