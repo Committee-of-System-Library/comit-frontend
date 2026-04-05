@@ -3,7 +3,7 @@ import { useEffect, useRef } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import toast from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { z } from "zod";
 
 import { WRITE_POST_PRESET_TAGS } from "@/constants/writeTags";
@@ -15,6 +15,8 @@ import {
 import { normalizePostDomainError } from "@/features/post/model/postDomainError";
 import { resolvePostDomainErrorMessage } from "@/features/post/model/postDomainErrorMessage";
 import { useCreatePostMutation } from "@/features/post/model/useCreatePostMutation";
+import { usePostDetailQuery } from "@/features/post/model/usePostDetailQuery";
+import { useUpdatePostMutation } from "@/features/post/model/useUpdatePostMutation";
 import {
   WRITE_POST_MAX_CONTENT_LENGTH,
   WRITE_POST_MAX_IMAGE_COUNT,
@@ -82,6 +84,12 @@ const BOARD_TYPE_MAP: Record<string, BoardType> = {
   qna: "QNA",
 };
 
+const BOARD_TYPE_REVERSE_MAP: Partial<Record<string, string>> = {
+  FREE: "free",
+  INFO: "info",
+  QNA: "qna",
+};
+
 const createUploadItems = (selectedFiles: File[]) =>
   selectedFiles.map<WriteImageUploadItem>((file) => ({
     file,
@@ -99,14 +107,28 @@ const revokePreviewUrl = (thumbnailUrl?: string) => {
 
 const WritePage = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const editPostIdParam = searchParams.get("postId");
+  const editPostId = editPostIdParam ? Number(editPostIdParam) : null;
+  const isEditMode =
+    editPostId !== null && Number.isInteger(editPostId) && editPostId > 0;
+
   const { mutateAsync: createPost, isPending: isCreatingPost } =
     useCreatePostMutation();
+  const { mutateAsync: updatePost, isPending: isUpdatingPost } =
+    useUpdatePostMutation();
+  const { data: existingPost } = usePostDetailQuery({
+    postId: editPostId ?? 0,
+    enabled: isEditMode,
+  });
+
   const {
     control,
     clearErrors,
     formState: { errors, isSubmitting },
     getValues,
     handleSubmit,
+    reset,
     setError,
     setValue,
   } = useForm<WritePostFormValues>({
@@ -139,6 +161,24 @@ const WritePage = () => {
       );
     };
   }, []);
+
+  useEffect(() => {
+    if (isEditMode && existingPost) {
+      const existingImages = (existingPost.imageUrls ?? []).map((url) => ({
+        id: url,
+        name: url.split("/").pop() ?? "image",
+        thumbnailUrl: url,
+      }));
+
+      reset({
+        board: BOARD_TYPE_REVERSE_MAP[existingPost.boardType] ?? "",
+        title: existingPost.title,
+        content: existingPost.content,
+        tags: existingPost.tags ?? [],
+        images: existingImages,
+      });
+    }
+  }, [existingPost, isEditMode, reset]);
 
   const handleToggleTag = (tag: string) => {
     const previousTags = getValues("tags");
@@ -230,6 +270,46 @@ const WritePage = () => {
   };
 
   const onSubmit = async (values: WritePostFormValues) => {
+    if (isEditMode) {
+      try {
+        const existingImageUrls = values.images
+          .filter((item) => !item.file)
+          .map((item) => item.thumbnailUrl!);
+
+        const newFiles = values.images
+          .filter((item) => !!item.file)
+          .map((item) => item.file!);
+
+        const newImageUrls =
+          newFiles.length > 0
+            ? await uploadImagesWithPresignedUrl(newFiles, "posts")
+            : [];
+
+        await updatePost({
+          postId: editPostId!,
+          payload: {
+            title: values.title.trim(),
+            content: values.content.trim(),
+            tags: values.tags,
+            imageUrls: [...existingImageUrls, ...newImageUrls],
+          },
+        });
+        toast.success("게시글이 수정되었습니다.");
+        navigate(`/post/${editPostId}`);
+      } catch (error) {
+        const normalizedError = normalizePostDomainError(error);
+        toast.error(
+          resolvePostDomainErrorMessage(normalizedError, {
+            auth: "로그인 후 게시글을 수정할 수 있어요.",
+            default: "게시글 수정에 실패했습니다. 잠시 후 다시 시도해 주세요.",
+            forbidden: "게시글을 수정할 권한이 없습니다.",
+            notFound: "게시글을 찾을 수 없습니다.",
+          }),
+        );
+      }
+      return;
+    }
+
     const boardType = BOARD_TYPE_MAP[values.board];
 
     if (!boardType) {
@@ -310,7 +390,9 @@ const WritePage = () => {
 
   return (
     <section className="w-full space-y-10">
-      <h1 className="w-full text-head-02 text-text-primary">글 작성하기</h1>
+      <h1 className="w-full text-head-02 text-text-primary">
+        {isEditMode ? "글 수정하기" : "글 작성하기"}
+      </h1>
 
       <form
         className="flex flex-col gap-8"
@@ -324,6 +406,7 @@ const WritePage = () => {
             render={({ field }) => (
               <BoardSelectField
                 className="w-[282px]"
+                disabled={isEditMode}
                 errorMessage={errors.board?.message}
                 inlineError
                 label={
@@ -403,7 +486,7 @@ const WritePage = () => {
         <div className="w-full">
           <WriteImageUploadField
             countText={`${currentImages.length}/${WRITE_POST_MAX_IMAGE_COUNT}`}
-            disabled={isSubmitting || isCreatingPost}
+            disabled={isSubmitting || isCreatingPost || isUpdatingPost}
             errorMessage={errors.images?.message}
             files={currentImages}
             inlineError
@@ -416,13 +499,13 @@ const WritePage = () => {
         </div>
 
         <WritingButton
-          disabled={isSubmitting || isCreatingPost}
+          disabled={isSubmitting || isCreatingPost || isUpdatingPost}
           form="write-post-form"
           icon={null}
           type="submit"
           variant="writing"
         >
-          작성 완료
+          {isEditMode ? "수정 완료" : "작성 완료"}
         </WritingButton>
       </form>
     </section>

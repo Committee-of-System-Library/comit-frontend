@@ -5,7 +5,7 @@ import { Image as ImageIcon, Trash2, Upload } from "lucide-react";
 import { cn } from "@/utils/cn";
 
 export interface WriteImageUploadItem {
-  file: File;
+  file?: File;
   id: string;
   name: string;
   sizeLabel?: string;

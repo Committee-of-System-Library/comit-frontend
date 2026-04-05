@@ -40,9 +40,6 @@ export const validateImageFiles = (files: readonly File[]) => {
 const uploadFileToPresignedUrl = async (presignedUrl: string, file: File) => {
   const response = await fetch(presignedUrl, {
     body: file,
-    headers: {
-      "Content-Type": file.type,
-    },
     method: "PUT",
   });
 

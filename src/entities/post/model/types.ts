@@ -57,6 +57,7 @@ export interface CreatePostRequest {
 
 export interface UpdatePostRequest {
   content: string;
+  imageUrls?: string[];
   tags?: string[] | null;
   title: string;
 }
