@@ -324,7 +324,9 @@ const WritePage = () => {
       const imageUrls =
         values.images.length > 0
           ? await uploadImagesWithPresignedUrl(
-              values.images.map((image) => image.file),
+              values.images
+                .map((image) => image.file)
+                .filter((f): f is File => f !== undefined),
               "posts",
             )
           : [];
