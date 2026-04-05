@@ -18,6 +18,6 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {
   args: {
     studentNumber: "2024123456",
-    initialVisible: false,
+    visible: false,
   },
 };
