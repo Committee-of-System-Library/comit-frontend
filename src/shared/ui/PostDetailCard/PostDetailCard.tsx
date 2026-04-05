@@ -14,6 +14,7 @@ interface PostDetailCardProps extends Post {
   onClick?: () => void;
   onLikeClick?: () => void;
   isLikePending?: boolean;
+  shareUrl?: string;
 }
 
 export const PostDetailCard = ({
@@ -31,6 +32,7 @@ export const PostDetailCard = ({
   isMine = false,
   onLikeClick,
   isLikePending = false,
+  shareUrl,
 }: PostDetailCardProps) => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [scrollProgress, setScrollProgress] = useState(0);
@@ -153,7 +155,7 @@ export const PostDetailCard = ({
           onClick={onLikeClick}
           variant={likedByMe ? "liked" : "unLiked"}
         />
-        <ShareButton url={`https://yourdomain.com/post/${title}`} />
+        <ShareButton url={shareUrl} />
       </div>
     </article>
   );
