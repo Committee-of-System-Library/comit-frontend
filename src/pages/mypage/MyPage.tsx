@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 import { useMyProfileQuery } from "@/features/member/model/useMyProfileQuery";
 import { useUpdateNicknameMutation } from "@/features/member/model/useUpdateNicknameMutation";
+import { useUpdateStudentNumberVisibilityMutation } from "@/features/member/model/useUpdateStudentNumberVisibilityMutation";
 import { likedPosts } from "@/mocks/likedPosts";
 import { myComments } from "@/mocks/myComments";
 import { myPosts } from "@/mocks/myPosts";
@@ -15,6 +16,8 @@ const MyPage = () => {
   const navigate = useNavigate();
   const { data: profile } = useMyProfileQuery();
   const { mutate: updateNickname } = useUpdateNicknameMutation();
+  const { mutate: updateStudentNumberVisibility } =
+    useUpdateStudentNumberVisibilityMutation();
 
   const handleProfileSave = ({
     userName,
@@ -52,7 +55,7 @@ const MyPage = () => {
               key={profile?.id}
               studentNumber={profile?.studentNumber ?? ""}
               initialVisible={profile?.studentNumberVisible ?? false}
-              onToggle={() => {}}
+              onToggle={updateStudentNumberVisibility}
             />
           </section>
 

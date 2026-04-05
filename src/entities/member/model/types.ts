@@ -10,5 +10,5 @@ export interface UpdateNicknameRequest {
 }
 
 export interface UpdateStudentNumberVisibilityRequest {
-  studentNumberVisible: boolean;
+  visible: boolean;
 }
