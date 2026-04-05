@@ -78,6 +78,7 @@ export const mapPostSummaryToRecentNotice = (
   post: PostSummary,
 ): RecentNotice => {
   return {
+    id: post.id,
     title: post.title,
     date: formatDateLabel(post.createdAt),
   };
@@ -85,6 +86,7 @@ export const mapPostSummaryToRecentNotice = (
 
 export const mapPostSummaryToRecentEvent = (post: PostSummary): RecentEvent => {
   return {
+    id: post.id,
     title: post.title,
     date: formatDateLabel(post.createdAt),
   };
@@ -92,6 +94,7 @@ export const mapPostSummaryToRecentEvent = (post: PostSummary): RecentEvent => {
 
 export const mapHotPostSummaryToHotPost = (post: HotPostSummary): HotPost => {
   return {
+    id: post.id,
     author: post.authorNickname,
     // hot post 응답에 viewCount가 없어 likeCount를 우선 노출합니다.
     views: post.likeCount,

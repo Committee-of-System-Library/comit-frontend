@@ -1,8 +1,9 @@
 import { useMemo } from "react";
 
 import toast from "react-hot-toast";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
+import { useMyProfileQuery } from "@/features/member/model/useMyProfileQuery";
 import { normalizePostDomainError } from "@/features/post/model/postDomainError";
 import { resolvePostDomainErrorMessage } from "@/features/post/model/postDomainErrorMessage";
 import { mapPostDetailToPost } from "@/features/post/model/postUiMappers";
@@ -15,6 +16,7 @@ import { CommentInput } from "@/shared/ui/CommentInput/CommentInput";
 import { PostDetailCard } from "@/shared/ui/PostDetailCard/PostDetailCard";
 
 const PostPage = () => {
+  const navigate = useNavigate();
   const { postId } = useParams<{ postId: string }>();
   const parsedPostId = Number(postId);
   const isValidPostId = Number.isInteger(parsedPostId) && parsedPostId > 0;
@@ -28,14 +30,16 @@ const PostPage = () => {
     enabled: isValidPostId,
   });
   const togglePostLikeMutation = useTogglePostLikeMutation();
+  const { data: myProfile } = useMyProfileQuery();
 
   const mappedPost = useMemo(() => {
     if (!data) {
       return null;
     }
 
-    return mapPostDetailToPost(data);
-  }, [data]);
+    const isMine = !!myProfile && myProfile.nickname === data.authorNickname;
+    return { ...mapPostDetailToPost(data), isMine };
+  }, [data, myProfile]);
 
   // 💡 댓글 등록 핸들러 (API 연동 전 테스트용)
   const handleCommentSubmit = (value: string) => {
@@ -106,7 +110,9 @@ const PostPage = () => {
       <PostDetailCard
         {...mappedPost}
         image={mappedPost.image ?? []}
+        isMine={mappedPost.isMine}
         isLikePending={togglePostLikeMutation.isPending}
+        onEdit={() => navigate(`/write?postId=${parsedPostId}`)}
         onLikeClick={handleTogglePostLike}
         shareUrl={buildPostShareUrl(parsedPostId)}
         tag={mappedPost.tag ?? []}

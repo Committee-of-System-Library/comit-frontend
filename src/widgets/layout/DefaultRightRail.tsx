@@ -73,9 +73,18 @@ export const DefaultRightRail = ({
       >
         글 작성하기
       </WritingButton>
-      <NoticeSideBoard notices={resolvedNotices} />
-      <HotPostSideBoard posts={resolvedHotPosts} />
-      <EventSideBoard events={resolvedEvents} />
+      <NoticeSideBoard
+        notices={resolvedNotices}
+        onItemClick={(id) => navigate(`/post/${id}`)}
+      />
+      <HotPostSideBoard
+        posts={resolvedHotPosts}
+        onItemClick={(id) => navigate(`/post/${id}`)}
+      />
+      <EventSideBoard
+        events={resolvedEvents}
+        onItemClick={(id) => navigate(`/post/${id}`)}
+      />
     </div>
   );
 };
