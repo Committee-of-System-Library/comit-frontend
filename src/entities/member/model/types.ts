@@ -18,6 +18,9 @@ export interface MyPost {
   title: string;
   boardType: string;
   createdAt: string;
+  content?: string;
+  likeCount?: number;
+  commentCount?: number;
 }
 
 export interface MyComment {
@@ -26,6 +29,8 @@ export interface MyComment {
   postId: number;
   postTitle: string;
   createdAt: string;
+  likeCount?: number;
+  commentCount?: number;
 }
 
 export interface MyLike {
@@ -33,6 +38,9 @@ export interface MyLike {
   title: string;
   boardType: string;
   createdAt: string;
+  content?: string;
+  likeCount?: number;
+  commentCount?: number;
 }
 
 export interface CursorPage<T> {
