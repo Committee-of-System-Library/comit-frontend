@@ -81,9 +81,8 @@ const MyPage = () => {
               onSave={handleProfileSave}
             />
             <StudentNumberVisibilityToggle
-              key={profile?.id}
               studentNumber={profile?.studentNumber ?? ""}
-              initialVisible={profile?.studentNumberVisible ?? false}
+              visible={profile?.studentNumberVisible ?? false}
               onToggle={updateStudentNumberVisibility}
             />
           </section>

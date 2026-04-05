@@ -1,26 +1,20 @@
-import { useState } from "react";
-
 import { cn } from "@/utils/cn";
 
 interface StudentNumberVisibilityToggleProps {
   studentNumber: string;
-  initialVisible: boolean;
+  visible: boolean;
   className?: string;
   onToggle: (visible: boolean) => void;
 }
 
 export const StudentNumberVisibilityToggle = ({
   studentNumber,
-  initialVisible,
+  visible,
   className,
   onToggle,
 }: StudentNumberVisibilityToggleProps) => {
-  const [visible, setVisible] = useState(initialVisible);
-
   const handleToggle = () => {
-    const next = !visible;
-    setVisible(next);
-    onToggle(next);
+    onToggle(!visible);
   };
 
   return (
