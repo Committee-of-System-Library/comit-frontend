@@ -21,9 +21,25 @@ const MyPage = () => {
   const { mutate: updateStudentNumberVisibility } =
     useUpdateStudentNumberVisibilityMutation();
   const { mutate: logoutMutate } = useLogoutMutation();
-  const { data: postsData } = useMyPostsQuery();
-  const { data: commentsData } = useMyCommentsQuery();
-  const { data: likesData } = useMyLikesQuery();
+  const {
+    data: postsData,
+    isLoading: isPostsLoading,
+    isError: isPostsError,
+  } = useMyPostsQuery();
+  const {
+    data: commentsData,
+    isLoading: isCommentsLoading,
+    isError: isCommentsError,
+  } = useMyCommentsQuery();
+  const {
+    data: likesData,
+    isLoading: isLikesLoading,
+    isError: isLikesError,
+  } = useMyLikesQuery();
+
+  const isActivityLoading =
+    isPostsLoading || isCommentsLoading || isLikesLoading;
+  const isActivityError = isPostsError || isCommentsError || isLikesError;
 
   const handleProfileSave = ({
     userName,
@@ -98,29 +114,41 @@ const MyPage = () => {
         <div className="flex-1 flex flex-col gap-3">
           <h2 className="text-subtitle-01 text-text-secondary px-3">내 활동</h2>
           <div className="bg-white border border-border-deactivated rounded-2xl p-5 flex flex-col gap-10">
-            <MyActivitySectionBoard
-              title="내가 쓴 글"
-              count={postsData?.totalCount ?? 0}
-              icon={<FileText size={18} />}
-              items={myPostItems}
-              onMoreClick={() => handleMoreClick("posts")}
-            />
+            {isActivityLoading ? (
+              <span className="text-body-03 text-text-secondary font-medium text-center py-10">
+                로딩 중...
+              </span>
+            ) : isActivityError ? (
+              <span className="text-body-03 text-text-secondary font-medium text-center py-10">
+                데이터를 불러오지 못했습니다.
+              </span>
+            ) : (
+              <>
+                <MyActivitySectionBoard
+                  title="내가 쓴 글"
+                  count={postsData?.totalCount ?? 0}
+                  icon={<FileText size={18} />}
+                  items={myPostItems}
+                  onMoreClick={() => handleMoreClick("posts")}
+                />
 
-            <MyActivitySectionBoard
-              title="내가 쓴 댓글"
-              count={commentsData?.totalCount ?? 0}
-              icon={<MessageCircleMore size={18} />}
-              items={myCommentItems}
-              onMoreClick={() => handleMoreClick("comments")}
-            />
+                <MyActivitySectionBoard
+                  title="내가 쓴 댓글"
+                  count={commentsData?.totalCount ?? 0}
+                  icon={<MessageCircleMore size={18} />}
+                  items={myCommentItems}
+                  onMoreClick={() => handleMoreClick("comments")}
+                />
 
-            <MyActivitySectionBoard
-              title="좋아요"
-              count={likesData?.totalCount ?? 0}
-              icon={<Heart size={18} />}
-              items={myLikeItems}
-              onMoreClick={() => handleMoreClick("likes")}
-            />
+                <MyActivitySectionBoard
+                  title="좋아요"
+                  count={likesData?.totalCount ?? 0}
+                  icon={<Heart size={18} />}
+                  items={myLikeItems}
+                  onMoreClick={() => handleMoreClick("likes")}
+                />
+              </>
+            )}
           </div>
         </div>
       </div>

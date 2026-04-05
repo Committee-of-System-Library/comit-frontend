@@ -16,9 +16,24 @@ const MyActivityPage = () => {
   const selectedCategory =
     (location.state?.category as CategoryType) || "posts";
 
-  const { data: postsData } = useMyPostsQuery();
-  const { data: commentsData } = useMyCommentsQuery();
-  const { data: likesData } = useMyLikesQuery();
+  const {
+    data: postsData,
+    isLoading: isPostsLoading,
+    isError: isPostsError,
+  } = useMyPostsQuery();
+  const {
+    data: commentsData,
+    isLoading: isCommentsLoading,
+    isError: isCommentsError,
+  } = useMyCommentsQuery();
+  const {
+    data: likesData,
+    isLoading: isLikesLoading,
+    isError: isLikesError,
+  } = useMyLikesQuery();
+
+  const isLoading = isPostsLoading || isCommentsLoading || isLikesLoading;
+  const isError = isPostsError || isCommentsError || isLikesError;
 
   const handleCategoryChange = (category: CategoryType) => {
     navigate("/mypage/activity", { state: { category } });
@@ -98,7 +113,19 @@ const MyActivityPage = () => {
         </header>
 
         <div className="flex flex-col">
-          {current.items.length > 0 ? (
+          {isLoading ? (
+            <div className="flex h-40 items-center justify-center">
+              <span className="text-body-03 text-text-secondary font-medium">
+                로딩 중...
+              </span>
+            </div>
+          ) : isError ? (
+            <div className="flex h-40 items-center justify-center">
+              <span className="text-body-03 text-text-secondary font-medium">
+                데이터를 불러오지 못했습니다.
+              </span>
+            </div>
+          ) : current.items.length > 0 ? (
             current.items.map((item) => (
               <PostPreviewItem
                 key={item.id}
