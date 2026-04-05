@@ -32,8 +32,19 @@ const MyActivityPage = () => {
     isError: isLikesError,
   } = useMyLikesQuery();
 
-  const isLoading = isPostsLoading || isCommentsLoading || isLikesLoading;
-  const isError = isPostsError || isCommentsError || isLikesError;
+  const isLoadingMap = {
+    posts: isPostsLoading,
+    comments: isCommentsLoading,
+    likes: isLikesLoading,
+  };
+  const isErrorMap = {
+    posts: isPostsError,
+    comments: isCommentsError,
+    likes: isLikesError,
+  };
+
+  const isLoading = isLoadingMap[selectedCategory];
+  const isError = isErrorMap[selectedCategory];
 
   const handleCategoryChange = (category: CategoryType) => {
     navigate("/mypage/activity", { state: { category } });
