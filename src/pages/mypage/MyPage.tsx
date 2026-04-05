@@ -37,10 +37,6 @@ const MyPage = () => {
     isError: isLikesError,
   } = useMyLikesQuery();
 
-  const isActivityLoading =
-    isPostsLoading || isCommentsLoading || isLikesLoading;
-  const isActivityError = isPostsError || isCommentsError || isLikesError;
-
   const handleProfileSave = ({
     userName,
   }: {
@@ -114,41 +110,50 @@ const MyPage = () => {
         <div className="flex-1 flex flex-col gap-3">
           <h2 className="text-subtitle-01 text-text-secondary px-3">내 활동</h2>
           <div className="bg-white border border-border-deactivated rounded-2xl p-5 flex flex-col gap-10">
-            {isActivityLoading ? (
-              <span className="text-body-03 text-text-secondary font-medium text-center py-10">
-                로딩 중...
-              </span>
-            ) : isActivityError ? (
-              <span className="text-body-03 text-text-secondary font-medium text-center py-10">
-                데이터를 불러오지 못했습니다.
-              </span>
-            ) : (
-              <>
-                <MyActivitySectionBoard
-                  title="내가 쓴 글"
-                  count={postsData?.totalCount ?? 0}
-                  icon={<FileText size={18} />}
-                  items={myPostItems}
-                  onMoreClick={() => handleMoreClick("posts")}
-                />
+            <MyActivitySectionBoard
+              title="내가 쓴 글"
+              count={postsData?.totalCount ?? 0}
+              icon={<FileText size={18} />}
+              items={isPostsLoading || isPostsError ? [] : myPostItems}
+              onMoreClick={() => handleMoreClick("posts")}
+              statusMessage={
+                isPostsLoading
+                  ? "로딩 중..."
+                  : isPostsError
+                    ? "데이터를 불러오지 못했습니다."
+                    : undefined
+              }
+            />
 
-                <MyActivitySectionBoard
-                  title="내가 쓴 댓글"
-                  count={commentsData?.totalCount ?? 0}
-                  icon={<MessageCircleMore size={18} />}
-                  items={myCommentItems}
-                  onMoreClick={() => handleMoreClick("comments")}
-                />
+            <MyActivitySectionBoard
+              title="내가 쓴 댓글"
+              count={commentsData?.totalCount ?? 0}
+              icon={<MessageCircleMore size={18} />}
+              items={isCommentsLoading || isCommentsError ? [] : myCommentItems}
+              onMoreClick={() => handleMoreClick("comments")}
+              statusMessage={
+                isCommentsLoading
+                  ? "로딩 중..."
+                  : isCommentsError
+                    ? "데이터를 불러오지 못했습니다."
+                    : undefined
+              }
+            />
 
-                <MyActivitySectionBoard
-                  title="좋아요"
-                  count={likesData?.totalCount ?? 0}
-                  icon={<Heart size={18} />}
-                  items={myLikeItems}
-                  onMoreClick={() => handleMoreClick("likes")}
-                />
-              </>
-            )}
+            <MyActivitySectionBoard
+              title="좋아요"
+              count={likesData?.totalCount ?? 0}
+              icon={<Heart size={18} />}
+              items={isLikesLoading || isLikesError ? [] : myLikeItems}
+              onMoreClick={() => handleMoreClick("likes")}
+              statusMessage={
+                isLikesLoading
+                  ? "로딩 중..."
+                  : isLikesError
+                    ? "데이터를 불러오지 못했습니다."
+                    : undefined
+              }
+            />
           </div>
         </div>
       </div>
