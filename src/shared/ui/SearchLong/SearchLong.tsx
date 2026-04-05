@@ -15,7 +15,13 @@ export function SearchLong({ disabled = false, onSearch }: SearchLongProps) {
   const isActivated = searchTerm.trim().length > 0 && !disabled;
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(e.target.value);
+    const nextValue = e.target.value;
+
+    setSearchTerm(nextValue);
+
+    if (!disabled && nextValue.trim().length === 0) {
+      onSearch?.("");
+    }
   };
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
