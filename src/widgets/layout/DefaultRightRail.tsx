@@ -3,12 +3,11 @@ import type { HTMLAttributes } from "react";
 import { useNavigate } from "react-router-dom";
 
 import {
-  mapHotPostSummaryToHotPost,
   mapPostSummaryToRecentEvent,
   mapPostSummaryToRecentNotice,
 } from "@/features/post/model/postUiMappers";
+import { useCachedBoardPostList } from "@/features/post/model/useCachedBoardPostList";
 import { useHotPostsQuery } from "@/features/post/model/useHotPostsQuery";
-import { usePostListQuery } from "@/features/post/model/usePostListQuery";
 import { mockHotPosts, type HotPost } from "@/mocks/hotPosts";
 import { mockRecentEvents, type RecentEvent } from "@/mocks/recentEvents";
 import { mockRecentNotices, type RecentNotice } from "@/mocks/recentNotices";
@@ -34,27 +33,26 @@ export const DefaultRightRail = ({
   ...props
 }: DefaultRightRailProps) => {
   const navigate = useNavigate();
-  const { data: noticeData } = usePostListQuery({
+  const { data: cachedNoticePosts } = useCachedBoardPostList({
     boardType: "NOTICE",
-    size: 3,
+    size: 100,
   });
-  const { data: eventData } = usePostListQuery({
+  const { data: cachedEventPosts } = useCachedBoardPostList({
     boardType: "EVENT",
-    size: 3,
+    size: 100,
   });
-  const { data: hotPostData } = useHotPostsQuery();
+  const { data: hotPostData } = useHotPostsQuery({
+    enabled: hotPosts === undefined,
+  });
   const resolvedNotices: RecentNotice[] =
     notices ??
-    noticeData?.posts?.map(mapPostSummaryToRecentNotice) ??
+    cachedNoticePosts?.posts.slice(0, 5).map(mapPostSummaryToRecentNotice) ??
     mockRecentNotices;
   const resolvedEvents: RecentEvent[] =
     events ??
-    eventData?.posts?.map(mapPostSummaryToRecentEvent) ??
+    cachedEventPosts?.posts.slice(0, 5).map(mapPostSummaryToRecentEvent) ??
     mockRecentEvents;
-  const resolvedHotPosts: HotPost[] =
-    hotPosts ??
-    hotPostData?.posts?.map(mapHotPostSummaryToHotPost) ??
-    mockHotPosts;
+  const resolvedHotPosts: HotPost[] = hotPosts ?? hotPostData ?? mockHotPosts;
 
   const handleWriteClick = () => {
     if (onWriteClick) {
