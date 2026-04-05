@@ -16,6 +16,9 @@ export const queryKeys = {
   member: {
     all: ["member"] as const,
     me: () => ["member", "me"] as const,
+    myPosts: () => ["member", "my-posts"] as const,
+    myComments: () => ["member", "my-comments"] as const,
+    myLikes: () => ["member", "my-likes"] as const,
   },
   post: {
     all: ["post"] as const,

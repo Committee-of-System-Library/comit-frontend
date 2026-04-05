@@ -2,14 +2,15 @@ import { FileText, Heart, MessageCircleMore } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 import { useLogoutMutation } from "@/features/auth/model/useLogoutMutation";
+import { useMyCommentsQuery } from "@/features/member/model/useMyCommentsQuery";
+import { useMyLikesQuery } from "@/features/member/model/useMyLikesQuery";
+import { useMyPostsQuery } from "@/features/member/model/useMyPostsQuery";
 import { useMyProfileQuery } from "@/features/member/model/useMyProfileQuery";
 import { useUpdateNicknameMutation } from "@/features/member/model/useUpdateNicknameMutation";
 import { useUpdateStudentNumberVisibilityMutation } from "@/features/member/model/useUpdateStudentNumberVisibilityMutation";
-import { likedPosts } from "@/mocks/likedPosts";
-import { myComments } from "@/mocks/myComments";
-import { myPosts } from "@/mocks/myPosts";
 import { LogoutButton } from "@/shared/ui/LogoutButton/LogoutButton";
 import { StudentNumberVisibilityToggle } from "@/shared/ui/StudentNumberVisibilityToggle/StudentNumberVisibilityToggle";
+import { formatTimeAgo } from "@/utils/formatTime";
 import { MyActivitySectionBoard } from "@/widgets/mypage/MyActivitySectionBoard/MyActivitySectionBoard";
 import { ProfileWidget } from "@/widgets/mypage/ProfileWidget/ProfileWidget";
 
@@ -20,6 +21,9 @@ const MyPage = () => {
   const { mutate: updateStudentNumberVisibility } =
     useUpdateStudentNumberVisibilityMutation();
   const { mutate: logoutMutate } = useLogoutMutation();
+  const { data: postsData } = useMyPostsQuery();
+  const { data: commentsData } = useMyCommentsQuery();
+  const { data: likesData } = useMyLikesQuery();
 
   const handleProfileSave = ({
     userName,
@@ -37,6 +41,27 @@ const MyPage = () => {
   const handleMoreClick = (category: "posts" | "comments" | "likes") => {
     navigate("/mypage/activity", { state: { category } });
   };
+
+  const myPostItems = (postsData?.items ?? []).map((post) => ({
+    id: post.postId,
+    title: post.title,
+    createdAt: formatTimeAgo(post.createdAt),
+    onClick: () => navigate(`/post/${post.postId}`),
+  }));
+
+  const myCommentItems = (commentsData?.items ?? []).map((comment) => ({
+    id: comment.commentId,
+    title: comment.postTitle,
+    createdAt: formatTimeAgo(comment.createdAt),
+    onClick: () => navigate(`/post/${comment.postId}`),
+  }));
+
+  const myLikeItems = (likesData?.items ?? []).map((like) => ({
+    id: like.postId,
+    title: like.title,
+    createdAt: formatTimeAgo(like.createdAt),
+    onClick: () => navigate(`/post/${like.postId}`),
+  }));
 
   return (
     <div className="flex flex-col gap-10">
@@ -76,25 +101,25 @@ const MyPage = () => {
           <div className="bg-white border border-border-deactivated rounded-2xl p-5 flex flex-col gap-10">
             <MyActivitySectionBoard
               title="내가 쓴 글"
-              count={32}
+              count={postsData?.totalCount ?? 0}
               icon={<FileText size={18} />}
-              items={myPosts}
+              items={myPostItems}
               onMoreClick={() => handleMoreClick("posts")}
             />
 
             <MyActivitySectionBoard
               title="내가 쓴 댓글"
-              count={64}
+              count={commentsData?.totalCount ?? 0}
               icon={<MessageCircleMore size={18} />}
-              items={myComments}
+              items={myCommentItems}
               onMoreClick={() => handleMoreClick("comments")}
             />
 
             <MyActivitySectionBoard
               title="좋아요"
-              count={10}
+              count={likesData?.totalCount ?? 0}
               icon={<Heart size={18} />}
-              items={likedPosts}
+              items={myLikeItems}
               onMoreClick={() => handleMoreClick("likes")}
             />
           </div>
