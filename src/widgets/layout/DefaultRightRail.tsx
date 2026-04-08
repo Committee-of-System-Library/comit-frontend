@@ -5,12 +5,12 @@ import { useNavigate } from "react-router-dom";
 import {
   mapPostSummaryToRecentEvent,
   mapPostSummaryToRecentNotice,
+  type RightRailEventItem,
+  type RightRailHotPostItem,
+  type RightRailNoticeItem,
 } from "@/features/post/model/postUiMappers";
 import { useHotPostsQuery } from "@/features/post/model/useHotPostsQuery";
 import { usePostListQuery } from "@/features/post/model/usePostListQuery";
-import type { HotPost } from "@/mocks/hotPosts";
-import type { RecentEvent } from "@/mocks/recentEvents";
-import type { RecentNotice } from "@/mocks/recentNotices";
 import { WritingButton } from "@/shared/ui/WritingButton/WritingButton";
 import { cn } from "@/utils/cn";
 import { EventSideBoard } from "@/widgets/sideBoard/EventSideBoard/EventSideBoard";
@@ -18,9 +18,9 @@ import { HotPostSideBoard } from "@/widgets/sideBoard/HotPostSideBoard/HotPostSi
 import { NoticeSideBoard } from "@/widgets/sideBoard/NoticeSideBoard/NoticeSideBoard";
 
 interface DefaultRightRailProps extends HTMLAttributes<HTMLDivElement> {
-  events?: RecentEvent[];
-  hotPosts?: HotPost[];
-  notices?: RecentNotice[];
+  events?: RightRailEventItem[];
+  hotPosts?: RightRailHotPostItem[];
+  notices?: RightRailNoticeItem[];
   onWriteClick?: () => void;
 }
 
@@ -46,11 +46,21 @@ export const DefaultRightRail = ({
   const { data: hotPostData } = useHotPostsQuery({
     enabled: hotPosts === undefined,
   });
-  const resolvedNotices: RecentNotice[] =
-    notices ?? noticePosts?.posts.map(mapPostSummaryToRecentNotice) ?? [];
-  const resolvedEvents: RecentEvent[] =
-    events ?? eventPosts?.posts.map(mapPostSummaryToRecentEvent) ?? [];
-  const resolvedHotPosts: HotPost[] = hotPosts ?? hotPostData ?? [];
+  const noticeSummaries = Array.isArray(noticePosts?.posts)
+    ? noticePosts.posts
+    : [];
+  const eventSummaries = Array.isArray(eventPosts?.posts)
+    ? eventPosts.posts
+    : [];
+  const resolvedNotices: RightRailNoticeItem[] =
+    notices ?? noticeSummaries.map(mapPostSummaryToRecentNotice);
+  const resolvedEvents: RightRailEventItem[] =
+    events ?? eventSummaries.map(mapPostSummaryToRecentEvent);
+  const resolvedHotPosts: RightRailHotPostItem[] = Array.isArray(hotPosts)
+    ? hotPosts
+    : Array.isArray(hotPostData)
+      ? hotPostData
+      : [];
 
   const handleWriteClick = () => {
     if (onWriteClick) {

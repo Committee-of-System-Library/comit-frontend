@@ -3,9 +3,6 @@ import type {
   PostDetail,
   PostSummary,
 } from "@/entities/post/model/types";
-import type { HotPost } from "@/mocks/hotPosts";
-import type { RecentEvent } from "@/mocks/recentEvents";
-import type { RecentNotice } from "@/mocks/recentNotices";
 import type { Post } from "@/types/post";
 import { resolveContentPreview } from "@/utils/contentPreview";
 import { formatTimeAgo } from "@/utils/formatTime";
@@ -24,6 +21,26 @@ export interface SectionBoardPostItem {
   content: string;
   imageUrl?: string;
   likes: number;
+  time: string;
+  title: string;
+}
+
+export interface RightRailNoticeItem {
+  id: number;
+  title: string;
+  date: string;
+}
+
+export interface RightRailEventItem {
+  id: number;
+  title: string;
+  date: string;
+}
+
+export interface RightRailHotPostItem {
+  id: number;
+  author: string;
+  views: number;
   time: string;
   title: string;
 }
@@ -76,7 +93,7 @@ export const mapPostSummaryToSectionBoardPostItem = (
 
 export const mapPostSummaryToRecentNotice = (
   post: PostSummary,
-): RecentNotice => {
+): RightRailNoticeItem => {
   return {
     id: post.id,
     title: post.title,
@@ -84,7 +101,9 @@ export const mapPostSummaryToRecentNotice = (
   };
 };
 
-export const mapPostSummaryToRecentEvent = (post: PostSummary): RecentEvent => {
+export const mapPostSummaryToRecentEvent = (
+  post: PostSummary,
+): RightRailEventItem => {
   return {
     id: post.id,
     title: post.title,
@@ -92,7 +111,9 @@ export const mapPostSummaryToRecentEvent = (post: PostSummary): RecentEvent => {
   };
 };
 
-export const mapHotPostSummaryToHotPost = (post: HotPostSummary): HotPost => {
+export const mapHotPostSummaryToHotPost = (
+  post: HotPostSummary,
+): RightRailHotPostItem => {
   return {
     id: post.id,
     author: post.authorNickname,
