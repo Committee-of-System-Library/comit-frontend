@@ -20,7 +20,10 @@ export const useHotPostsQuery = (options: UseHotPostsQueryOptions = {}) => {
     queryFn: getHotPosts,
     queryKey: queryKeys.post.hot(),
     refetchOnWindowFocus: false,
-    select: (data) => data.posts.map(mapHotPostSummaryToHotPost),
+    select: (data) =>
+      (Array.isArray(data?.posts) ? data.posts : []).map(
+        mapHotPostSummaryToHotPost,
+      ),
     staleTime: HOT_POSTS_STALE_TIME,
   });
 };
