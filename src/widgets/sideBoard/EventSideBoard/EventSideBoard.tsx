@@ -2,11 +2,16 @@ import type { HTMLAttributes } from "react";
 
 import { Star } from "lucide-react";
 
-import type { RecentEvent } from "@/mocks/recentEvents";
 import { NoticePreviewItem } from "@/shared/ui/NoticePreviewItem/NoticePreviewItem";
 
+export interface EventSideBoardItem {
+  id: number;
+  title: string;
+  date: string;
+}
+
 interface EventSideBoardProps extends HTMLAttributes<HTMLDivElement> {
-  events: RecentEvent[];
+  events: EventSideBoardItem[];
   onItemClick?: (id: number) => void;
 }
 

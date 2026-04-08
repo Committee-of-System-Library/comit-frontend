@@ -2,11 +2,18 @@ import type { HTMLAttributes } from "react";
 
 import { TrendingUp } from "lucide-react";
 
-import type { HotPost } from "@/mocks/hotPosts";
 import { HotPostItem } from "@/shared/ui/HotPostItem/HotPostItem";
 
+export interface HotPostSideBoardItem {
+  id: number;
+  title: string;
+  author: string;
+  views: number;
+  time: string;
+}
+
 interface HotPostSideBoardProps extends HTMLAttributes<HTMLDivElement> {
-  posts: HotPost[];
+  posts: HotPostSideBoardItem[];
   onItemClick?: (id: number) => void;
 }
 

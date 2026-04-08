@@ -2,11 +2,16 @@ import type { HTMLAttributes } from "react";
 
 import { Volume2 } from "lucide-react";
 
-import type { RecentNotice } from "@/mocks/recentNotices";
 import { NoticePreviewItem } from "@/shared/ui/NoticePreviewItem/NoticePreviewItem";
 
+export interface NoticeSideBoardItem {
+  id: number;
+  title: string;
+  date: string;
+}
+
 interface NoticeSideBoardProps extends HTMLAttributes<HTMLDivElement> {
-  notices: RecentNotice[];
+  notices: NoticeSideBoardItem[];
   onItemClick?: (id: number) => void;
 }
 
