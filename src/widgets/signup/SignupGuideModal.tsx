@@ -34,6 +34,7 @@ export interface SignupGuideModalProps {
   defaultStep?: SignupStep;
   isCseStudent?: boolean;
   mode?: SignupGuideMode;
+  nonCseMessage?: string;
   open: boolean;
   onClose: () => void;
 }
@@ -43,6 +44,7 @@ export const SignupGuideModal = ({
   defaultStep = 1,
   isCseStudent = false,
   mode = "preview",
+  nonCseMessage,
   open,
   onClose,
 }: SignupGuideModalProps) => {
@@ -545,14 +547,20 @@ export const SignupGuideModal = ({
           </div>
         ) : (
           <div className="flex flex-col items-center gap-8">
-            <p className="text-center text-subtitle-01 text-text-primary">
-              <span className="block whitespace-nowrap">
-                컴퓨터학부 학생이 아니면
-              </span>
-              <span className="block whitespace-nowrap">
-                아직 Comit 서비스 회원가입이 불가능해요ㅜㅜ
-              </span>
-            </p>
+            {nonCseMessage ? (
+              <p className="whitespace-pre-line text-center text-subtitle-01 text-text-primary">
+                {nonCseMessage}
+              </p>
+            ) : (
+              <p className="text-center text-subtitle-01 text-text-primary">
+                <span className="block whitespace-nowrap">
+                  컴퓨터학부 학생이 아니면
+                </span>
+                <span className="block whitespace-nowrap">
+                  아직 Comit 서비스 회원가입이 불가능해요ㅜㅜ
+                </span>
+              </p>
+            )}
 
             <img
               alt="슬퍼하는 Comit 마스코트"
