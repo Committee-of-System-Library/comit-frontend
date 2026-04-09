@@ -35,15 +35,11 @@ export const EventSideBoard = ({
       <div className="flex w-full flex-col">
         {events.map((event, index) => (
           <NoticePreviewItem
-            key={index}
+            key={event.id}
             title={event.title}
             date={event.date}
             className={index === events.length - 1 ? "border-b-0" : ""}
-            onClick={
-              event.id !== undefined
-                ? () => onItemClick?.(event.id!)
-                : undefined
-            }
+            onClick={() => onItemClick?.(event.id)}
           />
         ))}
       </div>

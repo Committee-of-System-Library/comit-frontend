@@ -35,15 +35,11 @@ export const NoticeSideBoard = ({
       <div className="flex w-full flex-col">
         {notices.map((notice, index) => (
           <NoticePreviewItem
-            key={index}
+            key={notice.id}
             title={notice.title}
             date={notice.date}
             className={index === notices.length - 1 ? "border-b-0" : ""}
-            onClick={
-              notice.id !== undefined
-                ? () => onItemClick?.(notice.id!)
-                : undefined
-            }
+            onClick={() => onItemClick?.(notice.id)}
           />
         ))}
       </div>
