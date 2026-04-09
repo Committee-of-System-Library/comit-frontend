@@ -11,7 +11,7 @@ export const useLogoutMutation = () => {
     mutationFn: logout,
     onSuccess: () => {
       queryClient.clear();
-      navigate("/");
+      navigate("/?loginRequired=1", { replace: true });
     },
   });
 };
