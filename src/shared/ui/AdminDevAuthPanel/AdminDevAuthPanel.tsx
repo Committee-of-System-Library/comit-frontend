@@ -19,8 +19,7 @@ const presetAccounts: PresetAccount[] = [
   { label: "테스트유저", nickname: "테스트유저", role: "STUDENT" },
 ];
 
-const isDevAuthVisible =
-  import.meta.env.DEV || import.meta.env.VITE_ENABLE_DEV_AUTH === "true";
+const isDevAuthVisible = import.meta.env.DEV;
 
 const requestDevAuth = async (nickname: string, role: DevRole) => {
   const response = await fetch(

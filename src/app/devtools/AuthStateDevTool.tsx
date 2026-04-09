@@ -3,7 +3,6 @@ import { cn } from "@/utils/cn";
 interface AuthStateDevToolProps {
   isAuthenticated: boolean;
   isCseStudent: boolean;
-  onChange: (nextValue: boolean) => void;
   onCseStudentChange: (nextValue: boolean) => void;
   onPreviewSignupGuide: () => void;
 }
@@ -11,37 +10,16 @@ interface AuthStateDevToolProps {
 export const AuthStateDevTool = ({
   isAuthenticated,
   isCseStudent,
-  onChange,
   onCseStudentChange,
   onPreviewSignupGuide,
 }: AuthStateDevToolProps) => (
   <section>
     <p className="text-caption-01 text-text-placeholder">Auth DevTool</p>
-    <div className="mt-2 flex items-center gap-2">
-      <button
-        className={cn(
-          "rounded-lg px-3 py-1.5 text-label-06 transition-colors",
-          !isAuthenticated
-            ? "bg-primary-600 text-text-inverse"
-            : "bg-gray-100 text-text-tertiary hover:bg-gray-200",
-        )}
-        onClick={() => onChange(false)}
-        type="button"
-      >
-        비로그인
-      </button>
-      <button
-        className={cn(
-          "rounded-lg px-3 py-1.5 text-label-06 transition-colors",
-          isAuthenticated
-            ? "bg-primary-600 text-text-inverse"
-            : "bg-gray-100 text-text-tertiary hover:bg-gray-200",
-        )}
-        onClick={() => onChange(true)}
-        type="button"
-      >
-        로그인
-      </button>
+    <p className="mt-2 text-label-06 text-text-tertiary">
+      현재 인증 상태는 쿠키 기반 <code>/members/me</code> 결과로 반영됩니다.
+    </p>
+    <div className="mt-2 inline-flex rounded-lg bg-gray-100 px-3 py-1.5 text-label-06 text-text-tertiary">
+      상태: {isAuthenticated ? "로그인" : "비로그인"}
     </div>
 
     <p className="mt-3 text-label-06 text-text-tertiary">회원가입 대상</p>

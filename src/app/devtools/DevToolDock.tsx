@@ -11,7 +11,6 @@ import { cn } from "@/utils/cn";
 interface DevToolDockProps {
   isAuthenticated: boolean;
   isCseStudent: boolean;
-  onChange: (nextValue: boolean) => void;
   onCseStudentChange: (nextValue: boolean) => void;
   onPreviewSignupGuide: () => void;
 }
@@ -21,7 +20,6 @@ type DevToolTab = "auth" | "admin";
 export const DevToolDock = ({
   isAuthenticated,
   isCseStudent,
-  onChange,
   onCseStudentChange,
   onPreviewSignupGuide,
 }: DevToolDockProps) => {
@@ -110,7 +108,6 @@ export const DevToolDock = ({
           <AuthStateDevTool
             isAuthenticated={isAuthenticated}
             isCseStudent={isCseStudent}
-            onChange={onChange}
             onCseStudentChange={onCseStudentChange}
             onPreviewSignupGuide={onPreviewSignupGuide}
           />
