@@ -1,3 +1,4 @@
+import { getSsoLoginUrl } from "@/entities/auth/api/logout";
 import { Button } from "@/shared/ui/button/Button";
 import { SearchInput } from "@/shared/ui/input/SearchInput";
 import { cn } from "@/utils/cn";
@@ -48,7 +49,15 @@ export const Header = ({
   };
 
   const handleAuthActionClick = () => {
-    window.location.href = isAuthenticated ? "/mypage" : "/login";
+    if (isAuthenticated) {
+      window.location.href = "/mypage";
+      return;
+    }
+
+    const redirectUri =
+      typeof window !== "undefined" ? window.location.origin : undefined;
+
+    window.location.assign(getSsoLoginUrl({ redirectUri }));
   };
 
   return (
