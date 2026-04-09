@@ -7,10 +7,15 @@ import {
 } from "react";
 
 import { ChevronLeft, Image as ImageIcon, X } from "lucide-react";
+import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 import defaultMascotImage from "@/assets/Ori_defualt.svg";
 import greetingMascotImage from "@/assets/Ori_happy.svg";
 import sadMascotImage from "@/assets/Ori_sad.svg";
+import { useRegisterMutation } from "@/features/signup/model/useRegisterMutation";
+import { useRegisterPrefillQuery } from "@/features/signup/model/useRegisterPrefillQuery";
+import { isApiHttpError } from "@/shared/api/http-error";
 import { SignupCheckbox } from "@/shared/ui/SignupCheckbox/SignupCheckbox";
 import { SignupMascotBubble } from "@/shared/ui/SignupMascotBubble/SignupMascotBubble";
 import { SignupStepBadge } from "@/shared/ui/SignupStepBadge/SignupStepBadge";
@@ -20,6 +25,7 @@ import { cn } from "@/utils/cn";
 
 type SignupStep = 1 | 2;
 type NicknameValidationStatus = "idle" | "error" | "success";
+type SignupGuideMode = "preview" | "register";
 
 const DUPLICATED_NICKNAME_SET = new Set(["admin", "comit", "관리자", "운영자"]);
 
@@ -27,6 +33,7 @@ export interface SignupGuideModalProps {
   className?: string;
   defaultStep?: SignupStep;
   isCseStudent?: boolean;
+  mode?: SignupGuideMode;
   open: boolean;
   onClose: () => void;
 }
@@ -35,9 +42,12 @@ export const SignupGuideModal = ({
   className,
   defaultStep = 1,
   isCseStudent = false,
+  mode = "preview",
   open,
   onClose,
 }: SignupGuideModalProps) => {
+  const navigate = useNavigate();
+  const isRegisterMode = mode === "register";
   const [step, setStep] = useState<SignupStep>(defaultStep);
   const [name, setName] = useState("");
   const [phoneFirst, setPhoneFirst] = useState("");
@@ -51,9 +61,19 @@ export const SignupGuideModal = ({
     useState("");
   const [profileImageUrl, setProfileImageUrl] = useState<string | null>(null);
   const profileImageInputRef = useRef<HTMLInputElement>(null);
+  const {
+    data: registerPrefill,
+    error: registerPrefillError,
+    isError: isRegisterPrefillError,
+    isLoading: isRegisterPrefillLoading,
+  } = useRegisterPrefillQuery({
+    enabled: open && isRegisterMode,
+  });
+  const registerMutation = useRegisterMutation();
+  const effectiveCseStudent = isRegisterMode ? true : isCseStudent;
 
   const isStep1Valid =
-    name.trim().length > 0 &&
+    (isRegisterMode ? true : name.trim().length > 0) &&
     phoneFirst.length === 3 &&
     phoneMiddle.length === 4 &&
     phoneLast.length === 4 &&
@@ -84,8 +104,10 @@ export const SignupGuideModal = ({
     onClose();
   }, [onClose, resetSignupState]);
 
-  const modalMaxWidthClass = isCseStudent ? "max-w-[400px]" : "max-w-[447px]";
-  const bubblePositionClass = isCseStudent
+  const modalMaxWidthClass = effectiveCseStudent
+    ? "max-w-[400px]"
+    : "max-w-[447px]";
+  const bubblePositionClass = effectiveCseStudent
     ? step === 1
       ? "absolute -right-[340px] top-[200px] inline-flex"
       : "absolute -right-[295px] top-[370px] inline-flex"
@@ -115,6 +137,41 @@ export const SignupGuideModal = ({
       }
     };
   }, [profileImageUrl]);
+
+  useEffect(() => {
+    if (!isRegisterMode || !isRegisterPrefillError) {
+      return;
+    }
+
+    if (isApiHttpError(registerPrefillError)) {
+      if (
+        registerPrefillError.status === 409 ||
+        registerPrefillError.code === "MEMBER_ALREADY_EXISTS"
+      ) {
+        toast.success("이미 회원가입이 완료된 계정입니다.");
+        onClose();
+        navigate("/", { replace: true });
+        return;
+      }
+
+      if (registerPrefillError.status === 401) {
+        toast.error("인증 정보가 만료되었습니다. 다시 로그인해 주세요.");
+        onClose();
+        navigate("/", { replace: true });
+        return;
+      }
+    }
+
+    toast.error("회원가입 사전 정보를 불러오지 못했습니다.");
+    onClose();
+    navigate("/", { replace: true });
+  }, [
+    isRegisterMode,
+    isRegisterPrefillError,
+    navigate,
+    onClose,
+    registerPrefillError,
+  ]);
 
   const handleNicknameChange = (event: ChangeEvent<HTMLInputElement>) => {
     setNickname(event.target.value);
@@ -165,6 +222,53 @@ export const SignupGuideModal = ({
     setProfileImageUrl(null);
   };
 
+  const handleRegisterComplete = async () => {
+    if (!isStep2Valid) {
+      return;
+    }
+
+    if (!isRegisterMode) {
+      handleCloseModal();
+      return;
+    }
+
+    try {
+      await registerMutation.mutateAsync({
+        agreedToTerms: true,
+        nickname: nickname.trim(),
+        phone: `${phoneFirst}-${phoneMiddle}-${phoneLast}`,
+      });
+
+      toast.success("회원가입이 완료되었습니다.");
+      handleCloseModal();
+      navigate("/", { replace: true });
+    } catch (error) {
+      if (isApiHttpError(error)) {
+        if (error.code === "DUPLICATE_NICKNAME") {
+          setNicknameValidationStatus("error");
+          setNicknameValidationMessage("이미 사용 중인 닉네임입니다");
+          return;
+        }
+
+        if (error.status === 401 || error.code === "UNAUTHORIZED") {
+          toast.error("인증 정보가 만료되었습니다. 다시 로그인해 주세요.");
+          handleCloseModal();
+          navigate("/", { replace: true });
+          return;
+        }
+
+        if (error.status === 409 || error.code === "MEMBER_ALREADY_EXISTS") {
+          toast.success("이미 회원가입이 완료된 계정입니다.");
+          handleCloseModal();
+          navigate("/", { replace: true });
+          return;
+        }
+      }
+
+      toast.error("회원가입 처리 중 오류가 발생했습니다. 다시 시도해 주세요.");
+    }
+  };
+
   if (!open) {
     return null;
   }
@@ -185,7 +289,7 @@ export const SignupGuideModal = ({
         )}
         role="dialog"
       >
-        {isCseStudent && step === 1 ? (
+        {effectiveCseStudent && step === 1 ? (
           <div className="flex min-h-[476px] flex-col items-center gap-8">
             <div className="flex items-center gap-2">
               <SignupStepBadge active step={1} />
@@ -208,10 +312,11 @@ export const SignupGuideModal = ({
                   이름 <span className="text-error-03">*</span>
                 </label>
                 <SignupTextInput
+                  disabled={isRegisterMode}
                   id="signup-name"
                   onChange={(event) => setName(event.target.value)}
                   placeholder="이름을 입력해 주세요"
-                  value={name}
+                  value={isRegisterMode ? (registerPrefill?.name ?? "") : name}
                 />
               </div>
 
@@ -296,7 +401,7 @@ export const SignupGuideModal = ({
               프로필 설정하러 가기
             </WritingButton>
           </div>
-        ) : isCseStudent && step === 2 ? (
+        ) : effectiveCseStudent && step === 2 ? (
           <div className="flex min-h-[616px] flex-col items-center gap-8">
             <div className="relative flex w-full items-center justify-center">
               <button
@@ -400,6 +505,9 @@ export const SignupGuideModal = ({
                   disabled
                   id="signup-student-id"
                   placeholder="2023..."
+                  value={
+                    isRegisterMode ? (registerPrefill?.studentNumber ?? "") : ""
+                  }
                 />
               </div>
 
@@ -414,6 +522,7 @@ export const SignupGuideModal = ({
                   disabled
                   id="signup-major"
                   placeholder="전공이름"
+                  value={isRegisterMode ? (registerPrefill?.major ?? "") : ""}
                 />
               </div>
             </div>
@@ -424,16 +533,14 @@ export const SignupGuideModal = ({
                   ? "bg-primary-600 hover:bg-primary-1000 active:bg-primary-800"
                   : "bg-primary-200 hover:bg-primary-200 active:bg-primary-200",
               )}
-              disabled={!isStep2Valid}
+              disabled={!isStep2Valid || registerMutation.isPending}
               icon={null}
-              onClick={() => {
-                if (isStep2Valid) {
-                  handleCloseModal();
-                }
-              }}
+              onClick={handleRegisterComplete}
               variant="action"
             >
-              Comit의 세계로 빠져들기
+              {registerMutation.isPending
+                ? "회원가입 처리 중..."
+                : "Comit의 세계로 빠져들기"}
             </WritingButton>
           </div>
         ) : (
@@ -466,14 +573,19 @@ export const SignupGuideModal = ({
         <SignupMascotBubble
           className={bubblePositionClass}
           text={
-            isCseStudent
+            effectiveCseStudent
               ? step === 1
                 ? "서비스를 이용하기 위한\n필수 정보다꿱🐥"
                 : "거의 다 끝났꿱🐥"
               : "다음에 만나꿱🐥"
           }
         />
-        {isCseStudent ? (
+        {isRegisterMode && isRegisterPrefillLoading ? (
+          <p className="absolute right-8 top-8 text-caption-02 text-text-placeholder">
+            회원가입 정보 확인 중...
+          </p>
+        ) : null}
+        {effectiveCseStudent ? (
           <img
             alt="Comit 마스코트"
             className="absolute -right-[140px] bottom-[-40px] block h-[287px] w-[205px] object-contain"
