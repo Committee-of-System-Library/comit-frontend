@@ -117,10 +117,6 @@ const AppContent = ({
   const shouldForceNonCseGuide =
     signupGuideType === "non-cse" || signupGuideType === "restricted";
   const shouldUseRestrictedGuideMessage = signupGuideType === "restricted";
-  const shouldShowLoginRequiredModal =
-    (loginRequired || !isAuthChecking) &&
-    !isAuthenticated &&
-    !shouldShowSignupGuideModal;
 
   useEffect(() => {
     if (!stage) {
@@ -220,6 +216,40 @@ const AppContent = ({
     window.location.assign(getSsoLoginUrl({ redirectUri }));
   };
 
+  if (loginRequired) {
+    return <LoginRequiredModal onLogin={handleStartSsoLogin} open />;
+  }
+
+  if (isAuthChecking) {
+    return (
+      <main className="flex min-h-screen w-full items-center justify-center bg-background-dark px-4">
+        <p className="text-body-01 text-text-tertiary">
+          인증 상태를 확인하고 있습니다...
+        </p>
+      </main>
+    );
+  }
+
+  if (!isAuthenticated) {
+    if (shouldShowSignupGuideModal) {
+      return (
+        <SignupGuideModal
+          isCseStudent={shouldForceNonCseGuide ? false : isCseStudent}
+          mode={signupGuideMode}
+          nonCseMessage={
+            shouldUseRestrictedGuideMessage
+              ? "접근이 제한된 계정이거나\n컴퓨터학부 계정만 사용이 가능해요ㅜㅜ"
+              : undefined
+          }
+          onClose={handleCloseSignupGuideModal}
+          open
+        />
+      );
+    }
+
+    return <LoginRequiredModal onLogin={handleStartSsoLogin} open />;
+  }
+
   return (
     <AppDesktopShell
       isAuthenticated={isAuthenticated}
@@ -261,10 +291,6 @@ const AppContent = ({
             open
           />
         ) : null}
-        <LoginRequiredModal
-          onLogin={handleStartSsoLogin}
-          open={shouldShowLoginRequiredModal}
-        />
       </>
     </AppDesktopShell>
   );
