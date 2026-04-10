@@ -146,6 +146,7 @@ const MyActivityPage = () => {
                 comments={item.comments}
                 time={item.time}
                 onClick={item.onClick}
+                className="rounded-xl"
               />
             ))
           ) : (
