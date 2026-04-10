@@ -49,3 +49,34 @@ export interface CursorPage<T> {
   nextCursor: number | null;
   items: T[];
 }
+
+export interface MyPostSummary {
+  id: number;
+  title: string;
+  createdAt: string;
+}
+
+export interface MyCommentSummary {
+  id: number;
+  content: string;
+  postId: number;
+  postTitle: string;
+  boardType: string;
+  createdAt: string;
+}
+
+export interface MyLikedPostSummary {
+  postId: number;
+  postTitle: string;
+  boardType: string;
+  likedAt: string;
+}
+
+export interface MyActivity {
+  postCount: number;
+  commentCount: number;
+  likeCount: number;
+  recentPosts: MyPostSummary[];
+  recentComments: MyCommentSummary[];
+  recentLikes: MyLikedPostSummary[];
+}
