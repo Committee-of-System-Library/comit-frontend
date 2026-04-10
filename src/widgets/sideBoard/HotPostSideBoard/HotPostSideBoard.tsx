@@ -2,11 +2,18 @@ import type { HTMLAttributes } from "react";
 
 import { TrendingUp } from "lucide-react";
 
-import type { HotPost } from "@/mocks/hotPosts";
 import { HotPostItem } from "@/shared/ui/HotPostItem/HotPostItem";
 
+export interface HotPostSideBoardItem {
+  id: number;
+  title: string;
+  author: string;
+  views: number;
+  time: string;
+}
+
 interface HotPostSideBoardProps extends HTMLAttributes<HTMLDivElement> {
-  posts: HotPost[];
+  posts: HotPostSideBoardItem[];
   onItemClick?: (id: number) => void;
 }
 
@@ -30,7 +37,7 @@ export const HotPostSideBoard = ({
       <div className="flex w-full flex-col">
         {posts.slice(0, 5).map((post, index) => (
           <HotPostItem
-            key={index}
+            key={post.id}
             rank={index + 1}
             title={post.title}
             author={post.author}
@@ -39,9 +46,7 @@ export const HotPostSideBoard = ({
             className={
               index === Math.min(posts.length, 5) - 1 ? "border-b-0" : ""
             }
-            onClick={
-              post.id !== undefined ? () => onItemClick?.(post.id!) : undefined
-            }
+            onClick={() => onItemClick?.(post.id)}
           />
         ))}
       </div>

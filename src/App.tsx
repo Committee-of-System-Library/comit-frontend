@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 
-import { Toaster } from "react-hot-toast";
+import { useQueryClient } from "@tanstack/react-query";
+import { Toaster, toast } from "react-hot-toast";
 import {
   BrowserRouter,
   Route,
@@ -11,6 +12,8 @@ import {
 
 import { DevToolDock } from "@/app/devtools/DevToolDock";
 import { AppDesktopShell } from "@/app/layout/AppDesktopShell";
+import { getSsoLoginUrl } from "@/entities/auth/api/logout";
+import { useMyProfileQuery } from "@/features/member/model/useMyProfileQuery";
 import { mockBannerItems } from "@/mocks/bannerItems";
 import AdminApp from "@/pages/admin/AdminApp";
 import EventBoardPage from "@/pages/board/EventBoardPage";
@@ -24,19 +27,12 @@ import MyActivityPage from "@/pages/mypage/MyActivityPage";
 import MyPage from "@/pages/mypage/MyPage";
 import PostPage from "@/pages/PostPage";
 import WritePage from "@/pages/write/WritePage";
+import { queryKeys } from "@/shared/api/query-keys";
 import { Banner } from "@/widgets/home/Banner/Banner";
+import { LoginRequiredModal } from "@/widgets/signup/LoginRequiredModal";
 import { SignupGuideModal } from "@/widgets/signup/SignupGuideModal";
 
-const DEV_AUTH_STORAGE_KEY = "comit.dev.authenticated";
 const DEV_CSE_STUDENT_STORAGE_KEY = "comit.dev.cse.student";
-
-const getInitialAuthState = () => {
-  if (!import.meta.env.DEV) {
-    return false;
-  }
-
-  return window.localStorage.getItem(DEV_AUTH_STORAGE_KEY) === "true";
-};
 
 const getInitialCseStudentState = () => {
   if (!import.meta.env.DEV) {
@@ -53,26 +49,156 @@ const getInitialCseStudentState = () => {
 };
 
 interface AppContentProps {
+  isAuthChecking: boolean;
   isCseStudent: boolean;
   isAuthenticated: boolean;
 }
 
-const AppContent = ({ isCseStudent, isAuthenticated }: AppContentProps) => {
+const isNonCseSsoError = (reason: string | null, errorCode: string | null) => {
+  const token = `${errorCode ?? ""} ${reason ?? ""}`.toLowerCase();
+
+  const nonCseHints = [
+    "unauthorized",
+    "not_cse",
+    "not-cse",
+    "non_cse",
+    "non-cse",
+    "school email",
+    "email domain",
+    "학교 이메일",
+    "컴퓨터학부",
+  ];
+
+  return nonCseHints.some((hint) => token.includes(hint));
+};
+
+const isRestrictedAccountSsoError = (
+  reason: string | null,
+  errorCode: string | null,
+) => {
+  const token = `${errorCode ?? ""} ${reason ?? ""}`.toLowerCase();
+
+  const restrictedHints = [
+    "external_user",
+    "external-user",
+    "external user",
+    "forbidden",
+    "403",
+  ];
+
+  return restrictedHints.some((hint) => token.includes(hint));
+};
+
+const AppContent = ({
+  isAuthChecking,
+  isCseStudent,
+  isAuthenticated,
+}: AppContentProps) => {
   const { pathname, search } = useLocation();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const isWritePath = /^\/write\/?$/.test(pathname);
+  const isAuthPath = /^\/login\/?$/.test(pathname);
   const isMyPage = pathname.startsWith("/mypage");
   const isMainPage = pathname === "/";
   const isTitleBoardPage =
     /^\/board\/(qna|info|free)\/?$/.test(pathname) ||
     /^\/(notice|event)\/?$/.test(pathname);
   const queryParams = new URLSearchParams(search);
+  const stage = queryParams.get("stage");
+  const reason = queryParams.get("reason");
+  const errorCode = queryParams.get("errorCode") ?? queryParams.get("code");
+  const loginRequired = queryParams.get("loginRequired") === "1";
+  const signupFlow = queryParams.get("signupFlow");
+  const signupGuideType = queryParams.get("signupGuideType");
+  const signupGuideMode = signupFlow === "register" ? "register" : "preview";
   const shouldShowSignupGuideModal =
     isMainPage && queryParams.get("signupGuide") === "1";
+  const shouldForceNonCseGuide =
+    signupGuideType === "non-cse" || signupGuideType === "restricted";
+  const shouldUseRestrictedGuideMessage = signupGuideType === "restricted";
+
+  useEffect(() => {
+    if (!stage) {
+      return;
+    }
+
+    if (stage === "success") {
+      toast.success("로그인이 완료되었습니다.");
+      queryClient.invalidateQueries({ queryKey: queryKeys.member.all });
+      navigate("/", { replace: true });
+      return;
+    }
+
+    if (stage === "register") {
+      const nextParams = new URLSearchParams(search);
+      nextParams.set("signupGuide", "1");
+      nextParams.set("signupFlow", "register");
+      nextParams.delete("stage");
+      nextParams.delete("reason");
+
+      navigate(
+        {
+          pathname: "/",
+          search: `?${nextParams.toString()}`,
+        },
+        { replace: true },
+      );
+      return;
+    }
+
+    if (stage === "error") {
+      const nonCseError = isNonCseSsoError(reason, errorCode);
+      const restrictedError = isRestrictedAccountSsoError(reason, errorCode);
+
+      if (nonCseError || restrictedError) {
+        const nextParams = new URLSearchParams(search);
+        nextParams.set("signupGuide", "1");
+        nextParams.set("signupFlow", "preview");
+        nextParams.set(
+          "signupGuideType",
+          restrictedError ? "restricted" : "non-cse",
+        );
+        nextParams.delete("stage");
+        nextParams.delete("reason");
+        nextParams.delete("errorCode");
+        nextParams.delete("code");
+
+        navigate(
+          {
+            pathname: "/",
+            search: `?${nextParams.toString()}`,
+          },
+          { replace: true },
+        );
+        return;
+      }
+
+      toast.error(
+        reason || "SSO 인증 중 오류가 발생했습니다. 다시 시도해 주세요.",
+      );
+      const nextParams = new URLSearchParams(search);
+      nextParams.delete("stage");
+      nextParams.delete("reason");
+      nextParams.delete("errorCode");
+      nextParams.delete("code");
+
+      navigate(
+        {
+          pathname: "/",
+          search: nextParams.toString() ? `?${nextParams.toString()}` : "",
+        },
+        { replace: true },
+      );
+    }
+  }, [errorCode, navigate, queryClient, reason, search, stage]);
 
   const handleCloseSignupGuideModal = () => {
     const nextParams = new URLSearchParams(search);
     nextParams.delete("signupGuide");
+    nextParams.delete("signupFlow");
+    nextParams.delete("signupGuideType");
+    nextParams.delete("loginRequired");
     nextParams.delete("oauth");
 
     navigate(
@@ -84,6 +210,46 @@ const AppContent = ({ isCseStudent, isAuthenticated }: AppContentProps) => {
     );
   };
 
+  const handleStartSsoLogin = () => {
+    const redirectUri =
+      typeof window !== "undefined" ? window.location.origin : undefined;
+    window.location.assign(getSsoLoginUrl({ redirectUri }));
+  };
+
+  if (loginRequired) {
+    return <LoginRequiredModal onLogin={handleStartSsoLogin} open />;
+  }
+
+  if (isAuthChecking) {
+    return (
+      <main className="flex min-h-screen w-full items-center justify-center bg-background-dark px-4">
+        <p className="text-body-01 text-text-tertiary">
+          인증 상태를 확인하고 있습니다...
+        </p>
+      </main>
+    );
+  }
+
+  if (!isAuthenticated) {
+    if (shouldShowSignupGuideModal) {
+      return (
+        <SignupGuideModal
+          isCseStudent={shouldForceNonCseGuide ? false : isCseStudent}
+          mode={signupGuideMode}
+          nonCseMessage={
+            shouldUseRestrictedGuideMessage
+              ? "접근이 제한된 계정이거나\n컴퓨터학부 계정만 사용이 가능해요ㅜㅜ"
+              : undefined
+          }
+          onClose={handleCloseSignupGuideModal}
+          open
+        />
+      );
+    }
+
+    return <LoginRequiredModal onLogin={handleStartSsoLogin} open />;
+  }
+
   return (
     <AppDesktopShell
       isAuthenticated={isAuthenticated}
@@ -94,6 +260,7 @@ const AppContent = ({ isCseStudent, isAuthenticated }: AppContentProps) => {
             ? "max-w-[1200px] pt-10 pb-20"
             : undefined
       }
+      rightRail={isWritePath || isMyPage || isAuthPath ? null : undefined}
       rightRailClassName={isTitleBoardPage ? "pt-[90px]" : undefined}
       topBanner={isMainPage ? <Banner items={mockBannerItems} /> : undefined}
     >
@@ -113,7 +280,13 @@ const AppContent = ({ isCseStudent, isAuthenticated }: AppContentProps) => {
         </Routes>
         {shouldShowSignupGuideModal ? (
           <SignupGuideModal
-            isCseStudent={isCseStudent}
+            isCseStudent={shouldForceNonCseGuide ? false : isCseStudent}
+            mode={signupGuideMode}
+            nonCseMessage={
+              shouldUseRestrictedGuideMessage
+                ? "접근이 제한된 계정이거나\n컴퓨터학부 계정만 사용이 가능해요ㅜㅜ"
+                : undefined
+            }
             onClose={handleCloseSignupGuideModal}
             open
           />
@@ -127,16 +300,10 @@ function App() {
   const [isCseStudent, setIsCseStudent] = useState<boolean>(
     getInitialCseStudentState,
   );
-  const [isAuthenticated, setIsAuthenticated] =
-    useState<boolean>(getInitialAuthState);
-
-  useEffect(() => {
-    if (!import.meta.env.DEV) {
-      return;
-    }
-
-    window.localStorage.setItem(DEV_AUTH_STORAGE_KEY, String(isAuthenticated));
-  }, [isAuthenticated]);
+  const { data: myProfile, isLoading: isMyProfileLoading } =
+    useMyProfileQuery();
+  const isAuthChecking = isMyProfileLoading;
+  const isAuthenticated = Boolean(myProfile);
 
   useEffect(() => {
     if (!import.meta.env.DEV) {
@@ -150,7 +317,7 @@ function App() {
   }, [isCseStudent]);
 
   const handlePreviewSignupGuide = () => {
-    window.location.assign("/?oauth=success&signupGuide=1");
+    window.location.assign("/?signupGuide=1");
   };
 
   return (
@@ -181,6 +348,7 @@ function App() {
           <Route
             element={
               <AppContent
+                isAuthChecking={isAuthChecking}
                 isAuthenticated={isAuthenticated}
                 isCseStudent={isCseStudent}
               />
@@ -192,7 +360,6 @@ function App() {
         {import.meta.env.DEV ? (
           <DevToolDock
             isAuthenticated={isAuthenticated}
-            onChange={setIsAuthenticated}
             isCseStudent={isCseStudent}
             onCseStudentChange={setIsCseStudent}
             onPreviewSignupGuide={handlePreviewSignupGuide}
