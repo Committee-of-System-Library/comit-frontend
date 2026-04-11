@@ -1,4 +1,6 @@
 import bannerImg from "@/assets/home/banner/Banner.png";
+import bannerImg2 from "@/assets/home/banner/Banner2.png";
+import bannerImg3 from "@/assets/home/banner/Banner3.png";
 
 export interface BannerItem {
   id: number;
@@ -16,12 +18,12 @@ export const mockBannerItems: BannerItem[] = [
   },
   {
     id: 2,
-    imageUrl: "https://picsum.photos/1200/208?random=1",
+    imageUrl: bannerImg2,
     alt: "메인 배너 2",
   },
   {
     id: 3,
-    imageUrl: "https://picsum.photos/1200/208?random=2",
+    imageUrl: bannerImg3,
     alt: "메인 배너 3",
   },
 ];
