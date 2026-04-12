@@ -30,6 +30,7 @@ const PostPage = () => {
     id: number;
     name: string;
     content: string;
+    type: "comment" | "post";
   } | null>(null);
   const [deleteTargetId, setDeleteTargetId] = useState<number | null>(null);
 
@@ -48,12 +49,15 @@ const PostPage = () => {
 
   const togglePostLikeMutation = useTogglePostLikeMutation();
 
-  const { data: commentsData, isLoading: isCommentsLoading } = useCommentsQuery({ 
-    postId: parsedPostId 
-  });
-  
+  const { data: commentsData, isLoading: isCommentsLoading } = useCommentsQuery(
+    {
+      postId: parsedPostId,
+    },
+  );
+
   const comments = commentsData?.comments ?? [];
-  const { mutate: createComment, isPending: isCreating } = useCreateCommentMutation();
+  const { mutate: createComment, isPending: isCreating } =
+    useCreateCommentMutation();
   const { mutate: deleteComment } = useDeleteCommentMutation();
 
   // -- 데이터 가공 (Memos) --
@@ -61,7 +65,8 @@ const PostPage = () => {
     if (!postData) {
       return null;
     }
-    const isMine = !!myProfile && myProfile.nickname === postData.authorNickname;
+    const isMine =
+      !!myProfile && myProfile.nickname === postData.authorNickname;
     return { ...mapPostDetailToPost(postData), isMine };
   }, [postData, myProfile]);
 
@@ -162,6 +167,14 @@ const PostPage = () => {
         isMine={mappedPost.isMine}
         isLikePending={togglePostLikeMutation.isPending}
         onEdit={() => navigate(`/write?postId=${parsedPostId}`)}
+        onReport={() =>
+          setReportTarget({
+            id: parsedPostId,
+            name: mappedPost.user,
+            content: mappedPost.content,
+            type: "post",
+          })
+        }
         onLikeClick={handleTogglePostLike}
         shareUrl={buildPostShareUrl(parsedPostId)}
         tag={mappedPost.tag ?? []}
@@ -191,7 +204,7 @@ const PostPage = () => {
                 comment={item}
                 postId={parsedPostId}
                 onReport={(id, name, content) =>
-                  setReportTarget({ id, name, content })
+                  setReportTarget({ id, name, content, type: "comment" })
                 }
                 onDelete={(id) => setDeleteTargetId(Number(id))}
               />
@@ -199,17 +212,17 @@ const PostPage = () => {
           )}
         </div>
       </div>
-      
+
       {/* 모달 렌더링 */}
       {reportTarget && (
         <ReportModal
           user={reportTarget.name}
           contents={reportTarget.content}
-          commentId={reportTarget.id}
+          target={{ type: reportTarget.type, id: reportTarget.id }}
           onClose={() => setReportTarget(null)}
         />
       )}
-      
+
       {deleteTargetId !== null && (
         <DeleteModal
           target="comment"
