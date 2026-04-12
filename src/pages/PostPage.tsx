@@ -139,7 +139,8 @@ const PostPage = () => {
       await deletePostMutation.mutateAsync(parsedPostId);
       toast.success("게시글이 삭제되었습니다.");
       setIsPostDeleteModalOpen(false);
-      navigate(resolveBoardPath(postData.boardType), { replace: true });
+      const nextPath = postData ? resolveBoardPath(postData.boardType) : "/";
+      navigate(nextPath, { replace: true });
     } catch (error) {
       toast.error(
         resolvePostDomainErrorMessage(error, {
