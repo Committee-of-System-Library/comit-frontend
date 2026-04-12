@@ -16,7 +16,7 @@ vi.mock("@/entities/member/api/getMyProfile", () => ({
 }));
 
 describe("useMyProfileQuery", () => {
-  it("올바른 queryKey와 queryFn으로 useQuery를 호출한다", () => {
+  it("올바른 queryKey로 useQuery를 호출한다", () => {
     vi.mocked(useQuery).mockReturnValue({ data: undefined } as never);
 
     renderHook(() => useMyProfileQuery());
@@ -24,9 +24,19 @@ describe("useMyProfileQuery", () => {
     expect(useQuery).toHaveBeenCalledWith(
       expect.objectContaining({
         queryKey: queryKeys.member.me(),
-        queryFn: getMyProfile,
       }),
     );
+  });
+
+  it("queryFn 실행 시 getMyProfile을 호출한다", async () => {
+    vi.mocked(useQuery).mockReturnValue({ data: undefined } as never);
+
+    renderHook(() => useMyProfileQuery());
+
+    const options = vi.mocked(useQuery).mock.calls[0][0];
+    await (options.queryFn as () => Promise<unknown>)?.();
+
+    expect(getMyProfile).toHaveBeenCalled();
   });
 
   it("enabled 옵션이 false일 때 반영된다", () => {
