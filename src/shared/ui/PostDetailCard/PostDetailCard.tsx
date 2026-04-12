@@ -13,6 +13,7 @@ interface PostDetailCardProps extends Post {
   isMine?: boolean;
   onClick?: () => void;
   onEdit?: () => void;
+  onDelete?: () => void;
   onReport?: () => void;
   onLikeClick?: () => void;
   isLikePending?: boolean;
@@ -33,6 +34,7 @@ export const PostDetailCard = ({
   disabled = false,
   isMine = false,
   onEdit,
+  onDelete,
   onReport,
   onLikeClick,
   isLikePending = false,
@@ -89,6 +91,7 @@ export const PostDetailCard = ({
               <OptionList
                 mode={isMine ? "myPost" : "others"}
                 onEdit={onEdit}
+                onDelete={onDelete}
                 onReport={onReport}
               />
             </div>
