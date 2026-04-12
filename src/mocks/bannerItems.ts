@@ -1,6 +1,6 @@
 import bannerImg from "@/assets/home/banner/Banner.png";
 import bannerImg2 from "@/assets/home/banner/Banner2.png";
-import bannerImg3 from "@/assets/home/banner/Banner3.png";
+import bannerImg3 from "@/assets/home/banner/Banner3-3.png";
 
 export interface BannerItem {
   id: number;
