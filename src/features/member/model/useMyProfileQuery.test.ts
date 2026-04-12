@@ -51,8 +51,8 @@ describe("useMyProfileQuery", () => {
 
     renderHook(() => useMyProfileQuery());
 
-    const queryOptions = vi.mocked(useQuery).mock.calls[0]?.[0] as {
-      queryFn: () => Promise<unknown>;
+    const queryOptions = vi.mocked(useQuery).mock.calls[0]?.[0] as unknown as {
+      queryFn?: (context: unknown) => Promise<unknown>;
     };
 
     vi.mocked(getMyProfile).mockRejectedValueOnce(
@@ -64,7 +64,11 @@ describe("useMyProfileQuery", () => {
       }),
     );
 
-    await expect(queryOptions.queryFn()).resolves.toBeNull();
+    if (!queryOptions.queryFn) {
+      throw new Error("queryFn is not defined");
+    }
+
+    await expect(queryOptions.queryFn({})).resolves.toBeNull();
   });
 
   it("401/403 이외 에러는 그대로 throw한다", async () => {
@@ -72,8 +76,8 @@ describe("useMyProfileQuery", () => {
 
     renderHook(() => useMyProfileQuery());
 
-    const queryOptions = vi.mocked(useQuery).mock.calls[0]?.[0] as {
-      queryFn: () => Promise<unknown>;
+    const queryOptions = vi.mocked(useQuery).mock.calls[0]?.[0] as unknown as {
+      queryFn?: (context: unknown) => Promise<unknown>;
     };
 
     const internalServerError = new ApiHttpError({
@@ -85,6 +89,10 @@ describe("useMyProfileQuery", () => {
 
     vi.mocked(getMyProfile).mockRejectedValueOnce(internalServerError);
 
-    await expect(queryOptions.queryFn()).rejects.toBe(internalServerError);
+    if (!queryOptions.queryFn) {
+      throw new Error("queryFn is not defined");
+    }
+
+    await expect(queryOptions.queryFn({})).rejects.toBe(internalServerError);
   });
 });
