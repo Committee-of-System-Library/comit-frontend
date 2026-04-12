@@ -5,8 +5,9 @@ export interface MyProfile {
   studentNumberVisible: boolean;
 }
 
-export interface UpdateNicknameRequest {
-  nickname: string;
+export interface UpdateProfileRequest {
+  nickname?: string;
+  profileImageUrl?: string | null;
 }
 
 export interface UpdateStudentNumberVisibilityRequest {
