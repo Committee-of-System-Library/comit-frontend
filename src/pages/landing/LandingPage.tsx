@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import mascotImage from "@/assets/Ori_happy.svg";
+import mascotImage from "@/assets/Ori_Jump.svg";
 import { getSsoLoginUrl } from "@/entities/auth/api/logout";
 import { WritingButton } from "@/shared/ui/WritingButton/WritingButton";
 import { cn } from "@/utils/cn";
@@ -68,7 +68,7 @@ const LandingPage = () => {
           aria-valuemax={100}
           aria-valuemin={0}
           aria-valuenow={Math.round(scrollProgress)}
-          className="h-2.5 w-full bg-gray-200"
+          className="h-1.5 w-full bg-gray-200"
           role="progressbar"
         >
           <div
@@ -91,7 +91,7 @@ const LandingPage = () => {
             </div>
 
             <WritingButton
-              className="mt-10 h-[46px] rounded-xl px-6 text-label-01"
+              className="mt-10 h-[46px] rounded-xl px-6"
               fullWidth={false}
               icon={null}
               onClick={handleStartSsoLogin}
@@ -152,13 +152,13 @@ const LandingPage = () => {
             </div>
           </section>
 
-          <section className="mt-[340px] flex items-end justify-center gap-10">
+          <section className="mt-[340px] flex items-end justify-center gap-6">
             <div className="flex flex-col items-center gap-6">
               <p className="text-center text-head-01 text-text-primary">
                 지금 시작해 볼까요?
               </p>
               <WritingButton
-                className="h-[46px] min-w-[274px] rounded-xl px-6 text-label-01"
+                className="h-[46px] min-w-[274px] rounded-xl px-6"
                 fullWidth={false}
                 icon={null}
                 onClick={handleStartSsoLogin}
@@ -170,7 +170,7 @@ const LandingPage = () => {
 
             <img
               alt="Comit 마스코트"
-              className="h-[221px] w-[158px] object-contain"
+              className="h-[221px] w-[158px] object-contain translate-y-12"
               src={mascotImage}
             />
           </section>
