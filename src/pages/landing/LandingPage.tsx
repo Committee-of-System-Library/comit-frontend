@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 
+import logoImage from "@/assets/Logo.svg";
 import mascotImage from "@/assets/Ori_Jump.svg";
 import { getSsoLoginUrl } from "@/entities/auth/api/logout";
 import { WritingButton } from "@/shared/ui/WritingButton/WritingButton";
@@ -79,10 +80,14 @@ const LandingPage = () => {
       </div>
 
       <div className="mx-auto w-full max-w-[1440px]">
-        <div className="px-[120px] pb-[160px] pt-[209px]">
+        <div className="px-[120px] pb-[160px] pt-[170px]">
           <section className="flex flex-col items-center">
             <div className="text-center">
-              <p className="text-head-03 text-primary-600">comit</p>
+              <img
+                alt="Comit 로고"
+                className="mb-7 mx-auto h-[58px] w-auto object-contain"
+                src={logoImage}
+              />
               <h1 className="mt-2 text-center text-head-01 text-text-primary">
                 경북대학교 컴퓨터학부만의 이야기,
                 <br />
