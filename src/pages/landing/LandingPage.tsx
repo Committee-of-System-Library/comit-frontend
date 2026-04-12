@@ -1,3 +1,5 @@
+import { useEffect, useState } from "react";
+
 import mascotImage from "@/assets/Ori_happy.svg";
 import { getSsoLoginUrl } from "@/entities/auth/api/logout";
 import { WritingButton } from "@/shared/ui/WritingButton/WritingButton";
@@ -14,11 +16,69 @@ const PlaceholderBlock = ({ className = "" }: { className?: string }) => (
 );
 
 const LandingPage = () => {
+  const [scrollProgress, setScrollProgress] = useState(0);
+
+  useEffect(() => {
+    const updateScrollProgress = () => {
+      const scrollTop =
+        window.scrollY || document.documentElement.scrollTop || 0;
+      const scrollableHeight =
+        document.documentElement.scrollHeight - window.innerHeight;
+
+      if (scrollableHeight <= 0) {
+        setScrollProgress(0);
+        return;
+      }
+
+      const nextProgress = Math.min((scrollTop / scrollableHeight) * 100, 100);
+      setScrollProgress(nextProgress);
+    };
+
+    let frameId = 0;
+    const handleScroll = () => {
+      if (frameId) {
+        return;
+      }
+
+      frameId = window.requestAnimationFrame(() => {
+        updateScrollProgress();
+        frameId = 0;
+      });
+    };
+
+    updateScrollProgress();
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    window.addEventListener("resize", updateScrollProgress);
+
+    return () => {
+      if (frameId) {
+        window.cancelAnimationFrame(frameId);
+      }
+
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("resize", updateScrollProgress);
+    };
+  }, []);
+
   return (
     <main className="min-h-screen w-full bg-background-dark">
-      <div className="mx-auto w-full max-w-[1440px]">
-        <div className="h-2.5 w-full max-w-[1001px] rounded-r-[5px] bg-primary-600" />
+      <div className="fixed inset-x-0 top-0 z-40">
+        <div
+          aria-label="랜딩 진행률"
+          aria-valuemax={100}
+          aria-valuemin={0}
+          aria-valuenow={Math.round(scrollProgress)}
+          className="h-2.5 w-full bg-gray-200"
+          role="progressbar"
+        >
+          <div
+            className="h-full bg-primary-600 transition-[width] duration-150 ease-out"
+            style={{ width: `${scrollProgress}%` }}
+          />
+        </div>
+      </div>
 
+      <div className="mx-auto w-full max-w-[1440px]">
         <div className="px-[120px] pb-[160px] pt-[209px]">
           <section className="flex flex-col items-center">
             <div className="text-center">
