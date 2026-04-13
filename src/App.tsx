@@ -5,6 +5,7 @@ import { posthog } from "posthog-js";
 import { Toaster, toast } from "react-hot-toast";
 import {
   BrowserRouter,
+  Navigate,
   Route,
   Routes,
   useLocation,
@@ -240,7 +241,10 @@ const AppContent = ({
           <Route element={<PostPage />} path="/post/:postId" />
           <Route element={<MyPage />} path="/mypage" />
           <Route element={<MyActivityPage />} path="/mypage/activity" />
-          <Route element={<NotFoundPage />} path="*" />
+          <Route
+            element={<Navigate replace to="/error/not-found" />}
+            path="*"
+          />
         </Routes>
       </>
     </AppDesktopShell>
@@ -318,12 +322,21 @@ function App() {
           <Routes>
             <Route element={<LandingPage />} path="/landing" />
             <Route element={<AdminApp />} path="/admin/*" />
+            <Route element={<NotFoundPage />} path="/error/not-found" />
+            <Route
+              element={<NetworkErrorPage onRetry={handleRetryMyProfile} />}
+              path="/error/network"
+            />
+            <Route
+              element={<ServerErrorPage onRetry={handleRetryMyProfile} />}
+              path="/error/server"
+            />
             <Route
               element={
                 isNetworkError ? (
-                  <NetworkErrorPage onRetry={handleRetryMyProfile} />
+                  <Navigate replace to="/error/network" />
                 ) : isServerError ? (
-                  <ServerErrorPage onRetry={handleRetryMyProfile} />
+                  <Navigate replace to="/error/server" />
                 ) : (
                   <AppContent
                     isAuthChecking={isAuthChecking}
