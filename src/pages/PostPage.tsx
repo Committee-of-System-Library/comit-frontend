@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useEffect, useState, useMemo } from "react";
 
 import toast from "react-hot-toast";
 import { useNavigate, useParams } from "react-router-dom";
@@ -26,6 +26,14 @@ const PostPage = () => {
   const { postId } = useParams<{ postId: string }>();
   const parsedPostId = Number(postId);
   const isValidPostId = Number.isInteger(parsedPostId) && parsedPostId > 0;
+
+  useEffect(() => {
+    try {
+      window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    } catch {
+      // jsdom 환경에서 scrollTo 미구현 예외를 무시한다.
+    }
+  }, [postId]);
 
   // -- 댓글 모달 상태 --
   const [reportTarget, setReportTarget] = useState<{

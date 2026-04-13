@@ -5,6 +5,7 @@ import { posthog } from "posthog-js";
 import { Toaster, toast } from "react-hot-toast";
 import {
   BrowserRouter,
+  Navigate,
   Route,
   Routes,
   useLocation,
@@ -23,7 +24,6 @@ import NoticeBoardPage from "@/pages/board/NoticeBoardPage";
 import QnABoardPage from "@/pages/board/QnABoardPage";
 import HomePage from "@/pages/home/HomePage";
 import LandingPage from "@/pages/landing/LandingPage";
-import LoginPage from "@/pages/login/LoginPage";
 import MyActivityPage from "@/pages/mypage/MyActivityPage";
 import MyPage from "@/pages/mypage/MyPage";
 import PostPage from "@/pages/PostPage";
@@ -102,7 +102,6 @@ const AppContent = ({
   }, [pathname]);
   const queryClient = useQueryClient();
   const isWritePath = /^\/write\/?$/.test(pathname);
-  const isAuthPath = /^\/login\/?$/.test(pathname);
   const isMyPage = pathname.startsWith("/mypage");
   const isMainPage = pathname === "/";
   const isTitleBoardPage =
@@ -221,7 +220,7 @@ const AppContent = ({
             ? "max-w-[1200px] pt-10 pb-20"
             : undefined
       }
-      rightRail={isWritePath || isMyPage || isAuthPath ? null : undefined}
+      rightRail={isWritePath || isMyPage ? null : undefined}
       rightRailClassName={isTitleBoardPage ? "pt-[90px]" : undefined}
       topBanner={isMainPage ? <Banner items={mockBannerItems} /> : undefined}
     >
@@ -235,9 +234,9 @@ const AppContent = ({
           <Route element={<NoticeBoardPage />} path="/notice" />
           <Route element={<EventBoardPage />} path="/event" />
           <Route element={<PostPage />} path="/post/:postId" />
-          <Route element={<LoginPage />} path="/login" />
           <Route element={<MyPage />} path="/mypage" />
           <Route element={<MyActivityPage />} path="/mypage/activity" />
+          <Route element={<Navigate replace to="/" />} path="*" />
         </Routes>
       </>
     </AppDesktopShell>
