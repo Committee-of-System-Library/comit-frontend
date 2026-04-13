@@ -3,6 +3,7 @@ import { useState, useMemo } from "react";
 import toast from "react-hot-toast";
 import { useNavigate, useParams } from "react-router-dom";
 
+import type { BoardType } from "@/entities/post/model/types";
 import { useCommentsQuery } from "@/features/comment/model/useCommentsQuery";
 import { useCreateCommentMutation } from "@/features/comment/model/useCreateCommentMutation";
 import { useDeleteCommentMutation } from "@/features/comment/model/useDeleteCommentMutation";
@@ -10,6 +11,7 @@ import { useMyProfileQuery } from "@/features/member/model/useMyProfileQuery";
 import { normalizePostDomainError } from "@/features/post/model/postDomainError";
 import { resolvePostDomainErrorMessage } from "@/features/post/model/postDomainErrorMessage";
 import { mapPostDetailToPost } from "@/features/post/model/postUiMappers";
+import { useDeletePostMutation } from "@/features/post/model/useDeletePostMutation";
 import { usePostDetailQuery } from "@/features/post/model/usePostDetailQuery";
 import { useTogglePostLikeMutation } from "@/features/post/model/useTogglePostLikeMutation";
 import { buildPostShareUrl } from "@/shared/lib/share-url";
@@ -30,8 +32,10 @@ const PostPage = () => {
     id: number;
     name: string;
     content: string;
+    type: "comment" | "post";
   } | null>(null);
   const [deleteTargetId, setDeleteTargetId] = useState<number | null>(null);
+  const [isPostDeleteModalOpen, setIsPostDeleteModalOpen] = useState(false);
 
   // -- API Queries & Mutations --
   const { data: myProfile } = useMyProfileQuery();
@@ -47,13 +51,17 @@ const PostPage = () => {
   });
 
   const togglePostLikeMutation = useTogglePostLikeMutation();
+  const deletePostMutation = useDeletePostMutation();
 
-  const { data: commentsData, isLoading: isCommentsLoading } = useCommentsQuery({ 
-    postId: parsedPostId 
-  });
-  
+  const { data: commentsData, isLoading: isCommentsLoading } = useCommentsQuery(
+    {
+      postId: parsedPostId,
+    },
+  );
+
   const comments = commentsData?.comments ?? [];
-  const { mutate: createComment, isPending: isCreating } = useCreateCommentMutation();
+  const { mutate: createComment, isPending: isCreating } =
+    useCreateCommentMutation();
   const { mutate: deleteComment } = useDeleteCommentMutation();
 
   // -- 데이터 가공 (Memos) --
@@ -61,7 +69,8 @@ const PostPage = () => {
     if (!postData) {
       return null;
     }
-    const isMine = !!myProfile && myProfile.nickname === postData.authorNickname;
+    const isMine =
+      !!myProfile && myProfile.nickname === postData.authorNickname;
     return { ...mapPostDetailToPost(postData), isMine };
   }, [postData, myProfile]);
 
@@ -106,6 +115,42 @@ const PostPage = () => {
       postId: parsedPostId,
       payload: { content: value },
     });
+  };
+
+  const resolveBoardPath = (boardType: BoardType) => {
+    switch (boardType) {
+      case "QNA":
+        return "/board/qna";
+      case "INFO":
+        return "/board/info";
+      case "FREE":
+        return "/board/free";
+      case "NOTICE":
+        return "/notice";
+      case "EVENT":
+        return "/event";
+      default:
+        return "/";
+    }
+  };
+
+  const handlePostDeleteConfirm = async () => {
+    try {
+      await deletePostMutation.mutateAsync(parsedPostId);
+      toast.success("게시글이 삭제되었습니다.");
+      setIsPostDeleteModalOpen(false);
+      const nextPath = postData ? resolveBoardPath(postData.boardType) : "/";
+      navigate(nextPath, { replace: true });
+    } catch (error) {
+      toast.error(
+        resolvePostDomainErrorMessage(error, {
+          auth: "로그인 후 게시글을 삭제할 수 있어요.",
+          default: "게시글 삭제에 실패했습니다. 잠시 후 다시 시도해 주세요.",
+          forbidden: "해당 게시글을 삭제할 권한이 없습니다.",
+          notFound: "이미 삭제되었거나 존재하지 않는 게시글이에요.",
+        }),
+      );
+    }
   };
 
   // -- 예외 및 로딩 처리 (Early Returns) --
@@ -162,6 +207,15 @@ const PostPage = () => {
         isMine={mappedPost.isMine}
         isLikePending={togglePostLikeMutation.isPending}
         onEdit={() => navigate(`/write?postId=${parsedPostId}`)}
+        onDelete={() => setIsPostDeleteModalOpen(true)}
+        onReport={() =>
+          setReportTarget({
+            id: parsedPostId,
+            name: mappedPost.user,
+            content: mappedPost.content,
+            type: "post",
+          })
+        }
         onLikeClick={handleTogglePostLike}
         shareUrl={buildPostShareUrl(parsedPostId)}
         tag={mappedPost.tag ?? []}
@@ -191,7 +245,7 @@ const PostPage = () => {
                 comment={item}
                 postId={parsedPostId}
                 onReport={(id, name, content) =>
-                  setReportTarget({ id, name, content })
+                  setReportTarget({ id, name, content, type: "comment" })
                 }
                 onDelete={(id) => setDeleteTargetId(Number(id))}
               />
@@ -199,17 +253,17 @@ const PostPage = () => {
           )}
         </div>
       </div>
-      
+
       {/* 모달 렌더링 */}
       {reportTarget && (
         <ReportModal
           user={reportTarget.name}
           contents={reportTarget.content}
-          commentId={reportTarget.id}
+          target={{ type: reportTarget.type, id: reportTarget.id }}
           onClose={() => setReportTarget(null)}
         />
       )}
-      
+
       {deleteTargetId !== null && (
         <DeleteModal
           target="comment"
@@ -224,6 +278,14 @@ const PostPage = () => {
               },
             );
           }}
+        />
+      )}
+
+      {isPostDeleteModalOpen && (
+        <DeleteModal
+          target="post"
+          onClose={() => setIsPostDeleteModalOpen(false)}
+          onConfirm={handlePostDeleteConfirm}
         />
       )}
     </main>
