@@ -1,5 +1,6 @@
 import { Github, Instagram } from "lucide-react";
 
+import logoImage from "@/assets/Logo.svg";
 import { cn } from "@/utils/cn";
 
 type FooterLink = {
@@ -27,7 +28,11 @@ export const Footer = ({
       <div className="flex flex-wrap items-start justify-between gap-10">
         <div className="flex w-full max-w-[714px] flex-1 flex-wrap items-start justify-between gap-10">
           <section className="w-full space-y-6 md:flex-1 md:pr-10">
-            <h2 className="text-subtitle-01 text-text-primary">로고</h2>
+            <img
+              alt="Comit 로고"
+              className="h-10 w-auto object-contain mb-4"
+              src={logoImage}
+            />
             <p className="text-body-02 text-text-placeholder">
               경북대학교 컴퓨터학부 학생들을 위한 지식 나눔 커뮤니티입니다.
               <br />
