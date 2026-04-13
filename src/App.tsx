@@ -30,6 +30,7 @@ import PostPage from "@/pages/PostPage";
 import WritePage from "@/pages/write/WritePage";
 import { queryKeys } from "@/shared/api/query-keys";
 import { Banner } from "@/widgets/home/Banner/Banner";
+import { DefaultRightRail } from "@/widgets/layout/DefaultRightRail";
 import { SignupGuideModal } from "@/widgets/signup/SignupGuideModal";
 
 const DEV_CSE_STUDENT_STORAGE_KEY = "comit.dev.cse.student";
@@ -210,6 +211,9 @@ const AppContent = ({
     return null;
   }
 
+  const isNoticePage = pathname === "/notice";
+  const isEventPage = pathname === "/event";
+
   return (
     <AppDesktopShell
       isAuthenticated={isAuthenticated}
@@ -220,7 +224,13 @@ const AppContent = ({
             ? "max-w-[1200px] pt-10 pb-20"
             : undefined
       }
-      rightRail={isWritePath || isMyPage ? null : undefined}
+      rightRail={
+        isWritePath || isMyPage ? null : isNoticePage ? (
+          <DefaultRightRail hideNotice hideWritingButton />
+        ) : isEventPage ? (
+          <DefaultRightRail hideEvent hideWritingButton />
+        ) : undefined
+      }
       rightRailClassName={isTitleBoardPage ? "pt-[90px]" : undefined}
       topBanner={isMainPage ? <Banner items={mockBannerItems} /> : undefined}
     >
