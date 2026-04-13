@@ -31,6 +31,11 @@ export default defineConfig({
         test: {
           name: "unit",
           include: ["src/**/*.test.ts", "src/**/*.test.tsx"],
+          poolOptions: {
+            forks: {
+              maxForks: 4,
+            },
+          },
         },
       },
       {
