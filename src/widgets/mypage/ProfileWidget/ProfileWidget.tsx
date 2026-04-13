@@ -38,7 +38,7 @@ export const ProfileWidget = ({
   return (
     <div
       className={cn(
-        "bg-background-light border-border-deactivated flex w-[384px] shrink-0 items-center justify-between rounded-xl border p-4 shadow-sm",
+        "bg-background-light border-border-deactivated flex w-[384px] shrink-0 items-center justify-between rounded-xl border p-4",
         className,
       )}
     >

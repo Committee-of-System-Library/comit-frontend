@@ -55,24 +55,24 @@ const MyActivityPage = () => {
       label: "내가 쓴 글",
       totalCount: postsData?.totalCount ?? 0,
       items: (postsData?.items ?? []).map((post) => ({
-        id: post.postId,
+        id: post.id,
         title: post.title,
-        content: post.content ?? "",
-        likes: post.likeCount ?? 0,
-        comments: post.commentCount ?? 0,
+        content: post.contentPreview,
+        likes: post.likeCount,
+        comments: post.commentCount,
         time: formatTimeAgo(post.createdAt),
-        onClick: () => navigate(`/post/${post.postId}`),
+        onClick: () => navigate(`/post/${post.id}`),
       })),
     },
     comments: {
       label: "내가 쓴 댓글",
       totalCount: commentsData?.totalCount ?? 0,
       items: (commentsData?.items ?? []).map((comment) => ({
-        id: comment.commentId,
+        id: comment.id,
         title: comment.postTitle,
         content: comment.content,
-        likes: comment.likeCount ?? 0,
-        comments: comment.commentCount ?? 0,
+        likes: 0,
+        comments: 0,
         time: formatTimeAgo(comment.createdAt),
         onClick: () => navigate(`/post/${comment.postId}`),
       })),
@@ -82,11 +82,11 @@ const MyActivityPage = () => {
       totalCount: likesData?.totalCount ?? 0,
       items: (likesData?.items ?? []).map((like) => ({
         id: like.postId,
-        title: like.title,
-        content: like.content ?? "",
-        likes: like.likeCount ?? 0,
-        comments: like.commentCount ?? 0,
-        time: formatTimeAgo(like.createdAt),
+        title: like.postTitle,
+        content: "",
+        likes: 0,
+        comments: 0,
+        time: formatTimeAgo(like.likedAt),
         onClick: () => navigate(`/post/${like.postId}`),
       })),
     },
@@ -146,6 +146,7 @@ const MyActivityPage = () => {
                 comments={item.comments}
                 time={item.time}
                 onClick={item.onClick}
+                className="rounded-xl"
               />
             ))
           ) : (

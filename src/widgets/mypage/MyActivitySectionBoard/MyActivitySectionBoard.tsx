@@ -59,7 +59,7 @@ export const MyActivitySectionBoard = ({
         </button>
       </header>
 
-      <section className="bg-background-light border-border-deactivated h-[122px] overflow-hidden rounded-xl border shadow-sm">
+      <section className="bg-background-light border-border-deactivated h-[122px] overflow-hidden rounded-xl border">
         <div className="flex flex-col py-1">
           {statusMessage ? (
             <div className="flex h-[122px] items-center justify-center p-4">
