@@ -237,21 +237,23 @@ const PostPage = () => {
           </p>
         </div>
 
-        <div className="flex flex-col border border-border-deactivated rounded-xl overflow-hidden">
+        <div className="flex flex-col border border-border-deactivated rounded-xl">
           {isCommentsLoading ? (
             <div className="p-8 text-center text-text-secondary">
               댓글을 불러오는 중입니다...
             </div>
           ) : comments.length === 0 ? (
-            <div className="p-8 text-center text-text-secondary bg-white">
+            <div className="p-8 text-center text-text-secondary bg-white rounded-xl">
               아직 댓글이 없습니다. 첫 댓글을 남겨보세요!
             </div>
           ) : (
-            uiComments.map((item) => (
+            uiComments.map((item, index) => (
               <CommentGroup
                 key={item.id}
                 comment={item}
                 postId={parsedPostId}
+                isFirstGroup={index === 0}
+                isLastGroup={index === uiComments.length - 1}
                 onReport={(id, name, content) =>
                   setReportTarget({ id, name, content, type: "comment" })
                 }
