@@ -23,7 +23,7 @@ export const Banner = ({ items, className }: BannerProps) => {
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentIndex((prev) => (prev === items.length - 1 ? 0 : prev + 1));
-    }, 3000);
+    }, 5000);
     return () => clearInterval(timer);
   }, [currentIndex, items.length]);
 
