@@ -55,10 +55,7 @@ export const Header = ({
       return;
     }
 
-    const redirectUri =
-      typeof window !== "undefined" ? window.location.origin : undefined;
-
-    window.location.assign(getSsoLoginUrl({ redirectUri }));
+    window.location.assign(getSsoLoginUrl());
   };
 
   return (
