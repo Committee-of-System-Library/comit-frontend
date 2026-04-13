@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import type { BannerItem } from "@/mocks/bannerItems";
 import { ArrowButton } from "@/shared/ui/ArrowButton/ArrowButton";
@@ -19,6 +19,13 @@ export const Banner = ({ items, className }: BannerProps) => {
   const handleNext = () => {
     setCurrentIndex((prev) => (prev === items.length - 1 ? 0 : prev + 1));
   };
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentIndex((prev) => (prev === items.length - 1 ? 0 : prev + 1));
+    }, 3000);
+    return () => clearInterval(timer);
+  }, [currentIndex, items.length]);
 
   return (
     <div

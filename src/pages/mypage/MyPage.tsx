@@ -2,11 +2,9 @@ import { FileText, Heart, MessageCircleMore } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 import { useLogoutMutation } from "@/features/auth/model/useLogoutMutation";
-import { useMyCommentsQuery } from "@/features/member/model/useMyCommentsQuery";
-import { useMyLikesQuery } from "@/features/member/model/useMyLikesQuery";
-import { useMyPostsQuery } from "@/features/member/model/useMyPostsQuery";
+import { useMyActivityQuery } from "@/features/member/model/useMyActivityQuery";
 import { useMyProfileQuery } from "@/features/member/model/useMyProfileQuery";
-import { useUpdateNicknameMutation } from "@/features/member/model/useUpdateNicknameMutation";
+import { useUpdateProfileMutation } from "@/features/member/model/useUpdateProfileMutation";
 import { useUpdateStudentNumberVisibilityMutation } from "@/features/member/model/useUpdateStudentNumberVisibilityMutation";
 import { LogoutButton } from "@/shared/ui/LogoutButton/LogoutButton";
 import { StudentNumberVisibilityToggle } from "@/shared/ui/StudentNumberVisibilityToggle/StudentNumberVisibilityToggle";
@@ -17,33 +15,24 @@ import { ProfileWidget } from "@/widgets/mypage/ProfileWidget/ProfileWidget";
 const MyPage = () => {
   const navigate = useNavigate();
   const { data: profile } = useMyProfileQuery();
-  const { mutate: updateNickname } = useUpdateNicknameMutation();
+  const { mutate: updateProfile } = useUpdateProfileMutation();
   const { mutate: updateStudentNumberVisibility } =
     useUpdateStudentNumberVisibilityMutation();
   const { mutate: logoutMutate } = useLogoutMutation();
   const {
-    data: postsData,
-    isLoading: isPostsLoading,
-    isError: isPostsError,
-  } = useMyPostsQuery();
-  const {
-    data: commentsData,
-    isLoading: isCommentsLoading,
-    isError: isCommentsError,
-  } = useMyCommentsQuery();
-  const {
-    data: likesData,
-    isLoading: isLikesLoading,
-    isError: isLikesError,
-  } = useMyLikesQuery();
+    data: activityData,
+    isLoading: isActivityLoading,
+    isError: isActivityError,
+  } = useMyActivityQuery();
 
   const handleProfileSave = ({
     userName,
+    imageFile,
   }: {
     userName: string;
     imageFile: File | null;
   }) => {
-    updateNickname(userName);
+    updateProfile({ nickname: userName, imageFile });
   };
 
   const handleLogout = () => {
@@ -54,24 +43,26 @@ const MyPage = () => {
     navigate("/mypage/activity", { state: { category } });
   };
 
-  const myPostItems = (postsData?.items ?? []).map((post) => ({
-    id: post.postId,
+  const myPostItems = (activityData?.recentPosts ?? []).map((post) => ({
+    id: post.id,
     title: post.title,
     createdAt: formatTimeAgo(post.createdAt),
-    onClick: () => navigate(`/post/${post.postId}`),
+    onClick: () => navigate(`/post/${post.id}`),
   }));
 
-  const myCommentItems = (commentsData?.items ?? []).map((comment) => ({
-    id: comment.commentId,
-    title: comment.postTitle,
-    createdAt: formatTimeAgo(comment.createdAt),
-    onClick: () => navigate(`/post/${comment.postId}`),
-  }));
+  const myCommentItems = (activityData?.recentComments ?? []).map(
+    (comment) => ({
+      id: comment.id,
+      title: comment.postTitle,
+      createdAt: formatTimeAgo(comment.createdAt),
+      onClick: () => navigate(`/post/${comment.postId}`),
+    }),
+  );
 
-  const myLikeItems = (likesData?.items ?? []).map((like) => ({
+  const myLikeItems = (activityData?.recentLikes ?? []).map((like) => ({
     id: like.postId,
-    title: like.title,
-    createdAt: formatTimeAgo(like.createdAt),
+    title: like.postTitle,
+    createdAt: formatTimeAgo(like.likedAt),
     onClick: () => navigate(`/post/${like.postId}`),
   }));
 
@@ -89,7 +80,7 @@ const MyPage = () => {
               initialUserName={profile?.nickname ?? ""}
               major="전공"
               studentId={profile?.studentNumber ?? ""}
-              imgURL={null}
+              imgURL={profile?.profileImageUrl ?? null}
               onSave={handleProfileSave}
             />
             <StudentNumberVisibilityToggle
@@ -112,14 +103,14 @@ const MyPage = () => {
           <div className="bg-white border border-border-deactivated rounded-2xl p-5 flex flex-col gap-10">
             <MyActivitySectionBoard
               title="내가 쓴 글"
-              count={postsData?.totalCount ?? 0}
+              count={activityData?.postCount ?? 0}
               icon={<FileText size={18} />}
-              items={isPostsLoading || isPostsError ? [] : myPostItems}
+              items={isActivityLoading || isActivityError ? [] : myPostItems}
               onMoreClick={() => handleMoreClick("posts")}
               statusMessage={
-                isPostsLoading
+                isActivityLoading
                   ? "로딩 중..."
-                  : isPostsError
+                  : isActivityError
                     ? "데이터를 불러오지 못했습니다."
                     : undefined
               }
@@ -127,14 +118,14 @@ const MyPage = () => {
 
             <MyActivitySectionBoard
               title="내가 쓴 댓글"
-              count={commentsData?.totalCount ?? 0}
+              count={activityData?.commentCount ?? 0}
               icon={<MessageCircleMore size={18} />}
-              items={isCommentsLoading || isCommentsError ? [] : myCommentItems}
+              items={isActivityLoading || isActivityError ? [] : myCommentItems}
               onMoreClick={() => handleMoreClick("comments")}
               statusMessage={
-                isCommentsLoading
+                isActivityLoading
                   ? "로딩 중..."
-                  : isCommentsError
+                  : isActivityError
                     ? "데이터를 불러오지 못했습니다."
                     : undefined
               }
@@ -142,14 +133,14 @@ const MyPage = () => {
 
             <MyActivitySectionBoard
               title="좋아요"
-              count={likesData?.totalCount ?? 0}
+              count={activityData?.likeCount ?? 0}
               icon={<Heart size={18} />}
-              items={isLikesLoading || isLikesError ? [] : myLikeItems}
+              items={isActivityLoading || isActivityError ? [] : myLikeItems}
               onMoreClick={() => handleMoreClick("likes")}
               statusMessage={
-                isLikesLoading
+                isActivityLoading
                   ? "로딩 중..."
-                  : isLikesError
+                  : isActivityError
                     ? "데이터를 불러오지 못했습니다."
                     : undefined
               }

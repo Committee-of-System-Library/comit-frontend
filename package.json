@@ -1,7 +1,7 @@
 {
   "name": "knu-cse-comit-client",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.1.0",
   "type": "module",
   "packageManager": "pnpm@9.15.3",
   "engines": {
@@ -11,6 +11,11 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "release": "pnpm run release:check",
+    "release:check": "pnpm run lint && pnpm run test && pnpm run build",
+    "release:version:patch": "pnpm version patch --no-git-tag-version",
+    "release:version:minor": "pnpm version minor --no-git-tag-version",
+    "release:version:major": "pnpm version major --no-git-tag-version",
     "test": "vitest run --passWithNoTests",
     "lint": "eslint .",
     "preview": "vite preview",
@@ -25,6 +30,7 @@
     "clsx": "^2.1.1",
     "lucide-react": "^0.577.0",
     "nuqs": "^2.8.9",
+    "posthog-js": "^1.367.0",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "react-hook-form": "^7.71.2",

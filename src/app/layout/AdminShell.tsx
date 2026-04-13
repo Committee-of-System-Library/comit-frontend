@@ -30,7 +30,7 @@ export const AdminShell = ({ children }: AdminShellProps) => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    navigate("/login");
+    navigate("/landing");
   };
 
   return (

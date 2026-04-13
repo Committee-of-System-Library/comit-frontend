@@ -13,6 +13,8 @@ import { formatTimeAgo } from "@/utils/formatTime";
 
 interface CommentItemProps extends Omit<CommentData, "replies"> {
   postId: number;
+  isFirstItem?: boolean;
+  isLastItem?: boolean;
   onReport: (id: number, name: string, content: string) => void;
   onDelete: (id: number) => void;
 }
@@ -48,6 +50,8 @@ export const CommentItem = ({
   isEdited = false,
   name,
   profileImageUrl,
+  isFirstItem,
+  isLastItem,
   onReport,
   onDelete,
 }: CommentItemProps) => {
@@ -61,7 +65,14 @@ export const CommentItem = ({
 
   if (variant === "deleted" || variant === "deletedReply") {
     return (
-      <div className={cn(baseClass, variantClassMap[variant])}>
+      <div
+        className={cn(
+          baseClass,
+          variantClassMap[variant],
+          isFirstItem && "rounded-t-xl",
+          isLastItem && "rounded-b-xl",
+        )}
+      >
         {variant === "deletedReply" && <ReplyIcon />}
         <p className="text-label-04 text-text-secondary">삭제된 댓글입니다</p>
       </div>
@@ -134,7 +145,14 @@ export const CommentItem = ({
   };
 
   return (
-    <div className={cn(baseClass, variantClassMap[variant])}>
+    <div
+      className={cn(
+        baseClass,
+        variantClassMap[variant],
+        isFirstItem && "rounded-t-xl",
+        isLastItem && "rounded-b-xl",
+      )}
+    >
       {variant === "reply" && <ReplyIcon />}
 
       <div className="flex flex-col w-full">

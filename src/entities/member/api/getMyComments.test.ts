@@ -6,7 +6,11 @@ import { apiClient } from "@/shared/api/client";
 import { API_ENDPOINTS } from "@/shared/api/endpoints";
 
 vi.mock("@/shared/api/client", () => ({
-  apiClient: { get: vi.fn() },
+  apiClient: {
+    get: vi
+      .fn()
+      .mockResolvedValue({ comments: [], nextCursorId: null, hasNext: false }),
+  },
 }));
 
 describe("getMyComments", () => {
