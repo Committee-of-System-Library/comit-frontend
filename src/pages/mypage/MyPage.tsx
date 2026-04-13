@@ -78,7 +78,7 @@ const MyPage = () => {
             </h2>
             <ProfileWidget
               initialUserName={profile?.nickname ?? ""}
-              major="전공"
+              major={profile?.majorTrack ?? ""}
               studentId={profile?.studentNumber ?? ""}
               imgURL={profile?.profileImageUrl ?? null}
               onSave={handleProfileSave}
