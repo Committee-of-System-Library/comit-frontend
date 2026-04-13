@@ -1,3 +1,4 @@
+import logoImage from "@/assets/Logo.svg";
 import { getSsoLoginUrl } from "@/entities/auth/api/logout";
 import { Button } from "@/shared/ui/button/Button";
 import { SearchInput } from "@/shared/ui/input/SearchInput";
@@ -69,12 +70,12 @@ export const Header = ({
     >
       <div className="mx-auto flex h-full w-full max-w-[1440px] items-center justify-between px-10">
         <div className="flex items-center gap-8">
-          <a
-            aria-label="Comit 홈으로 이동"
-            className="text-head-03 text-text-primary transition-opacity hover:opacity-80"
-            href="/"
-          >
-            로고
+          <a aria-label="Comit 홈으로 이동" href="/">
+            <img
+              alt="Comit 로고"
+              className="h-7 w-auto object-contain mb-2"
+              src={logoImage}
+            />
           </a>
 
           <nav

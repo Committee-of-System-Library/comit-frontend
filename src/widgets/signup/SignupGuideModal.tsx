@@ -329,13 +329,12 @@ export const SignupGuideModal = ({
                 <div className="flex items-center gap-1">
                   <SignupTextInput
                     aria-label="연락처 앞자리"
-                    className="w-[63px]"
+                    className="w-[72px]"
                     inputMode="numeric"
                     maxLength={3}
                     onChange={(event) =>
                       handlePhoneChange(setPhoneFirst, 3)(event.target.value)
                     }
-                    placeholder="010"
                     value={phoneFirst}
                   />
                   <span className="text-body-01 text-text-tertiary">-</span>
@@ -347,7 +346,6 @@ export const SignupGuideModal = ({
                     onChange={(event) =>
                       handlePhoneChange(setPhoneMiddle, 4)(event.target.value)
                     }
-                    placeholder="0000"
                     value={phoneMiddle}
                   />
                   <span className="text-body-01 text-text-tertiary">-</span>
@@ -359,7 +357,6 @@ export const SignupGuideModal = ({
                     onChange={(event) =>
                       handlePhoneChange(setPhoneLast, 4)(event.target.value)
                     }
-                    placeholder="0000"
                     value={phoneLast}
                   />
                 </div>
