@@ -31,15 +31,6 @@ interface DeletePostMutationOptions {
 }
 
 describe("useDeletePostMutation", () => {
-interface MockMutationOptions {
-  mutationFn: (postId: number) => Promise<void>;
-  onSuccess: (data: void, postId: number, context: unknown) => Promise<void>;
-}
-
-describe("useDeletePostMutation", () => {
-  const mockInvalidateQueries = vi.fn();
-  const mockRemoveQueries = vi.fn();
-
   beforeEach(() => {
     vi.clearAllMocks();
 
@@ -56,8 +47,10 @@ describe("useDeletePostMutation", () => {
 
     const options = vi.mocked(useMutation).mock
       .calls[0][0] as unknown as DeletePostMutationOptions;
-    await (options.mutationFn as (postId: number) => Promise<unknown>)(321);
 
+    await options.mutationFn(321);
+
+    expect(deletePost).toHaveBeenCalledTimes(1);
     expect(deletePost).toHaveBeenCalledWith(321);
   });
 
@@ -66,32 +59,8 @@ describe("useDeletePostMutation", () => {
 
     const options = vi.mocked(useMutation).mock
       .calls[0][0] as unknown as DeletePostMutationOptions;
+
     await options.onSuccess?.(undefined, 321);
-
-    expect(mockInvalidateQueries).toHaveBeenCalledWith({
-      queryKey: queryKeys.post.all,
-    });
-    expect(mockRemoveQueries).toHaveBeenCalledWith({
-      queryKey: queryKeys.post.detail(321),
-  it("mutationFn 실행 시 deletePost API를 호출한다", async () => {
-    renderHook(() => useDeletePostMutation());
-
-    const options = vi.mocked(useMutation).mock
-      .calls[0][0] as unknown as MockMutationOptions;
-
-    await options.mutationFn(777);
-
-    expect(deletePost).toHaveBeenCalledTimes(1);
-    expect(deletePost).toHaveBeenCalledWith(777);
-  });
-
-  it("onSuccess 시 post.all 쿼리를 무효화하고 post.detail 쿼리를 제거한다", async () => {
-    renderHook(() => useDeletePostMutation());
-
-    const options = vi.mocked(useMutation).mock
-      .calls[0][0] as unknown as MockMutationOptions;
-
-    await options.onSuccess(undefined, 777, undefined);
 
     expect(mockInvalidateQueries).toHaveBeenCalledTimes(1);
     expect(mockInvalidateQueries).toHaveBeenCalledWith({
@@ -100,7 +69,7 @@ describe("useDeletePostMutation", () => {
 
     expect(mockRemoveQueries).toHaveBeenCalledTimes(1);
     expect(mockRemoveQueries).toHaveBeenCalledWith({
-      queryKey: queryKeys.post.detail(777),
+      queryKey: queryKeys.post.detail(321),
     });
   });
 });
