@@ -14,10 +14,12 @@ export const mockBannerItems: BannerItem[] = [
     id: 2,
     imageUrl: bannerImg2,
     alt: "메인 배너 2",
+    link: "/post/94",
   },
   {
     id: 3,
     imageUrl: bannerImg3,
     alt: "메인 배너 3",
+    link: "/post/95",
   },
 ];
