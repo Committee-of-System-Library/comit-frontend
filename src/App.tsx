@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 
+import { createPortal } from "react-dom";
+
 import { useQueryClient } from "@tanstack/react-query";
 import { posthog } from "posthog-js";
 import { Toaster, toast } from "react-hot-toast";
@@ -279,26 +281,33 @@ function App() {
 
   return (
     <>
-      <Toaster
-        position="top-center"
-        toastOptions={{
-          className:
-            "!bg-gray-800 !text-white !rounded-xl !px-4 !py-2 !text-caption-02 !shadow-md",
-          success: {
-            iconTheme: {
-              primary: "#30D158",
-              secondary: "#FFFFFF",
+      {createPortal(
+        <Toaster
+          position="top-center"
+          containerStyle={{
+            zIndex: 999999,
+          }}
+          toastOptions={{
+            className:
+              "!bg-gray-800 !text-white !rounded-xl !px-4 !py-2 !text-caption-02 !shadow-md",
+            success: {
+              iconTheme: {
+                primary: "#30D158",
+                secondary: "#FFFFFF",
+              },
             },
-          },
-          error: {
-            iconTheme: {
-              primary: "#FF4245",
-              secondary: "#FFFFFF",
+            error: {
+              iconTheme: {
+                primary: "#FF4245",
+                secondary: "#FFFFFF",
+              },
             },
-          },
-          duration: 3000,
-        }}
-      />
+            duration: 3000,
+          }}
+        />,
+        document.getElementById("toast-portal") || document.body,
+      )}
+
       <BrowserRouter>
         <Routes>
           <Route element={<LandingPage />} path="/landing" />
