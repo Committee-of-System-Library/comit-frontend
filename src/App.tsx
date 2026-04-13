@@ -5,7 +5,6 @@ import { posthog } from "posthog-js";
 import { Toaster, toast } from "react-hot-toast";
 import {
   BrowserRouter,
-  Navigate,
   Route,
   Routes,
   useLocation,
@@ -14,6 +13,7 @@ import {
 
 import { DevToolDock } from "@/app/devtools/DevToolDock";
 import { AppDesktopShell } from "@/app/layout/AppDesktopShell";
+import { AppErrorBoundary } from "@/app/layout/AppErrorBoundary";
 import { useMyProfileQuery } from "@/features/member/model/useMyProfileQuery";
 import { mockBannerItems } from "@/mocks/bannerItems";
 import AdminApp from "@/pages/admin/AdminApp";
@@ -22,12 +22,16 @@ import FreeBoardPage from "@/pages/board/FreeBoardPage";
 import InfoBoardPage from "@/pages/board/InfoBoardPage";
 import NoticeBoardPage from "@/pages/board/NoticeBoardPage";
 import QnABoardPage from "@/pages/board/QnABoardPage";
+import NetworkErrorPage from "@/pages/error/NetworkErrorPage";
+import NotFoundPage from "@/pages/error/NotFoundPage";
+import ServerErrorPage from "@/pages/error/ServerErrorPage";
 import HomePage from "@/pages/home/HomePage";
 import LandingPage from "@/pages/landing/LandingPage";
 import MyActivityPage from "@/pages/mypage/MyActivityPage";
 import MyPage from "@/pages/mypage/MyPage";
 import PostPage from "@/pages/PostPage";
 import WritePage from "@/pages/write/WritePage";
+import { isApiHttpError } from "@/shared/api/http-error";
 import { queryKeys } from "@/shared/api/query-keys";
 import { Banner } from "@/widgets/home/Banner/Banner";
 import { SignupGuideModal } from "@/widgets/signup/SignupGuideModal";
@@ -236,7 +240,7 @@ const AppContent = ({
           <Route element={<PostPage />} path="/post/:postId" />
           <Route element={<MyPage />} path="/mypage" />
           <Route element={<MyActivityPage />} path="/mypage/activity" />
-          <Route element={<Navigate replace to="/" />} path="*" />
+          <Route element={<NotFoundPage />} path="*" />
         </Routes>
       </>
     </AppDesktopShell>
@@ -247,10 +251,20 @@ function App() {
   const [isCseStudent, setIsCseStudent] = useState<boolean>(
     getInitialCseStudentState,
   );
-  const { data: myProfile, isLoading: isMyProfileLoading } =
-    useMyProfileQuery();
+  const {
+    data: myProfile,
+    error: myProfileError,
+    isError: isMyProfileError,
+    isLoading: isMyProfileLoading,
+    refetch: refetchMyProfile,
+  } = useMyProfileQuery();
   const isAuthChecking = isMyProfileLoading;
   const isAuthenticated = Boolean(myProfile);
+  const isNetworkError =
+    isMyProfileError &&
+    isApiHttpError(myProfileError) &&
+    myProfileError.kind === "network";
+  const isServerError = isMyProfileError && !isNetworkError;
 
   useEffect(() => {
     if (!import.meta.env.DEV) {
@@ -265,6 +279,10 @@ function App() {
 
   const handlePreviewSignupGuide = () => {
     window.location.assign("/?signupGuide=1");
+  };
+
+  const handleRetryMyProfile = () => {
+    void refetchMyProfile();
   };
 
   return (
@@ -296,20 +314,28 @@ function App() {
         }}
       />
       <BrowserRouter>
-        <Routes>
-          <Route element={<LandingPage />} path="/landing" />
-          <Route element={<AdminApp />} path="/admin/*" />
-          <Route
-            element={
-              <AppContent
-                isAuthChecking={isAuthChecking}
-                isAuthenticated={isAuthenticated}
-                isCseStudent={isCseStudent}
-              />
-            }
-            path="*"
-          />
-        </Routes>
+        <AppErrorBoundary>
+          <Routes>
+            <Route element={<LandingPage />} path="/landing" />
+            <Route element={<AdminApp />} path="/admin/*" />
+            <Route
+              element={
+                isNetworkError ? (
+                  <NetworkErrorPage onRetry={handleRetryMyProfile} />
+                ) : isServerError ? (
+                  <ServerErrorPage onRetry={handleRetryMyProfile} />
+                ) : (
+                  <AppContent
+                    isAuthChecking={isAuthChecking}
+                    isAuthenticated={isAuthenticated}
+                    isCseStudent={isCseStudent}
+                  />
+                )
+              }
+              path="*"
+            />
+          </Routes>
+        </AppErrorBoundary>
 
         {import.meta.env.DEV ? (
           <DevToolDock
