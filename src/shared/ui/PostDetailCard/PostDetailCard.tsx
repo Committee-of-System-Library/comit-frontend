@@ -13,6 +13,8 @@ interface PostDetailCardProps extends Post {
   isMine?: boolean;
   onClick?: () => void;
   onEdit?: () => void;
+  onDelete?: () => void;
+  onReport?: () => void;
   onLikeClick?: () => void;
   isLikePending?: boolean;
   shareUrl?: string;
@@ -32,6 +34,8 @@ export const PostDetailCard = ({
   disabled = false,
   isMine = false,
   onEdit,
+  onDelete,
+  onReport,
   onLikeClick,
   isLikePending = false,
   shareUrl,
@@ -84,7 +88,12 @@ export const PostDetailCard = ({
           <DetailButton onClick={() => setIsMenuOpen(!isMenuOpen)} />
           {isMenuOpen && (
             <div className="absolute right-0 top-full z-10 mt-1">
-              <OptionList mode={isMine ? "myPost" : "others"} onEdit={onEdit} />
+              <OptionList
+                mode={isMine ? "myPost" : "others"}
+                onEdit={onEdit}
+                onDelete={onDelete}
+                onReport={onReport}
+              />
             </div>
           )}
         </div>
