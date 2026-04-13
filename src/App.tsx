@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 
 import { useQueryClient } from "@tanstack/react-query";
+import { posthog } from "posthog-js";
 import { Toaster, toast } from "react-hot-toast";
 import {
   BrowserRouter,
@@ -95,6 +96,10 @@ const AppContent = ({
 }: AppContentProps) => {
   const { pathname, search } = useLocation();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    posthog.capture("$pageview");
+  }, [pathname]);
   const queryClient = useQueryClient();
   const isWritePath = /^\/write\/?$/.test(pathname);
   const isAuthPath = /^\/login\/?$/.test(pathname);
