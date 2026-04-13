@@ -10,7 +10,10 @@ interface ProfileWidgetProps {
   studentId: string;
   imgURL?: string | null;
   className?: string;
-  onSave?: (data: { userName: string; imageFile: File | null }) => void;
+  onSave?: (data: {
+    userName: string;
+    imageFile: File | null;
+  }) => Promise<void>;
 }
 
 export const ProfileWidget = ({
@@ -22,6 +25,7 @@ export const ProfileWidget = ({
   onSave,
 }: ProfileWidgetProps) => {
   const [isEditing, setIsEditing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [editingName, setEditingName] = useState(initialUserName);
   const [imageFile, setImageFile] = useState<File | null>(null);
 
@@ -30,9 +34,15 @@ export const ProfileWidget = ({
     setIsEditing(true);
   };
 
-  const handleSave = () => {
-    onSave?.({ userName: editingName, imageFile });
-    setIsEditing(false);
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+      await onSave?.({ userName: editingName, imageFile });
+      setIsEditing(false);
+      setImageFile(null);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -74,9 +84,10 @@ export const ProfileWidget = ({
           <button
             type="button"
             onClick={handleSave}
-            className="text-info-02 text-label-03 cursor-pointer whitespace-nowrap font-bold hover:opacity-80 transition-all"
+            disabled={isSaving}
+            className="text-info-02 text-label-03 cursor-pointer whitespace-nowrap font-bold hover:opacity-80 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            변경사항 저장
+            {isSaving ? "저장 중..." : "변경사항 저장"}
           </button>
         ) : (
           <button

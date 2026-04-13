@@ -15,7 +15,7 @@ import { ProfileWidget } from "@/widgets/mypage/ProfileWidget/ProfileWidget";
 const MyPage = () => {
   const navigate = useNavigate();
   const { data: profile } = useMyProfileQuery();
-  const { mutate: updateProfile } = useUpdateProfileMutation();
+  const { mutateAsync: updateProfile } = useUpdateProfileMutation();
   const { mutate: updateStudentNumberVisibility } =
     useUpdateStudentNumberVisibilityMutation();
   const { mutate: logoutMutate } = useLogoutMutation();
@@ -31,8 +31,8 @@ const MyPage = () => {
   }: {
     userName: string;
     imageFile: File | null;
-  }) => {
-    updateProfile({ nickname: userName, imageFile });
+  }): Promise<void> => {
+    return updateProfile({ nickname: userName, imageFile });
   };
 
   const handleLogout = () => {
