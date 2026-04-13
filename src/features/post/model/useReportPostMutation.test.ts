@@ -1,6 +1,6 @@
 import { useMutation } from "@tanstack/react-query";
 import { renderHook } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { useReportPostMutation } from "./useReportPostMutation";
 
@@ -30,40 +30,56 @@ vi.mock("@/entities/post/api/reportPost", () => ({
   reportPost: vi.fn(),
 }));
 
-describe("useReportPostMutation", () => {
-  it("mutationFn 실행 시 postId와 payload를 reportPost에 전달한다", async () => {
-    vi.mocked(useMutation).mockReturnValue({} as never);
+interface ReportPostMutationOptions {
+  mutationFn: (variables: {
+    payload: ReportRequest;
+    postId: number;
+  }) => Promise<unknown>;
+  onSuccess?: (
+    data: ReportResponse,
+    variables: { payload: ReportRequest; postId: number },
+    ...rest: unknown[]
+  ) => Promise<unknown> | unknown;
+  onError?: (
+    error: unknown,
+    variables: { payload: ReportRequest; postId: number },
+    ...rest: unknown[]
+  ) => Promise<unknown> | unknown;
+}
 
+describe("useReportPostMutation", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.mocked(useMutation).mockReturnValue({ mutate: vi.fn() } as never);
+  });
+
+  it("mutationFn 실행 시 postId와 payload를 reportPost에 전달한다", async () => {
     renderHook(() => useReportPostMutation());
 
-    const options = vi.mocked(useMutation).mock.calls[0][0];
-    await (
-      options.mutationFn as (variables: {
-        payload: ReportRequest;
-        postId: number;
-      }) => Promise<unknown>
-    )({
+    const options = vi.mocked(useMutation).mock
+      .calls[0][0] as unknown as ReportPostMutationOptions;
+
+    await options.mutationFn({
       payload: { message: "스팸 게시글입니다." },
       postId: 7,
     });
 
+    expect(reportPost).toHaveBeenCalledTimes(1);
     expect(reportPost).toHaveBeenCalledWith(7, {
       message: "스팸 게시글입니다.",
     });
   });
 
   it("onSuccess 실행 시 성공 토스트를 노출한다", async () => {
-    vi.mocked(useMutation).mockReturnValue({} as never);
-
     renderHook(() => useReportPostMutation());
 
-    const options = vi.mocked(useMutation).mock.calls[0][0];
-    await options.onSuccess?.(
-      { reportId: 1001 } as ReportResponse,
-      { payload: { message: "신고" }, postId: 1 },
-      undefined,
-      {} as never,
-    );
+    const options = vi.mocked(useMutation).mock
+      .calls[0][0] as unknown as ReportPostMutationOptions;
+
+    await options.onSuccess?.({ reportId: 1001 } as ReportResponse, {
+      payload: { message: "신고" },
+      postId: 1,
+    });
 
     expect(mockToastSuccess).toHaveBeenCalledWith(
       "신고가 정상적으로 접수되었습니다.",
@@ -71,17 +87,15 @@ describe("useReportPostMutation", () => {
   });
 
   it("onError 실행 시 실패 토스트를 노출한다", async () => {
-    vi.mocked(useMutation).mockReturnValue({} as never);
-
     renderHook(() => useReportPostMutation());
 
-    const options = vi.mocked(useMutation).mock.calls[0][0];
-    await options.onError?.(
-      new Error("신고 실패"),
-      { payload: { message: "신고" }, postId: 1 },
-      undefined,
-      {} as never,
-    );
+    const options = vi.mocked(useMutation).mock
+      .calls[0][0] as unknown as ReportPostMutationOptions;
+
+    await options.onError?.(new Error("신고 실패"), {
+      payload: { message: "신고" },
+      postId: 1,
+    });
 
     expect(mockToastError).toHaveBeenCalledWith(
       "신고 처리 중 오류가 발생했습니다.",
