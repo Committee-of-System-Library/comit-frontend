@@ -1,0 +1,53 @@
+name: Deploy
+
+concurrency:
+  group: deploy-${{ github.repository }}
+  cancel-in-progress: false
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  REGISTRY: ghcr.io
+  ORG: committee-of-system-library
+  IMAGE_NAME: knu-cse-comit-client
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Login to GHCR
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login $REGISTRY -u ${{ github.actor }} --password-stdin
+
+      - name: Build and push image
+        run: |
+          docker build \
+            --build-arg VITE_API_BASE_URL=https://chcse.knu.ac.kr/comit-staging/api \
+            --build-arg VITE_APP_BASE_URL=https://chcse.knu.ac.kr \
+            -t $REGISTRY/$ORG/$IMAGE_NAME:latest \
+            -t $REGISTRY/$ORG/$IMAGE_NAME:$(date +%Y%m%d%H%M%S) \
+            .
+          docker push $REGISTRY/$ORG/$IMAGE_NAME --all-tags
+
+  deploy:
+    needs: build-and-push
+    runs-on: [ 'self-hosted', 'frontend' ]
+    steps:
+      - name: Login to GHCR
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login $REGISTRY -u ${{ github.actor }} --password-stdin
+
+      - name: Pull and restart
+        run: |
+          docker pull $REGISTRY/$ORG/$IMAGE_NAME:latest
+          docker compose -f /opt/docker/compose/docker-compose.services.yml up -d knu-cse-comit-client
+
+      - name: Cleanup
+        run: docker image prune -f
