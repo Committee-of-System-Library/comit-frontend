@@ -3,10 +3,12 @@ export interface MyProfile {
   nickname: string;
   studentNumber: string;
   studentNumberVisible: boolean;
+  profileImageUrl: string | null;
 }
 
-export interface UpdateNicknameRequest {
-  nickname: string;
+export interface UpdateProfileRequest {
+  nickname?: string;
+  profileImageUrl?: string | null;
 }
 
 export interface UpdateStudentNumberVisibilityRequest {

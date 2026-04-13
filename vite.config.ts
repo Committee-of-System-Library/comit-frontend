@@ -25,6 +25,7 @@ export default defineConfig({
     globals: true, // test, expect 같은 함수를 import 없이 사용 가능
     environment: "jsdom", // 브라우저 환경을 흉내 내서 리액트 컴포넌트 테스트를 가능하게 함
     setupFiles: ["./src/test/setup.ts"],
+    fileParallelism: false,
     projects: [
       {
         extends: true,

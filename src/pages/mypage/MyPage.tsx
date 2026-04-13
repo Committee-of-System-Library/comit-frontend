@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useLogoutMutation } from "@/features/auth/model/useLogoutMutation";
 import { useMyActivityQuery } from "@/features/member/model/useMyActivityQuery";
 import { useMyProfileQuery } from "@/features/member/model/useMyProfileQuery";
-import { useUpdateNicknameMutation } from "@/features/member/model/useUpdateNicknameMutation";
+import { useUpdateProfileMutation } from "@/features/member/model/useUpdateProfileMutation";
 import { useUpdateStudentNumberVisibilityMutation } from "@/features/member/model/useUpdateStudentNumberVisibilityMutation";
 import { LogoutButton } from "@/shared/ui/LogoutButton/LogoutButton";
 import { StudentNumberVisibilityToggle } from "@/shared/ui/StudentNumberVisibilityToggle/StudentNumberVisibilityToggle";
@@ -15,7 +15,7 @@ import { ProfileWidget } from "@/widgets/mypage/ProfileWidget/ProfileWidget";
 const MyPage = () => {
   const navigate = useNavigate();
   const { data: profile } = useMyProfileQuery();
-  const { mutate: updateNickname } = useUpdateNicknameMutation();
+  const { mutate: updateProfile } = useUpdateProfileMutation();
   const { mutate: updateStudentNumberVisibility } =
     useUpdateStudentNumberVisibilityMutation();
   const { mutate: logoutMutate } = useLogoutMutation();
@@ -27,11 +27,12 @@ const MyPage = () => {
 
   const handleProfileSave = ({
     userName,
+    imageFile,
   }: {
     userName: string;
     imageFile: File | null;
   }) => {
-    updateNickname(userName);
+    updateProfile({ nickname: userName, imageFile });
   };
 
   const handleLogout = () => {
@@ -79,7 +80,7 @@ const MyPage = () => {
               initialUserName={profile?.nickname ?? ""}
               major="전공"
               studentId={profile?.studentNumber ?? ""}
-              imgURL={null}
+              imgURL={profile?.profileImageUrl ?? null}
               onSave={handleProfileSave}
             />
             <StudentNumberVisibilityToggle
