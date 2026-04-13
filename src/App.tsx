@@ -273,7 +273,13 @@ function App() {
         position="top-center"
         toastOptions={{
           className:
-            "!bg-gray-800 !text-white !rounded-xl !px-4 !py-2 !text-caption-02 !shadow-md",
+            "!bg-gray-800 !text-white !rounded-xl !px-4 !py-2 !text-caption-02 !shadow-md !whitespace-normal !break-words !text-left",
+          style: {
+            maxWidth: "min(92vw, 480px)",
+            overflowWrap: "anywhere",
+            whiteSpace: "pre-line",
+            wordBreak: "keep-all",
+          },
           success: {
             iconTheme: {
               primary: "#30D158",
