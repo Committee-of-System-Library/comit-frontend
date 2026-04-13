@@ -1,6 +1,7 @@
 export const API_ENDPOINTS = {
   auth: {
     register: "/auth/register",
+    registerProfileImagePresigned: "/auth/register/profile-image/presigned",
     registerPrefill: "/auth/register/prefill",
     ssoCallback: "/auth/sso/callback",
     ssoLogin: "/auth/sso/login",

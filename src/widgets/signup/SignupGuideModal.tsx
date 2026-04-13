@@ -13,6 +13,8 @@ import { useNavigate } from "react-router-dom";
 import defaultMascotImage from "@/assets/Ori_defualt.svg";
 import greetingMascotImage from "@/assets/Ori_happy.svg";
 import sadMascotImage from "@/assets/Ori_sad.svg";
+import { registerProfileImagePresigned } from "@/entities/auth/api/registerProfileImagePresigned";
+import { validateImageFile } from "@/features/image/model/imageUpload";
 import { useRegisterMutation } from "@/features/signup/model/useRegisterMutation";
 import { useRegisterPrefillQuery } from "@/features/signup/model/useRegisterPrefillQuery";
 import { isApiHttpError } from "@/shared/api/http-error";
@@ -61,7 +63,10 @@ export const SignupGuideModal = ({
     useState<NicknameValidationStatus>("idle");
   const [nicknameValidationMessage, setNicknameValidationMessage] =
     useState("");
-  const [profileImageUrl, setProfileImageUrl] = useState<string | null>(null);
+  const [profileImageFile, setProfileImageFile] = useState<File | null>(null);
+  const [profileImagePreviewUrl, setProfileImagePreviewUrl] = useState<
+    string | null
+  >(null);
   const profileImageInputRef = useRef<HTMLInputElement>(null);
   const {
     data: registerPrefill,
@@ -98,8 +103,12 @@ export const SignupGuideModal = ({
     setNickname("");
     setNicknameValidationStatus("idle");
     setNicknameValidationMessage("");
-    setProfileImageUrl(null);
-  }, [defaultStep]);
+    if (profileImagePreviewUrl) {
+      URL.revokeObjectURL(profileImagePreviewUrl);
+    }
+    setProfileImageFile(null);
+    setProfileImagePreviewUrl(null);
+  }, [defaultStep, profileImagePreviewUrl]);
 
   const handleCloseModal = useCallback(() => {
     resetSignupState();
@@ -134,11 +143,11 @@ export const SignupGuideModal = ({
 
   useEffect(() => {
     return () => {
-      if (profileImageUrl) {
-        URL.revokeObjectURL(profileImageUrl);
+      if (profileImagePreviewUrl) {
+        URL.revokeObjectURL(profileImagePreviewUrl);
       }
     };
-  }, [profileImageUrl]);
+  }, [profileImagePreviewUrl]);
 
   useEffect(() => {
     if (!isRegisterMode || !isRegisterPrefillError) {
@@ -212,16 +221,54 @@ export const SignupGuideModal = ({
   const handleProfileImageChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
 
-    if (!file || !file.type.startsWith("image/")) {
+    if (!file) {
       return;
     }
 
-    setProfileImageUrl(URL.createObjectURL(file));
+    const errorMessage = validateImageFile(file);
+    if (errorMessage) {
+      toast.error(errorMessage);
+      event.target.value = "";
+      return;
+    }
+
+    if (profileImagePreviewUrl) {
+      URL.revokeObjectURL(profileImagePreviewUrl);
+    }
+
+    setProfileImageFile(file);
+    setProfileImagePreviewUrl(URL.createObjectURL(file));
     event.target.value = "";
   };
 
   const handleProfileImageRemove = () => {
-    setProfileImageUrl(null);
+    if (profileImagePreviewUrl) {
+      URL.revokeObjectURL(profileImagePreviewUrl);
+    }
+    setProfileImageFile(null);
+    setProfileImagePreviewUrl(null);
+  };
+
+  const uploadSelectedProfileImage = async () => {
+    if (!profileImageFile) {
+      return null;
+    }
+
+    const { imageUrl, presignedUrl } = await registerProfileImagePresigned({
+      contentType: profileImageFile.type,
+      fileName: profileImageFile.name,
+    });
+
+    const response = await fetch(presignedUrl, {
+      body: profileImageFile,
+      method: "PUT",
+    });
+
+    if (!response.ok) {
+      throw new Error("PROFILE_IMAGE_UPLOAD_FAILED");
+    }
+
+    return imageUrl;
   };
 
   const handleRegisterComplete = async () => {
@@ -235,10 +282,13 @@ export const SignupGuideModal = ({
     }
 
     try {
+      const uploadedProfileImageUrl = await uploadSelectedProfileImage();
+
       await registerMutation.mutateAsync({
         agreedToTerms: true,
         nickname: nickname.trim(),
         phone: `${phoneFirst}-${phoneMiddle}-${phoneLast}`,
+        profileImageUrl: uploadedProfileImageUrl,
       });
 
       toast.success("회원가입이 완료되었습니다.");
@@ -265,6 +315,23 @@ export const SignupGuideModal = ({
           navigate("/", { replace: true });
           return;
         }
+
+        if (error.code === "UNSUPPORTED_FILE_TYPE") {
+          toast.error(
+            "이미지는 JPG, PNG, WEBP, GIF 형식만 업로드할 수 있습니다.",
+          );
+          return;
+        }
+      }
+
+      if (
+        error instanceof Error &&
+        error.message === "PROFILE_IMAGE_UPLOAD_FAILED"
+      ) {
+        toast.error(
+          "프로필 이미지 업로드에 실패했습니다. 잠시 후 다시 시도해 주세요.",
+        );
+        return;
       }
 
       toast.error("회원가입 처리 중 오류가 발생했습니다. 다시 시도해 주세요.");
@@ -434,18 +501,18 @@ export const SignupGuideModal = ({
                 onClick={handleProfileImageUploadClick}
                 type="button"
               >
-                {profileImageUrl ? (
+                {profileImagePreviewUrl ? (
                   <img
                     alt="프로필 이미지 미리보기"
                     className="size-full object-cover"
-                    src={profileImageUrl}
+                    src={profileImagePreviewUrl}
                   />
                 ) : (
                   <ImageIcon className="size-6 text-text-placeholder" />
                 )}
               </button>
 
-              {profileImageUrl ? (
+              {profileImagePreviewUrl ? (
                 <button
                   aria-label="프로필 이미지 삭제"
                   className="absolute -top-1 -right-1 inline-flex size-5 items-center justify-center rounded-full border border-border-deactivated bg-background-light text-text-deactivated transition-colors hover:text-text-primary"

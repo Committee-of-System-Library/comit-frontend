@@ -1,5 +1,6 @@
 export type MemberStatus = "ACTIVE" | "SUSPENDED" | "BANNED";
-export type BoardType = "QNA" | "FREE";
+export type BoardType = "EVENT" | "FREE" | "INFO" | "NOTICE" | "QNA";
+export type AdminEditableBoardType = "EVENT" | "INFO" | "NOTICE";
 export type ReportTargetType = "POST" | "COMMENT";
 export type ReportStatus = "RECEIVED" | "REVIEWED" | "DISMISSED" | "ACTIONED";
 
@@ -47,6 +48,33 @@ export interface AdminPostPageResponse {
 
 export interface AdminVisibilityPayload {
   hidden: boolean;
+}
+
+export interface AdminPostDetail {
+  authorNickname: string;
+  boardType: AdminEditableBoardType;
+  content: string;
+  createdAt: string;
+  hiddenByAdmin: boolean;
+  id: number;
+  imageUrls: string[];
+  likeCount: number;
+  tags: string[];
+  title: string;
+  updatedAt: string | null;
+  viewCount: number;
+}
+
+export interface AdminPostPayload {
+  boardType: AdminEditableBoardType;
+  content: string;
+  imageUrls: string[];
+  tags: string[];
+  title: string;
+}
+
+export interface AdminCreatePostResponse {
+  postId: number;
 }
 
 export interface AdminCommentSummary {

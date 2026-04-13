@@ -1,35 +1,52 @@
 import { useMemo, useState } from "react";
 
-import { Eye, Heart, UserRound } from "lucide-react";
+import { Eye, Heart, Pencil, Plus, UserRound } from "lucide-react";
 import toast from "react-hot-toast";
 import { useSearchParams } from "react-router-dom";
 
 import {
+  useAdminPostDetail,
   useAdminPosts,
+  useCreateAdminPost,
   useDeletePost,
   usePatchPostVisibility,
+  useUpdateAdminPost,
 } from "@/apis/modules/admin-post";
 import { resolvePostDomainErrorMessage } from "@/features/post/model/postDomainErrorMessage";
 import { AdminEmptyState } from "@/shared/ui/AdminEmptyState/AdminEmptyState";
 import { AdminPostCard } from "@/shared/ui/AdminPostCard/AdminPostCard";
+import { AdminPostEditorModal } from "@/shared/ui/AdminPostEditorModal/AdminPostEditorModal";
 import { AdminStatusBadge } from "@/shared/ui/AdminStatusBadge/AdminStatusBadge";
 import { Button } from "@/shared/ui/button/Button";
 import { DeleteModal } from "@/shared/ui/DeleteModal/DeleteModal";
 import { Pagination } from "@/shared/ui/Pagination/Pagination";
-import type { BoardType } from "@/types/admin";
+import type { AdminPostPayload, BoardType } from "@/types/admin";
 import { resolveContentPreview } from "@/utils/contentPreview";
 import { formatDateTime } from "@/utils/formatDateTime";
 
 const PAGE_SIZE = 8;
+const ADMIN_EDITABLE_BOARD_TYPES = ["NOTICE", "EVENT", "INFO"] as const;
+const isAdminEditableBoardType = (
+  boardType: BoardType,
+): boardType is (typeof ADMIN_EDITABLE_BOARD_TYPES)[number] =>
+  ADMIN_EDITABLE_BOARD_TYPES.includes(
+    boardType as (typeof ADMIN_EDITABLE_BOARD_TYPES)[number],
+  );
 
 const boardFilters: Array<{ label: string; value?: BoardType }> = [
   { label: "전체", value: undefined },
+  { label: "공지", value: "NOTICE" },
+  { label: "이벤트", value: "EVENT" },
+  { label: "정보", value: "INFO" },
   { label: "Q&A", value: "QNA" },
   { label: "자유", value: "FREE" },
 ];
 
 const boardLabels: Record<BoardType, string> = {
+  EVENT: "이벤트",
   FREE: "자유",
+  INFO: "정보",
+  NOTICE: "공지",
   QNA: "Q&A",
 };
 
@@ -53,10 +70,18 @@ const resolveAdminPostErrorMessage = (
 const AdminPostPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [deleteTargetId, setDeleteTargetId] = useState<number | null>(null);
+  const [editorMode, setEditorMode] = useState<"create" | "edit" | null>(null);
+  const [editorTargetId, setEditorTargetId] = useState<number | null>(null);
   const currentPage = parsePage(searchParams.get("page"));
   const boardTypeParam = searchParams.get("boardType");
   const boardType = useMemo<BoardType | undefined>(() => {
-    if (boardTypeParam === "FREE" || boardTypeParam === "QNA") {
+    if (
+      boardTypeParam === "EVENT" ||
+      boardTypeParam === "FREE" ||
+      boardTypeParam === "INFO" ||
+      boardTypeParam === "NOTICE" ||
+      boardTypeParam === "QNA"
+    ) {
       return boardTypeParam;
     }
 
@@ -68,8 +93,14 @@ const AdminPostPage = () => {
     page: currentPage - 1,
     size: PAGE_SIZE,
   });
+  const editorDetailQuery = useAdminPostDetail(
+    editorMode === "edit" ? editorTargetId : null,
+    editorMode === "edit",
+  );
+  const createPostMutation = useCreateAdminPost();
   const deletePostMutation = useDeletePost();
   const patchPostVisibilityMutation = usePatchPostVisibility();
+  const updatePostMutation = useUpdateAdminPost();
 
   const updateSearchParams = (nextValues: Record<string, string | null>) => {
     const nextParams = new URLSearchParams(searchParams);
@@ -130,6 +161,46 @@ const AdminPostPage = () => {
     }
   };
 
+  const handleOpenCreateEditor = () => {
+    setEditorTargetId(null);
+    setEditorMode("create");
+  };
+
+  const handleOpenEditEditor = (postId: number) => {
+    setEditorTargetId(postId);
+    setEditorMode("edit");
+  };
+
+  const handleCloseEditor = () => {
+    setEditorTargetId(null);
+    setEditorMode(null);
+  };
+
+  const handleSubmitEditor = async (payload: AdminPostPayload) => {
+    try {
+      if (editorMode === "edit" && editorTargetId !== null) {
+        await updatePostMutation.mutateAsync({
+          payload,
+          postId: editorTargetId,
+        });
+        toast.success("게시글을 수정했습니다.");
+      } else {
+        await createPostMutation.mutateAsync(payload);
+        toast.success("게시글을 등록했습니다.");
+      }
+      handleCloseEditor();
+    } catch (error) {
+      toast.error(
+        resolveAdminPostErrorMessage(
+          error,
+          editorMode === "edit"
+            ? "게시글을 수정하지 못했습니다."
+            : "게시글을 등록하지 못했습니다.",
+        ),
+      );
+    }
+  };
+
   const posts = postsQuery.data?.posts ?? [];
   const isEmpty = !postsQuery.isLoading && posts.length === 0;
 
@@ -139,10 +210,15 @@ const AdminPostPage = () => {
         <div>
           <h1 className="text-head-03 text-text-primary">게시글 관리</h1>
           <p className="mt-2 text-body-02 text-text-secondary">
-            관리자 숨김과 삭제가 필요한 게시글을 게시판별로 확인할 수 있습니다.
+            공지, 이벤트, 정보 게시글을 등록·수정하고 전체 게시글의 숨김과
+            삭제를 관리할 수 있습니다.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
+          <Button onClick={handleOpenCreateEditor}>
+            <Plus className="size-4" />
+            관리자 게시글 등록
+          </Button>
           {boardFilters.map((filter) => {
             const isActive = filter.value === boardType;
 
@@ -223,6 +299,15 @@ const AdminPostPage = () => {
                   </div>
 
                   <div className="mt-4 flex flex-wrap gap-2">
+                    {isAdminEditableBoardType(post.boardType) ? (
+                      <Button
+                        onClick={() => handleOpenEditEditor(post.id)}
+                        variant="secondary"
+                      >
+                        <Pencil className="size-4" />
+                        수정
+                      </Button>
+                    ) : null}
                     <Button
                       disabled={patchPostVisibilityMutation.isPending}
                       onClick={() =>
@@ -266,6 +351,29 @@ const AdminPostPage = () => {
           target="post"
         />
       ) : null}
+
+      <AdminPostEditorModal
+        key={`${editorMode ?? "closed"}-${editorTargetId ?? "new"}-${
+          editorDetailQuery.data?.updatedAt ?? "fresh"
+        }`}
+        detail={editorDetailQuery.data}
+        errorMessage={
+          editorDetailQuery.isError
+            ? resolveAdminPostErrorMessage(
+                editorDetailQuery.error,
+                "게시글 상세를 불러오지 못했습니다.",
+              )
+            : null
+        }
+        isLoading={editorDetailQuery.isLoading}
+        isSubmitting={
+          createPostMutation.isPending || updatePostMutation.isPending
+        }
+        mode={editorMode ?? "create"}
+        onClose={handleCloseEditor}
+        onSubmit={handleSubmitEditor}
+        open={editorMode !== null}
+      />
     </section>
   );
 };
