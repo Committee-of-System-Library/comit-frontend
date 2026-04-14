@@ -61,6 +61,7 @@ export const SignupGuideModal = ({
     useState<NicknameValidationStatus>("idle");
   const [nicknameValidationMessage, setNicknameValidationMessage] =
     useState("");
+  const [profileImageFile, setProfileImageFile] = useState<File | null>(null);
   const [profileImageUrl, setProfileImageUrl] = useState<string | null>(null);
   const profileImageInputRef = useRef<HTMLInputElement>(null);
   const {
@@ -98,6 +99,7 @@ export const SignupGuideModal = ({
     setNickname("");
     setNicknameValidationStatus("idle");
     setNicknameValidationMessage("");
+    setProfileImageFile(null);
     setProfileImageUrl(null);
   }, [defaultStep]);
 
@@ -216,11 +218,21 @@ export const SignupGuideModal = ({
       return;
     }
 
+    if (profileImageUrl?.startsWith("blob:")) {
+      URL.revokeObjectURL(profileImageUrl);
+    }
+
+    setProfileImageFile(file);
     setProfileImageUrl(URL.createObjectURL(file));
     event.target.value = "";
   };
 
   const handleProfileImageRemove = () => {
+    if (profileImageUrl?.startsWith("blob:")) {
+      URL.revokeObjectURL(profileImageUrl);
+    }
+
+    setProfileImageFile(null);
     setProfileImageUrl(null);
   };
 
@@ -237,6 +249,7 @@ export const SignupGuideModal = ({
     try {
       await registerMutation.mutateAsync({
         agreedToTerms: true,
+        imageFile: profileImageFile,
         nickname: nickname.trim(),
         phone: `${phoneFirst}-${phoneMiddle}-${phoneLast}`,
       });
