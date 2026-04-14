@@ -3,11 +3,16 @@ import { useState, type ChangeEvent } from "react";
 import { createPortal } from "react-dom";
 
 import { useReportCommentMutation } from "@/features/comment/model/useReportCommentMutation";
+import { useReportPostMutation } from "@/features/post/model/useReportPostMutation";
+
+export type ReportTarget =
+  | { type: "comment"; id: number }
+  | { type: "post"; id: number };
 
 interface ReportModalProps {
   user?: string;
   contents?: string;
-  commentId: number;
+  target: ReportTarget;
   disabled?: boolean;
   onClose: () => void;
 }
@@ -15,14 +20,19 @@ interface ReportModalProps {
 export const ReportModal = ({
   user = "",
   contents = "",
-  commentId,
+  target,
   disabled = false,
   onClose,
 }: ReportModalProps) => {
   const [reason, setReason] = useState("");
   const MAX_LENGTH = 30;
 
-  const { mutate: report, isPending } = useReportCommentMutation();
+  const { mutate: reportComment, isPending: isCommentPending } =
+    useReportCommentMutation();
+  const { mutate: reportPost, isPending: isPostPending } =
+    useReportPostMutation();
+  const isPending =
+    target.type === "comment" ? isCommentPending : isPostPending;
   const isActivated = reason.trim().length > 0 && !disabled && !isPending;
 
   const portalRoot = document.getElementById("modal-portal");
@@ -37,9 +47,24 @@ export const ReportModal = ({
   const handleConfirm = () => {
     if (!isActivated) return;
 
-    report(
+    if (target.type === "comment") {
+      reportComment(
+        {
+          commentId: target.id,
+          payload: { message: reason.trim() },
+        },
+        {
+          onSuccess: () => {
+            onClose();
+          },
+        },
+      );
+      return;
+    }
+
+    reportPost(
       {
-        commentId,
+        postId: target.id,
         payload: { message: reason.trim() },
       },
       {
@@ -51,7 +76,7 @@ export const ReportModal = ({
   };
 
   return createPortal(
-    <div className="fixed inset-0 z-9999 flex items-center justify-center bg-black/50">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50">
       <section className="w-[320px] bg-white rounded-2xl flex flex-col gap-4 pt-6 px-4 pb-4 items-center shadow-xl">
         <p className="text-center text-subtitle-03 text-text-primary">
           신고 사유 입력

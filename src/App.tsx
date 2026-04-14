@@ -1,9 +1,13 @@
 import { useEffect, useState } from "react";
 
+import { createPortal } from "react-dom";
+
 import { useQueryClient } from "@tanstack/react-query";
+import { posthog } from "posthog-js";
 import { Toaster, toast } from "react-hot-toast";
 import {
   BrowserRouter,
+  Navigate,
   Route,
   Routes,
   useLocation,
@@ -12,7 +16,6 @@ import {
 
 import { DevToolDock } from "@/app/devtools/DevToolDock";
 import { AppDesktopShell } from "@/app/layout/AppDesktopShell";
-import { getSsoLoginUrl } from "@/entities/auth/api/logout";
 import { useMyProfileQuery } from "@/features/member/model/useMyProfileQuery";
 import { mockBannerItems } from "@/mocks/bannerItems";
 import AdminApp from "@/pages/admin/AdminApp";
@@ -22,14 +25,14 @@ import InfoBoardPage from "@/pages/board/InfoBoardPage";
 import NoticeBoardPage from "@/pages/board/NoticeBoardPage";
 import QnABoardPage from "@/pages/board/QnABoardPage";
 import HomePage from "@/pages/home/HomePage";
-import LoginPage from "@/pages/login/LoginPage";
+import LandingPage from "@/pages/landing/LandingPage";
 import MyActivityPage from "@/pages/mypage/MyActivityPage";
 import MyPage from "@/pages/mypage/MyPage";
 import PostPage from "@/pages/PostPage";
 import WritePage from "@/pages/write/WritePage";
 import { queryKeys } from "@/shared/api/query-keys";
 import { Banner } from "@/widgets/home/Banner/Banner";
-import { LoginRequiredModal } from "@/widgets/signup/LoginRequiredModal";
+import { DefaultRightRail } from "@/widgets/layout/DefaultRightRail";
 import { SignupGuideModal } from "@/widgets/signup/SignupGuideModal";
 
 const DEV_CSE_STUDENT_STORAGE_KEY = "comit.dev.cse.student";
@@ -96,9 +99,12 @@ const AppContent = ({
 }: AppContentProps) => {
   const { pathname, search } = useLocation();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    posthog.capture("$pageview");
+  }, [pathname]);
   const queryClient = useQueryClient();
   const isWritePath = /^\/write\/?$/.test(pathname);
-  const isAuthPath = /^\/login\/?$/.test(pathname);
   const isMyPage = pathname.startsWith("/mypage");
   const isMainPage = pathname === "/";
   const isTitleBoardPage =
@@ -108,15 +114,12 @@ const AppContent = ({
   const stage = queryParams.get("stage");
   const reason = queryParams.get("reason");
   const errorCode = queryParams.get("errorCode") ?? queryParams.get("code");
-  const loginRequired = queryParams.get("loginRequired") === "1";
   const signupFlow = queryParams.get("signupFlow");
-  const signupGuideType = queryParams.get("signupGuideType");
   const signupGuideMode = signupFlow === "register" ? "register" : "preview";
   const shouldShowSignupGuideModal =
-    isMainPage && queryParams.get("signupGuide") === "1";
-  const shouldForceNonCseGuide =
-    signupGuideType === "non-cse" || signupGuideType === "restricted";
-  const shouldUseRestrictedGuideMessage = signupGuideType === "restricted";
+    isMainPage &&
+    queryParams.get("signupGuide") === "1" &&
+    signupFlow === "register";
 
   useEffect(() => {
     if (!stage) {
@@ -152,25 +155,10 @@ const AppContent = ({
       const restrictedError = isRestrictedAccountSsoError(reason, errorCode);
 
       if (nonCseError || restrictedError) {
-        const nextParams = new URLSearchParams(search);
-        nextParams.set("signupGuide", "1");
-        nextParams.set("signupFlow", "preview");
-        nextParams.set(
-          "signupGuideType",
-          restrictedError ? "restricted" : "non-cse",
+        toast.error(
+          "접근이 제한된 계정이거나 컴퓨터학부 계정으로 로그인해 주세요.",
         );
-        nextParams.delete("stage");
-        nextParams.delete("reason");
-        nextParams.delete("errorCode");
-        nextParams.delete("code");
-
-        navigate(
-          {
-            pathname: "/",
-            search: `?${nextParams.toString()}`,
-          },
-          { replace: true },
-        );
+        navigate("/landing", { replace: true });
         return;
       }
 
@@ -185,7 +173,7 @@ const AppContent = ({
 
       navigate(
         {
-          pathname: "/",
+          pathname: "/landing",
           search: nextParams.toString() ? `?${nextParams.toString()}` : "",
         },
         { replace: true },
@@ -194,31 +182,8 @@ const AppContent = ({
   }, [errorCode, navigate, queryClient, reason, search, stage]);
 
   const handleCloseSignupGuideModal = () => {
-    const nextParams = new URLSearchParams(search);
-    nextParams.delete("signupGuide");
-    nextParams.delete("signupFlow");
-    nextParams.delete("signupGuideType");
-    nextParams.delete("loginRequired");
-    nextParams.delete("oauth");
-
-    navigate(
-      {
-        pathname,
-        search: nextParams.toString() ? `?${nextParams.toString()}` : "",
-      },
-      { replace: true },
-    );
+    navigate("/landing", { replace: true });
   };
-
-  const handleStartSsoLogin = () => {
-    const redirectUri =
-      typeof window !== "undefined" ? window.location.origin : undefined;
-    window.location.assign(getSsoLoginUrl({ redirectUri }));
-  };
-
-  if (loginRequired) {
-    return <LoginRequiredModal onLogin={handleStartSsoLogin} open />;
-  }
 
   if (isAuthChecking) {
     return (
@@ -234,21 +199,22 @@ const AppContent = ({
     if (shouldShowSignupGuideModal) {
       return (
         <SignupGuideModal
-          isCseStudent={shouldForceNonCseGuide ? false : isCseStudent}
+          isCseStudent={isCseStudent}
           mode={signupGuideMode}
-          nonCseMessage={
-            shouldUseRestrictedGuideMessage
-              ? "접근이 제한된 계정이거나\n컴퓨터학부 계정만 사용이 가능해요ㅜㅜ"
-              : undefined
-          }
           onClose={handleCloseSignupGuideModal}
           open
         />
       );
     }
 
-    return <LoginRequiredModal onLogin={handleStartSsoLogin} open />;
+    toast.error("로그인하여 서비스를 사용해주세요", { id: "auth-required" });
+    navigate("/landing", { replace: true });
+
+    return null;
   }
+
+  const isNoticePage = pathname === "/notice";
+  const isEventPage = pathname === "/event";
 
   return (
     <AppDesktopShell
@@ -260,7 +226,13 @@ const AppContent = ({
             ? "max-w-[1200px] pt-10 pb-20"
             : undefined
       }
-      rightRail={isWritePath || isMyPage || isAuthPath ? null : undefined}
+      rightRail={
+        isWritePath || isMyPage ? null : isNoticePage ? (
+          <DefaultRightRail hideNotice hideWritingButton />
+        ) : isEventPage ? (
+          <DefaultRightRail hideEvent hideWritingButton />
+        ) : undefined
+      }
       rightRailClassName={isTitleBoardPage ? "pt-[90px]" : undefined}
       topBanner={isMainPage ? <Banner items={mockBannerItems} /> : undefined}
     >
@@ -274,23 +246,10 @@ const AppContent = ({
           <Route element={<NoticeBoardPage />} path="/notice" />
           <Route element={<EventBoardPage />} path="/event" />
           <Route element={<PostPage />} path="/post/:postId" />
-          <Route element={<LoginPage />} path="/login" />
           <Route element={<MyPage />} path="/mypage" />
           <Route element={<MyActivityPage />} path="/mypage/activity" />
+          <Route element={<Navigate replace to="/" />} path="*" />
         </Routes>
-        {shouldShowSignupGuideModal ? (
-          <SignupGuideModal
-            isCseStudent={shouldForceNonCseGuide ? false : isCseStudent}
-            mode={signupGuideMode}
-            nonCseMessage={
-              shouldUseRestrictedGuideMessage
-                ? "접근이 제한된 계정이거나\n컴퓨터학부 계정만 사용이 가능해요ㅜㅜ"
-                : undefined
-            }
-            onClose={handleCloseSignupGuideModal}
-            open
-          />
-        ) : null}
       </>
     </AppDesktopShell>
   );
@@ -322,28 +281,36 @@ function App() {
 
   return (
     <>
-      <Toaster
-        position="top-center"
-        toastOptions={{
-          className:
-            "!bg-gray-800 !text-white !rounded-xl !px-4 !py-2 !text-caption-02 !shadow-md",
-          success: {
-            iconTheme: {
-              primary: "#30D158",
-              secondary: "#FFFFFF",
+      {createPortal(
+        <Toaster
+          position="top-center"
+          containerStyle={{
+            zIndex: 999999,
+          }}
+          toastOptions={{
+            className:
+              "!bg-gray-800 !text-white !rounded-xl !px-4 !py-2 !text-caption-02 !shadow-md",
+            success: {
+              iconTheme: {
+                primary: "#30D158",
+                secondary: "#FFFFFF",
+              },
             },
-          },
-          error: {
-            iconTheme: {
-              primary: "#FF4245",
-              secondary: "#FFFFFF",
+            error: {
+              iconTheme: {
+                primary: "#FF4245",
+                secondary: "#FFFFFF",
+              },
             },
-          },
-          duration: 3000,
-        }}
-      />
+            duration: 3000,
+          }}
+        />,
+        document.getElementById("toast-portal") || document.body,
+      )}
+
       <BrowserRouter>
         <Routes>
+          <Route element={<LandingPage />} path="/landing" />
           <Route element={<AdminApp />} path="/admin/*" />
           <Route
             element={

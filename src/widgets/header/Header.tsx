@@ -1,3 +1,4 @@
+import logoImage from "@/assets/Logo.svg";
 import { getSsoLoginUrl } from "@/entities/auth/api/logout";
 import { Button } from "@/shared/ui/button/Button";
 import { SearchInput } from "@/shared/ui/input/SearchInput";
@@ -29,7 +30,7 @@ export const Header = ({
   isAuthenticated = false,
   navItems = defaultNavItems,
 }: HeaderProps) => {
-  const authButtonClassName = "h-9 px-3";
+  const authButtonClassName = "h-9 px-3 shrink-0 whitespace-nowrap";
 
   const currentPath = (() => {
     const normalizedPath = window.location.pathname.replace(/\/+$/, "");
@@ -67,14 +68,14 @@ export const Header = ({
         className,
       )}
     >
-      <div className="mx-auto flex h-full w-full max-w-[1440px] items-center justify-between px-10">
-        <div className="flex items-center gap-8">
-          <a
-            aria-label="Comit 홈으로 이동"
-            className="text-head-03 text-text-primary transition-opacity hover:opacity-80"
-            href="/"
-          >
-            로고
+      <div className="mx-auto flex h-full w-full max-w-[1440px] min-w-[1220px] items-center justify-between px-10 gap-4">
+        <div className="flex items-center gap-8 shrink-0">
+          <a aria-label="Comit 홈으로 이동" href="/" className="shrink-0">
+            <img
+              alt="Comit 로고"
+              className="h-7 w-auto object-contain mb-2 shrink-0"
+              src={logoImage}
+            />
           </a>
 
           <nav
@@ -103,11 +104,11 @@ export const Header = ({
           </nav>
         </div>
 
-        <div className="flex items-center justify-end gap-6">
+        <div className="flex flex-1 items-center justify-end gap-6 min-w-0">
           <SearchInput
             aria-label="게시글 검색"
-            className="border-border-deactivated bg-gray-50 text-label-04 text-text-primary placeholder:text-text-placeholder"
-            containerClassName="w-full min-w-[240px] max-w-[417px]"
+            className="border-border-deactivated min-w-0 bg-gray-50 text-label-04 text-text-primary placeholder:text-text-placeholder"
+            containerClassName="flex flex-1 min-w-[120px] max-w-[417px]"
             placeholder="검색어를 입력하세요"
           />
 

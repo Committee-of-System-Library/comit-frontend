@@ -68,7 +68,7 @@ export const mapPostSummaryToBoardPostCardItem = (
     createdAt: post.createdAt,
     heart: post.likeCount,
     id: post.id,
-    postImage: [],
+    postImage: post.imageUrls ?? [],
     tags: post.tags,
     title: post.title,
     user: post.authorNickname,

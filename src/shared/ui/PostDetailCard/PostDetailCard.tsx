@@ -3,6 +3,7 @@ import { useState, useRef, useEffect } from "react";
 import { BoardTag } from "@/shared/ui/BoardTag/BoardTag";
 import { DetailButton } from "@/shared/ui/DetailButton/DetailButton";
 import { HeartButton } from "@/shared/ui/HeartButton/HeartButton";
+import { ImageViewerModal } from "@/shared/ui/ImageViewerModal/ImageViewerModal";
 import { OptionList } from "@/shared/ui/OptionList/OptionList";
 import { ShareButton } from "@/shared/ui/ShareButton/ShareButton";
 import type { Post } from "@/types/post";
@@ -13,6 +14,8 @@ interface PostDetailCardProps extends Post {
   isMine?: boolean;
   onClick?: () => void;
   onEdit?: () => void;
+  onDelete?: () => void;
+  onReport?: () => void;
   onLikeClick?: () => void;
   isLikePending?: boolean;
   shareUrl?: string;
@@ -32,6 +35,8 @@ export const PostDetailCard = ({
   disabled = false,
   isMine = false,
   onEdit,
+  onDelete,
+  onReport,
   onLikeClick,
   isLikePending = false,
   shareUrl,
@@ -40,6 +45,10 @@ export const PostDetailCard = ({
   const [scrollProgress, setScrollProgress] = useState(0);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrollable, setIsScrollable] = useState(false);
+
+  const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(
+    null,
+  );
 
   useEffect(() => {
     const checkScrollable = () => {
@@ -84,7 +93,12 @@ export const PostDetailCard = ({
           <DetailButton onClick={() => setIsMenuOpen(!isMenuOpen)} />
           {isMenuOpen && (
             <div className="absolute right-0 top-full z-10 mt-1">
-              <OptionList mode={isMine ? "myPost" : "others"} onEdit={onEdit} />
+              <OptionList
+                mode={isMine ? "myPost" : "others"}
+                onEdit={onEdit}
+                onDelete={onDelete}
+                onReport={onReport}
+              />
             </div>
           )}
         </div>
@@ -107,16 +121,18 @@ export const PostDetailCard = ({
             className="flex gap-3 overflow-x-auto no-scrollbar scroll-smooth snap-x snap-mandatory cursor-grab active:cursor-grabbing"
           >
             {image.map((img, idx) => (
-              <div
+              <button
                 key={idx}
-                className="w-48 h-48 shrink-0 rounded-lg bg-gray-50 overflow-hidden snap-start"
+                type="button"
+                className="w-48 h-48 shrink-0 rounded-lg bg-gray-50 overflow-hidden snap-start cursor-pointer hover:opacity-90 transition-opacity"
+                onClick={() => setSelectedImageIndex(idx)}
               >
                 <img
                   src={img}
                   alt={`post-img-${idx}`}
                   className="w-full h-full object-cover pointer-events-none"
                 />
-              </div>
+              </button>
             ))}
           </div>
           {isScrollable && (
@@ -159,6 +175,13 @@ export const PostDetailCard = ({
         />
         <ShareButton url={shareUrl} />
       </div>
+      {selectedImageIndex !== null && (
+        <ImageViewerModal
+          images={image}
+          initialIndex={selectedImageIndex}
+          onClose={() => setSelectedImageIndex(null)}
+        />
+      )}
     </article>
   );
 };
