@@ -1,4 +1,5 @@
 import { FileText, Heart, MessageCircleMore } from "lucide-react";
+import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 
 import { useLogoutMutation } from "@/features/auth/model/useLogoutMutation";
@@ -15,7 +16,7 @@ import { ProfileWidget } from "@/widgets/mypage/ProfileWidget/ProfileWidget";
 const MyPage = () => {
   const navigate = useNavigate();
   const { data: profile } = useMyProfileQuery();
-  const { mutate: updateProfile } = useUpdateProfileMutation();
+  const { mutateAsync: updateProfile } = useUpdateProfileMutation();
   const { mutate: updateStudentNumberVisibility } =
     useUpdateStudentNumberVisibilityMutation();
   const { mutate: logoutMutate } = useLogoutMutation();
@@ -25,14 +26,20 @@ const MyPage = () => {
     isError: isActivityError,
   } = useMyActivityQuery();
 
-  const handleProfileSave = ({
+  const handleProfileSave = async ({
     userName,
     imageFile,
   }: {
     userName: string;
     imageFile: File | null;
-  }) => {
-    updateProfile({ nickname: userName, imageFile });
+  }): Promise<void> => {
+    try {
+      await updateProfile({ nickname: userName, imageFile });
+      toast.success("프로필이 저장되었습니다.");
+    } catch {
+      toast.error("프로필 저장에 실패했습니다. 다시 시도해 주세요.");
+      throw new Error();
+    }
   };
 
   const handleLogout = () => {
@@ -78,7 +85,7 @@ const MyPage = () => {
             </h2>
             <ProfileWidget
               initialUserName={profile?.nickname ?? ""}
-              major="전공"
+              major={profile?.majorTrack ?? ""}
               studentId={profile?.studentNumber ?? ""}
               imgURL={profile?.profileImageUrl ?? null}
               onSave={handleProfileSave}

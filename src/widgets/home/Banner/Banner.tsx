@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 
+import { useNavigate } from "react-router-dom";
+
 import type { BannerItem } from "@/mocks/bannerItems";
 import { ArrowButton } from "@/shared/ui/ArrowButton/ArrowButton";
 import { cn } from "@/utils/cn";
@@ -10,6 +12,7 @@ interface BannerProps {
 }
 
 export const Banner = ({ items, className }: BannerProps) => {
+  const navigate = useNavigate();
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const handlePrev = () => {
@@ -23,7 +26,7 @@ export const Banner = ({ items, className }: BannerProps) => {
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentIndex((prev) => (prev === items.length - 1 ? 0 : prev + 1));
-    }, 3000);
+    }, 5000);
     return () => clearInterval(timer);
   }, [currentIndex, items.length]);
 
@@ -38,19 +41,36 @@ export const Banner = ({ items, className }: BannerProps) => {
         className="flex transition-transform duration-500 ease-out h-full"
         style={{ transform: `translateX(-${currentIndex * 100}%)` }}
       >
-        {items.map((item) => (
-          <div
-            key={item.id}
-            className="w-full h-full flex-shrink-0"
-            style={{ backgroundColor: item.backgroundColor }}
-          >
-            <img
-              src={item.imageUrl}
-              alt={item.alt}
-              className="w-full h-full object-cover"
-            />
-          </div>
-        ))}
+        {items.map((item) =>
+          item.link ? (
+            <button
+              key={item.id}
+              type="button"
+              className="w-full h-full shrink-0 cursor-pointer"
+              style={{ backgroundColor: item.backgroundColor }}
+              onClick={() => navigate(item.link!)}
+              aria-label={item.alt}
+            >
+              <img
+                src={item.imageUrl}
+                alt={item.alt}
+                className="w-full h-full object-cover"
+              />
+            </button>
+          ) : (
+            <div
+              key={item.id}
+              className="w-full h-full shrink-0"
+              style={{ backgroundColor: item.backgroundColor }}
+            >
+              <img
+                src={item.imageUrl}
+                alt={item.alt}
+                className="w-full h-full object-cover"
+              />
+            </div>
+          ),
+        )}
       </div>
 
       <div className="absolute inset-y-0 left-4 flex items-center">
