@@ -78,3 +78,17 @@ export interface ReportResponse {
 export interface ToggleLikeResponse {
   liked: boolean;
 }
+
+export interface PostSearchQuery {
+  keyword: string;
+  boardType?: BoardType;
+  cursor?: number;
+  size?: number;
+}
+
+export interface PostSearchResponse {
+  totalCount: number;
+  hasNext: boolean;
+  nextCursorId: number | null;
+  posts: PostSummary[];
+}

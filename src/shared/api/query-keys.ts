@@ -26,5 +26,7 @@ export const queryKeys = {
     detail: (postId: number) => ["post", "detail", postId] as const,
     hot: () => ["post", "hot"] as const,
     list: (params: PostListKeyParams) => ["post", "list", params] as const,
+    search: (keyword: string, cursor?: number) =>
+      ["post", "search", keyword, cursor] as const,
   },
 };
