@@ -24,7 +24,7 @@ export const DeleteModal = ({
   if (!portalRoot) return null;
 
   return createPortal(
-    <div className="fixed inset-0 z-9999 flex items-center justify-center bg-black/50">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50">
       <section className="w-[320px] bg-white rounded-2xl flex flex-col gap-8 pt-6 pb-4 items-center shadow-xl">
         <p className="text-center text-label-02 text-text-primary">
           해당 {targetName}을 삭제하시겠습니까?

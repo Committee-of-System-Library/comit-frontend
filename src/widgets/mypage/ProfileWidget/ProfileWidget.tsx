@@ -4,13 +4,19 @@ import { ProfilePicture } from "@/shared/ui/ProfilePicture/ProfilePicture";
 import { UserNameInput } from "@/shared/ui/UserNameInput/UserNameInput";
 import { cn } from "@/utils/cn";
 
+const formatMajorTrack = (majorTrack: string) =>
+  majorTrack.replace(/ 전공$/, "").replace(/&[^)]*\)/, ")");
+
 interface ProfileWidgetProps {
   initialUserName: string;
   major: string;
   studentId: string;
   imgURL?: string | null;
   className?: string;
-  onSave?: (data: { userName: string; imageFile: File | null }) => void;
+  onSave?: (data: {
+    userName: string;
+    imageFile: File | null;
+  }) => Promise<void>;
 }
 
 export const ProfileWidget = ({
@@ -22,6 +28,7 @@ export const ProfileWidget = ({
   onSave,
 }: ProfileWidgetProps) => {
   const [isEditing, setIsEditing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [editingName, setEditingName] = useState(initialUserName);
   const [imageFile, setImageFile] = useState<File | null>(null);
 
@@ -30,9 +37,15 @@ export const ProfileWidget = ({
     setIsEditing(true);
   };
 
-  const handleSave = () => {
-    onSave?.({ userName: editingName, imageFile });
-    setIsEditing(false);
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+      await onSave?.({ userName: editingName, imageFile });
+      setIsEditing(false);
+      setImageFile(null);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -48,45 +61,45 @@ export const ProfileWidget = ({
           isEditing={isEditing}
           onImageChange={setImageFile}
         />
-        <div className="flex flex-col gap-1 min-w-0">
-          {isEditing ? (
-            <div className="w-[152px]">
-              <UserNameInput
-                value={editingName}
-                onChange={(e) => setEditingName(e.target.value)}
-              />
-            </div>
-          ) : (
-            <span className="text-text-primary text-label-01 h-[34px] flex items-center px-1 truncate font-bold">
-              {initialUserName}
-            </span>
-          )}
+        <div className="flex flex-col gap-1 min-w-0 flex-1">
+          <div className="flex items-center justify-between gap-2">
+            {isEditing ? (
+              <div className="w-[152px]">
+                <UserNameInput
+                  value={editingName}
+                  onChange={(e) => setEditingName(e.target.value)}
+                />
+              </div>
+            ) : (
+              <span className="text-text-primary text-label-01 h-[34px] flex items-center px-1 truncate font-bold">
+                {initialUserName}
+              </span>
+            )}
+            {isEditing ? (
+              <button
+                type="button"
+                onClick={handleSave}
+                disabled={isSaving}
+                className="text-info-02 text-label-03 cursor-pointer whitespace-nowrap font-bold hover:opacity-80 transition-all disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
+              >
+                {isSaving ? "저장 중..." : "변경사항 저장"}
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={handleEditToggle}
+                className="text-info-02 text-label-03 cursor-pointer whitespace-nowrap font-bold hover:opacity-80 transition-all shrink-0"
+              >
+                프로필 편집
+              </button>
+            )}
+          </div>
           <div className="text-text-secondary text-label-04 flex items-center gap-1 px-1 whitespace-nowrap">
-            <span>{major}</span>
+            <span>{formatMajorTrack(major)}</span>
             <span>·</span>
             <span>{studentId}</span>
           </div>
         </div>
-      </div>
-
-      <div className="ml-4 shrink-0">
-        {isEditing ? (
-          <button
-            type="button"
-            onClick={handleSave}
-            className="text-info-02 text-label-03 cursor-pointer whitespace-nowrap font-bold hover:opacity-80 transition-all"
-          >
-            변경사항 저장
-          </button>
-        ) : (
-          <button
-            type="button"
-            onClick={handleEditToggle}
-            className="text-info-02 text-label-03 cursor-pointer whitespace-nowrap font-bold hover:opacity-80 transition-all"
-          >
-            프로필 편집
-          </button>
-        )}
       </div>
     </div>
   );
