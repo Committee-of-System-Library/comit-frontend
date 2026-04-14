@@ -16,9 +16,9 @@ const meta: Meta<typeof CommentEditor> = {
   },
   args: {
     disabled: false,
-    onReply: fn((val) => console.info("답글 등록 완료:", val)),
-    onEdit: fn((val) => console.info("댓글/답글 수정 완료:", val)),
-    onCancel: fn(() => console.info("취소 완료")),
+    onReply: fn(),
+    onEdit: fn(),
+    onCancel: fn(),
   },
 } satisfies Meta<typeof CommentEditor>;
 

@@ -2,10 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import { toast } from "react-hot-toast";
 
 import { reportComment } from "@/entities/comment/api/reportComment";
-import type {
-  ReportRequest,
-  ReportResponse,
-} from "@/entities/comment/model/types";
+import type { ReportRequest } from "@/entities/comment/model/types";
 
 interface UseReportCommentParams {
   commentId: number;
@@ -17,8 +14,7 @@ export const useReportCommentMutation = () => {
     mutationFn: ({ commentId, payload }: UseReportCommentParams) =>
       reportComment(commentId, payload),
 
-    onSuccess: (data: ReportResponse) => {
-      console.info(`신고 접수 완료 (신고번호: ${data.reportId})`);
+    onSuccess: () => {
       toast.success("신고가 정상적으로 접수되었습니다.");
     },
 

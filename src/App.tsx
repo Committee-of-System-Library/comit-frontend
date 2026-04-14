@@ -16,6 +16,7 @@ import {
 
 import { DevToolDock } from "@/app/devtools/DevToolDock";
 import { AppDesktopShell } from "@/app/layout/AppDesktopShell";
+import { AppErrorBoundary } from "@/app/layout/AppErrorBoundary";
 import { useMyProfileQuery } from "@/features/member/model/useMyProfileQuery";
 import { mockBannerItems } from "@/mocks/bannerItems";
 import AdminApp from "@/pages/admin/AdminApp";
@@ -24,12 +25,16 @@ import FreeBoardPage from "@/pages/board/FreeBoardPage";
 import InfoBoardPage from "@/pages/board/InfoBoardPage";
 import NoticeBoardPage from "@/pages/board/NoticeBoardPage";
 import QnABoardPage from "@/pages/board/QnABoardPage";
+import NetworkErrorPage from "@/pages/error/NetworkErrorPage";
+import NotFoundPage from "@/pages/error/NotFoundPage";
+import ServerErrorPage from "@/pages/error/ServerErrorPage";
 import HomePage from "@/pages/home/HomePage";
 import LandingPage from "@/pages/landing/LandingPage";
 import MyActivityPage from "@/pages/mypage/MyActivityPage";
 import MyPage from "@/pages/mypage/MyPage";
 import PostPage from "@/pages/PostPage";
 import WritePage from "@/pages/write/WritePage";
+import { isApiHttpError } from "@/shared/api/http-error";
 import { queryKeys } from "@/shared/api/query-keys";
 import { Banner } from "@/widgets/home/Banner/Banner";
 import { DefaultRightRail } from "@/widgets/layout/DefaultRightRail";
@@ -248,7 +253,10 @@ const AppContent = ({
           <Route element={<PostPage />} path="/post/:postId" />
           <Route element={<MyPage />} path="/mypage" />
           <Route element={<MyActivityPage />} path="/mypage/activity" />
-          <Route element={<Navigate replace to="/" />} path="*" />
+          <Route
+            element={<Navigate replace to="/error/not-found" />}
+            path="*"
+          />
         </Routes>
       </>
     </AppDesktopShell>
@@ -259,10 +267,20 @@ function App() {
   const [isCseStudent, setIsCseStudent] = useState<boolean>(
     getInitialCseStudentState,
   );
-  const { data: myProfile, isLoading: isMyProfileLoading } =
-    useMyProfileQuery();
+  const {
+    data: myProfile,
+    error: myProfileError,
+    isError: isMyProfileError,
+    isLoading: isMyProfileLoading,
+    refetch: refetchMyProfile,
+  } = useMyProfileQuery();
   const isAuthChecking = isMyProfileLoading;
   const isAuthenticated = Boolean(myProfile);
+  const isNetworkError =
+    isMyProfileError &&
+    isApiHttpError(myProfileError) &&
+    myProfileError.kind === "network";
+  const isServerError = isMyProfileError && !isNetworkError;
 
   useEffect(() => {
     if (!import.meta.env.DEV) {
@@ -279,6 +297,10 @@ function App() {
     window.location.assign("/?signupGuide=1");
   };
 
+  const handleRetryMyProfile = () => {
+    void refetchMyProfile();
+  };
+
   return (
     <>
       {createPortal(
@@ -289,7 +311,13 @@ function App() {
           }}
           toastOptions={{
             className:
-              "!bg-gray-800 !text-white !rounded-xl !px-4 !py-2 !text-caption-02 !shadow-md",
+              "!bg-gray-800 !text-white !rounded-xl !px-4 !py-2 !text-caption-02 !shadow-md !whitespace-normal !break-words !text-left",
+            style: {
+              maxWidth: "min(92vw, 480px)",
+              overflowWrap: "anywhere",
+              whiteSpace: "pre-line",
+              wordBreak: "keep-all",
+            },
             success: {
               iconTheme: {
                 primary: "#30D158",
@@ -309,20 +337,37 @@ function App() {
       )}
 
       <BrowserRouter>
-        <Routes>
-          <Route element={<LandingPage />} path="/landing" />
-          <Route element={<AdminApp />} path="/admin/*" />
-          <Route
-            element={
-              <AppContent
-                isAuthChecking={isAuthChecking}
-                isAuthenticated={isAuthenticated}
-                isCseStudent={isCseStudent}
-              />
-            }
-            path="*"
-          />
-        </Routes>
+        <AppErrorBoundary>
+          <Routes>
+            <Route element={<LandingPage />} path="/landing" />
+            <Route element={<AdminApp />} path="/admin/*" />
+            <Route element={<NotFoundPage />} path="/error/not-found" />
+            <Route
+              element={<NetworkErrorPage onRetry={handleRetryMyProfile} />}
+              path="/error/network"
+            />
+            <Route
+              element={<ServerErrorPage onRetry={handleRetryMyProfile} />}
+              path="/error/server"
+            />
+            <Route
+              element={
+                isNetworkError ? (
+                  <Navigate replace to="/error/network" />
+                ) : isServerError ? (
+                  <Navigate replace to="/error/server" />
+                ) : (
+                  <AppContent
+                    isAuthChecking={isAuthChecking}
+                    isAuthenticated={isAuthenticated}
+                    isCseStudent={isCseStudent}
+                  />
+                )
+              }
+              path="*"
+            />
+          </Routes>
+        </AppErrorBoundary>
 
         {import.meta.env.DEV ? (
           <DevToolDock

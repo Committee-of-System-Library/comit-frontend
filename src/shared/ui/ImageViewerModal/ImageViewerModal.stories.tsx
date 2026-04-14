@@ -32,7 +32,7 @@ const meta: Meta<typeof ImageViewerModal> = {
       "https://picsum.photos/id/1019/800/800",
     ],
     initialIndex: 0,
-    onClose: fn(() => console.info("모달 닫기 이벤트 발생")),
+    onClose: fn(),
   },
 } satisfies Meta<typeof ImageViewerModal>;
 

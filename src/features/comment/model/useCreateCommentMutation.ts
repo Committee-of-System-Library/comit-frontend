@@ -20,8 +20,7 @@ export const useCreateCommentMutation = () => {
     mutationFn: ({ postId, payload }: UseCreateCommentParams) =>
       createComment(postId, payload),
 
-    onSuccess: async (data: CreateCommentResponse, { postId }) => {
-      console.info("댓글 작성 완료/새로 생성된 댓글 ID:", data);
+    onSuccess: async (_data: CreateCommentResponse, { postId }) => {
       toast.success("댓글이 작성되었습니다.");
 
       await queryClient.invalidateQueries({
