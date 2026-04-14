@@ -33,6 +33,7 @@ import LandingPage from "@/pages/landing/LandingPage";
 import MyActivityPage from "@/pages/mypage/MyActivityPage";
 import MyPage from "@/pages/mypage/MyPage";
 import PostPage from "@/pages/PostPage";
+import SearchResultPage from "@/pages/search/SearchResultPage";
 import WritePage from "@/pages/write/WritePage";
 import { isApiHttpError } from "@/shared/api/http-error";
 import { queryKeys } from "@/shared/api/query-keys";
@@ -253,6 +254,7 @@ const AppContent = ({
           <Route element={<PostPage />} path="/post/:postId" />
           <Route element={<MyPage />} path="/mypage" />
           <Route element={<MyActivityPage />} path="/mypage/activity" />
+          <Route element={<SearchResultPage />} path="/search" />
           <Route
             element={<Navigate replace to="/error/not-found" />}
             path="*"
