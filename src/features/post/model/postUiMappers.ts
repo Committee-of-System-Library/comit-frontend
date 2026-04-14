@@ -45,6 +45,16 @@ export interface RightRailHotPostItem {
   title: string;
 }
 
+const resolveAuthorProfileImageUrl = (item: {
+  author?: { profileImageUrl?: string | null } | null;
+  authorProfileImageUrl?: string | null;
+  profileImageUrl?: string | null;
+}) =>
+  item.authorProfileImageUrl ??
+  item.profileImageUrl ??
+  item.author?.profileImageUrl ??
+  undefined;
+
 const formatDateLabel = (dateString: string) => {
   const date = new Date(dateString);
 
@@ -72,7 +82,7 @@ export const mapPostSummaryToBoardPostCardItem = (
     tags: post.tags,
     title: post.title,
     user: post.authorNickname,
-    userImage: undefined,
+    userImage: resolveAuthorProfileImageUrl(post),
   };
 };
 
@@ -135,6 +145,7 @@ export const mapPostDetailToPost = (post: PostDetail): Post => {
     tag: post.tags,
     title: post.title,
     user: post.authorNickname,
+    userImage: resolveAuthorProfileImageUrl(post),
     view: post.viewCount,
   };
 };

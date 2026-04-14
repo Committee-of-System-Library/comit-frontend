@@ -72,6 +72,16 @@ const PostPage = () => {
     useCreateCommentMutation();
   const { mutate: deleteComment } = useDeleteCommentMutation();
 
+  const resolveCommentProfileImageUrl = (comment: {
+    author?: { profileImageUrl?: string | null } | null;
+    authorProfileImageUrl?: string | null;
+    profileImageUrl?: string | null;
+  }) =>
+    comment.authorProfileImageUrl ??
+    comment.profileImageUrl ??
+    comment.author?.profileImageUrl ??
+    undefined;
+
   // -- 데이터 가공 (Memos) --
   const mappedPost = useMemo(() => {
     if (!postData) {
@@ -87,6 +97,7 @@ const PostPage = () => {
     content: item.content,
     createdAt: item.createdAt,
     name: item.authorNickname,
+    profileImageUrl: resolveCommentProfileImageUrl(item),
     isMine: item.mine,
     variant: "base" as const,
     isEdited: item.updatedAt !== null,
@@ -96,6 +107,7 @@ const PostPage = () => {
         content: reply.content,
         createdAt: reply.createdAt,
         name: reply.authorNickname,
+        profileImageUrl: resolveCommentProfileImageUrl(reply),
         isMine: reply.mine,
         variant: "reply" as const,
         isEdited: reply.updatedAt !== null,
