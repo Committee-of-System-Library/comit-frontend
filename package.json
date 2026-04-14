@@ -11,6 +11,11 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "release": "pnpm run release:check",
+    "release:check": "pnpm run lint && pnpm run test && pnpm run build",
+    "release:version:patch": "pnpm version patch --no-git-tag-version",
+    "release:version:minor": "pnpm version minor --no-git-tag-version",
+    "release:version:major": "pnpm version major --no-git-tag-version",
     "test": "vitest run --passWithNoTests",
     "lint": "eslint .",
     "preview": "vite preview",
