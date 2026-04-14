@@ -8,7 +8,7 @@ export interface RegisterRequest {
   agreedToTerms: boolean;
   nickname: string;
   phone: string;
-  profileImageUrl?: string;
+  profileImageUrl?: string | null;
 }
 
 export interface RegisterProfileImagePresignedRequest {

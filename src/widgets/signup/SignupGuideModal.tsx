@@ -13,6 +13,7 @@ import { useNavigate } from "react-router-dom";
 import defaultMascotImage from "@/assets/Ori_defualt.svg";
 import greetingMascotImage from "@/assets/Ori_happy.svg";
 import sadMascotImage from "@/assets/Ori_sad.svg";
+import { validateImageFile } from "@/features/image/model/imageUpload";
 import { useRegisterMutation } from "@/features/signup/model/useRegisterMutation";
 import { useRegisterPrefillQuery } from "@/features/signup/model/useRegisterPrefillQuery";
 import { isApiHttpError } from "@/shared/api/http-error";
@@ -50,20 +51,24 @@ export const SignupGuideModal = ({
 }: SignupGuideModalProps) => {
   const navigate = useNavigate();
   const isRegisterMode = mode === "register";
+
   const [step, setStep] = useState<SignupStep>(defaultStep);
   const [name, setName] = useState("");
   const [phoneFirst, setPhoneFirst] = useState("");
   const [phoneMiddle, setPhoneMiddle] = useState("");
   const [phoneLast, setPhoneLast] = useState("");
   const [isPrivacyAgreed, setIsPrivacyAgreed] = useState(false);
+
   const [nickname, setNickname] = useState("");
   const [nicknameValidationStatus, setNicknameValidationStatus] =
     useState<NicknameValidationStatus>("idle");
   const [nicknameValidationMessage, setNicknameValidationMessage] =
     useState("");
+
   const [profileImageFile, setProfileImageFile] = useState<File | null>(null);
   const [profileImageUrl, setProfileImageUrl] = useState<string | null>(null);
   const profileImageInputRef = useRef<HTMLInputElement>(null);
+
   const {
     data: registerPrefill,
     error: registerPrefillError,
@@ -72,6 +77,7 @@ export const SignupGuideModal = ({
   } = useRegisterPrefillQuery({
     enabled: open && isRegisterMode,
   });
+
   const registerMutation = useRegisterMutation();
   const effectiveCseStudent = isRegisterMode ? true : isCseStudent;
 
@@ -81,6 +87,7 @@ export const SignupGuideModal = ({
     phoneMiddle.length === 4 &&
     phoneLast.length === 4 &&
     isPrivacyAgreed;
+
   const isStep2Valid = nicknameValidationStatus === "success";
 
   const handlePhoneChange =
@@ -99,9 +106,14 @@ export const SignupGuideModal = ({
     setNickname("");
     setNicknameValidationStatus("idle");
     setNicknameValidationMessage("");
+
+    if (profileImageUrl?.startsWith("blob:")) {
+      URL.revokeObjectURL(profileImageUrl);
+    }
+
     setProfileImageFile(null);
     setProfileImageUrl(null);
-  }, [defaultStep]);
+  }, [defaultStep, profileImageUrl]);
 
   const handleCloseModal = useCallback(() => {
     resetSignupState();
@@ -111,6 +123,7 @@ export const SignupGuideModal = ({
   const modalMaxWidthClass = effectiveCseStudent
     ? "max-w-[400px]"
     : "max-w-[447px]";
+
   const bubblePositionClass = effectiveCseStudent
     ? step === 1
       ? "absolute -right-[340px] top-[200px] inline-flex"
@@ -136,7 +149,7 @@ export const SignupGuideModal = ({
 
   useEffect(() => {
     return () => {
-      if (profileImageUrl) {
+      if (profileImageUrl?.startsWith("blob:")) {
         URL.revokeObjectURL(profileImageUrl);
       }
     };
@@ -214,7 +227,14 @@ export const SignupGuideModal = ({
   const handleProfileImageChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
 
-    if (!file || !file.type.startsWith("image/")) {
+    if (!file) {
+      return;
+    }
+
+    const errorMessage = validateImageFile(file);
+    if (errorMessage) {
+      toast.error(errorMessage);
+      event.target.value = "";
       return;
     }
 
@@ -278,6 +298,20 @@ export const SignupGuideModal = ({
           navigate("/", { replace: true });
           return;
         }
+
+        if (error.code === "UNSUPPORTED_FILE_TYPE") {
+          toast.error(
+            "이미지는 JPG, PNG, WEBP, GIF 형식만 업로드할 수 있습니다.",
+          );
+          return;
+        }
+      }
+
+      if (error instanceof Error && error.message.includes("이미지 업로드")) {
+        toast.error(
+          "프로필 이미지 업로드에 실패했습니다. 잠시 후 다시 시도해 주세요.",
+        );
+        return;
       }
 
       toast.error("회원가입 처리 중 오류가 발생했습니다. 다시 시도해 주세요.");
@@ -598,11 +632,13 @@ export const SignupGuideModal = ({
               : "다음에 만나꿱🐥"
           }
         />
+
         {isRegisterMode && isRegisterPrefillLoading ? (
           <p className="absolute right-8 top-8 text-caption-02 text-text-placeholder">
             회원가입 정보 확인 중...
           </p>
         ) : null}
+
         {effectiveCseStudent ? (
           <img
             alt="Comit 마스코트"
