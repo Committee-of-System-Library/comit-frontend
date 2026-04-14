@@ -85,7 +85,7 @@ const MyPage = () => {
             </h2>
             <ProfileWidget
               initialUserName={profile?.nickname ?? ""}
-              major={profile?.majorTrack ?? ""}
+              major={profile?.majorTrack ?? profile?.major ?? ""}
               studentId={profile?.studentNumber ?? ""}
               imgURL={profile?.profileImageUrl ?? null}
               onSave={handleProfileSave}
