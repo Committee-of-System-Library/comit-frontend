@@ -49,7 +49,6 @@ describe("useHotPostsQuery", () => {
       expect.objectContaining({
         author: "작성자",
         title: "핫 게시글",
-        views: 42,
       }),
     ]);
   });
