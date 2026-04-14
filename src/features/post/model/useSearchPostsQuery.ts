@@ -15,7 +15,7 @@ export const useSearchPostsQuery = ({
   keyword,
   boardType,
   cursor,
-  size = 20,
+  size = 10,
 }: UseSearchPostsQueryOptions) => {
   return useQuery({
     enabled: keyword.trim().length > 0,
