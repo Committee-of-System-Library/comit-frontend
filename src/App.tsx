@@ -36,6 +36,7 @@ import PostPage from "@/pages/PostPage";
 import WritePage from "@/pages/write/WritePage";
 import { isApiHttpError } from "@/shared/api/http-error";
 import { queryKeys } from "@/shared/api/query-keys";
+import { AdminRoute } from "@/shared/ui/AdminRoute/AdminRoute";
 import { Banner } from "@/widgets/home/Banner/Banner";
 import { DefaultRightRail } from "@/widgets/layout/DefaultRightRail";
 import { SignupGuideModal } from "@/widgets/signup/SignupGuideModal";
@@ -340,7 +341,14 @@ function App() {
         <AppErrorBoundary>
           <Routes>
             <Route element={<LandingPage />} path="/landing" />
-            <Route element={<AdminApp />} path="/admin/*" />
+            <Route
+              element={
+                <AdminRoute>
+                  <AdminApp />
+                </AdminRoute>
+              }
+              path="/admin/*"
+            />
             <Route element={<NotFoundPage />} path="/error/not-found" />
             <Route
               element={<NetworkErrorPage onRetry={handleRetryMyProfile} />}
