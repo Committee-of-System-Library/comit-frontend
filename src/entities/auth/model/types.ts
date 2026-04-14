@@ -11,6 +11,16 @@ export interface RegisterRequest {
   profileImageUrl?: string | null;
 }
 
+export interface RegisterProfileImagePresignedRequest {
+  contentType: string;
+  fileName: string;
+}
+
+export interface RegisterProfileImagePresignedResponse {
+  imageUrl: string;
+  presignedUrl: string;
+}
+
 export interface SsoCallbackQuery {
   state: string;
   token: string;

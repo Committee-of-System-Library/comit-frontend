@@ -13,7 +13,6 @@ import { useNavigate } from "react-router-dom";
 import defaultMascotImage from "@/assets/Ori_defualt.svg";
 import greetingMascotImage from "@/assets/Ori_happy.svg";
 import sadMascotImage from "@/assets/Ori_sad.svg";
-import { registerProfileImagePresigned } from "@/entities/auth/api/registerProfileImagePresigned";
 import { validateImageFile } from "@/features/image/model/imageUpload";
 import { useRegisterMutation } from "@/features/signup/model/useRegisterMutation";
 import { useRegisterPrefillQuery } from "@/features/signup/model/useRegisterPrefillQuery";
@@ -52,22 +51,24 @@ export const SignupGuideModal = ({
 }: SignupGuideModalProps) => {
   const navigate = useNavigate();
   const isRegisterMode = mode === "register";
+
   const [step, setStep] = useState<SignupStep>(defaultStep);
   const [name, setName] = useState("");
   const [phoneFirst, setPhoneFirst] = useState("");
   const [phoneMiddle, setPhoneMiddle] = useState("");
   const [phoneLast, setPhoneLast] = useState("");
   const [isPrivacyAgreed, setIsPrivacyAgreed] = useState(false);
+
   const [nickname, setNickname] = useState("");
   const [nicknameValidationStatus, setNicknameValidationStatus] =
     useState<NicknameValidationStatus>("idle");
   const [nicknameValidationMessage, setNicknameValidationMessage] =
     useState("");
+
   const [profileImageFile, setProfileImageFile] = useState<File | null>(null);
-  const [profileImagePreviewUrl, setProfileImagePreviewUrl] = useState<
-    string | null
-  >(null);
+  const [profileImageUrl, setProfileImageUrl] = useState<string | null>(null);
   const profileImageInputRef = useRef<HTMLInputElement>(null);
+
   const {
     data: registerPrefill,
     error: registerPrefillError,
@@ -76,6 +77,7 @@ export const SignupGuideModal = ({
   } = useRegisterPrefillQuery({
     enabled: open && isRegisterMode,
   });
+
   const registerMutation = useRegisterMutation();
   const effectiveCseStudent = isRegisterMode ? true : isCseStudent;
 
@@ -85,6 +87,7 @@ export const SignupGuideModal = ({
     phoneMiddle.length === 4 &&
     phoneLast.length === 4 &&
     isPrivacyAgreed;
+
   const isStep2Valid = nicknameValidationStatus === "success";
 
   const handlePhoneChange =
@@ -103,12 +106,14 @@ export const SignupGuideModal = ({
     setNickname("");
     setNicknameValidationStatus("idle");
     setNicknameValidationMessage("");
-    if (profileImagePreviewUrl) {
-      URL.revokeObjectURL(profileImagePreviewUrl);
+
+    if (profileImageUrl?.startsWith("blob:")) {
+      URL.revokeObjectURL(profileImageUrl);
     }
+
     setProfileImageFile(null);
-    setProfileImagePreviewUrl(null);
-  }, [defaultStep, profileImagePreviewUrl]);
+    setProfileImageUrl(null);
+  }, [defaultStep, profileImageUrl]);
 
   const handleCloseModal = useCallback(() => {
     resetSignupState();
@@ -118,6 +123,7 @@ export const SignupGuideModal = ({
   const modalMaxWidthClass = effectiveCseStudent
     ? "max-w-[400px]"
     : "max-w-[447px]";
+
   const bubblePositionClass = effectiveCseStudent
     ? step === 1
       ? "absolute -right-[340px] top-[200px] inline-flex"
@@ -143,11 +149,11 @@ export const SignupGuideModal = ({
 
   useEffect(() => {
     return () => {
-      if (profileImagePreviewUrl) {
-        URL.revokeObjectURL(profileImagePreviewUrl);
+      if (profileImageUrl?.startsWith("blob:")) {
+        URL.revokeObjectURL(profileImageUrl);
       }
     };
-  }, [profileImagePreviewUrl]);
+  }, [profileImageUrl]);
 
   useEffect(() => {
     if (!isRegisterMode || !isRegisterPrefillError) {
@@ -232,43 +238,22 @@ export const SignupGuideModal = ({
       return;
     }
 
-    if (profileImagePreviewUrl) {
-      URL.revokeObjectURL(profileImagePreviewUrl);
+    if (profileImageUrl?.startsWith("blob:")) {
+      URL.revokeObjectURL(profileImageUrl);
     }
 
     setProfileImageFile(file);
-    setProfileImagePreviewUrl(URL.createObjectURL(file));
+    setProfileImageUrl(URL.createObjectURL(file));
     event.target.value = "";
   };
 
   const handleProfileImageRemove = () => {
-    if (profileImagePreviewUrl) {
-      URL.revokeObjectURL(profileImagePreviewUrl);
+    if (profileImageUrl?.startsWith("blob:")) {
+      URL.revokeObjectURL(profileImageUrl);
     }
+
     setProfileImageFile(null);
-    setProfileImagePreviewUrl(null);
-  };
-
-  const uploadSelectedProfileImage = async () => {
-    if (!profileImageFile) {
-      return null;
-    }
-
-    const { imageUrl, presignedUrl } = await registerProfileImagePresigned({
-      contentType: profileImageFile.type,
-      fileName: profileImageFile.name,
-    });
-
-    const response = await fetch(presignedUrl, {
-      body: profileImageFile,
-      method: "PUT",
-    });
-
-    if (!response.ok) {
-      throw new Error("PROFILE_IMAGE_UPLOAD_FAILED");
-    }
-
-    return imageUrl;
+    setProfileImageUrl(null);
   };
 
   const handleRegisterComplete = async () => {
@@ -282,13 +267,11 @@ export const SignupGuideModal = ({
     }
 
     try {
-      const uploadedProfileImageUrl = await uploadSelectedProfileImage();
-
       await registerMutation.mutateAsync({
         agreedToTerms: true,
+        imageFile: profileImageFile,
         nickname: nickname.trim(),
         phone: `${phoneFirst}-${phoneMiddle}-${phoneLast}`,
-        profileImageUrl: uploadedProfileImageUrl,
       });
 
       toast.success("회원가입이 완료되었습니다.");
@@ -324,10 +307,7 @@ export const SignupGuideModal = ({
         }
       }
 
-      if (
-        error instanceof Error &&
-        error.message === "PROFILE_IMAGE_UPLOAD_FAILED"
-      ) {
+      if (error instanceof Error && error.message.includes("이미지 업로드")) {
         toast.error(
           "프로필 이미지 업로드에 실패했습니다. 잠시 후 다시 시도해 주세요.",
         );
@@ -498,18 +478,18 @@ export const SignupGuideModal = ({
                 onClick={handleProfileImageUploadClick}
                 type="button"
               >
-                {profileImagePreviewUrl ? (
+                {profileImageUrl ? (
                   <img
                     alt="프로필 이미지 미리보기"
                     className="size-full object-cover"
-                    src={profileImagePreviewUrl}
+                    src={profileImageUrl}
                   />
                 ) : (
                   <ImageIcon className="size-6 text-text-placeholder" />
                 )}
               </button>
 
-              {profileImagePreviewUrl ? (
+              {profileImageUrl ? (
                 <button
                   aria-label="프로필 이미지 삭제"
                   className="absolute -top-1 -right-1 inline-flex size-5 items-center justify-center rounded-full border border-border-deactivated bg-background-light text-text-deactivated transition-colors hover:text-text-primary"
@@ -652,11 +632,13 @@ export const SignupGuideModal = ({
               : "다음에 만나꿱🐥"
           }
         />
+
         {isRegisterMode && isRegisterPrefillLoading ? (
           <p className="absolute right-8 top-8 text-caption-02 text-text-placeholder">
             회원가입 정보 확인 중...
           </p>
         ) : null}
+
         {effectiveCseStudent ? (
           <img
             alt="Comit 마스코트"

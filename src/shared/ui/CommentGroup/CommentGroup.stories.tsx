@@ -9,9 +9,7 @@ const meta = {
   tags: ["autodocs"],
   args: {
     postId: 1,
-    onReport: fn((id, name, content) =>
-      console.info("신고하기:", id, name, content),
-    ),
+    onReport: fn(),
     onDelete: fn(),
   },
   parameters: {

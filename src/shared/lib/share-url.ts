@@ -19,10 +19,6 @@ export const buildPostShareUrl = (postId: number) => {
   const baseUrl = resolveAppBaseUrl();
 
   if (baseUrl.length === 0) {
-    if (import.meta.env.DEV) {
-      console.warn("공유 URL base를 확인하지 못해 상대 경로를 사용합니다.");
-    }
-
     return normalizedPath;
   }
 

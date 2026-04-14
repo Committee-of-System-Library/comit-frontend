@@ -38,13 +38,6 @@ export const OptionItem = forwardRef<HTMLButtonElement, OptionItemProps>(
     ref,
   ) => {
     const handleClick = (e: MouseEvent<HTMLButtonElement>) => {
-      const messages = {
-        report: "신고 로직 실행 중...",
-        delete: "삭제 로직 실행 중...",
-        edit: "수정 로직 실행 중...",
-      };
-      console.info(messages[variant]);
-
       if (onClick) {
         onClick(e);
       }
