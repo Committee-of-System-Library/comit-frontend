@@ -76,7 +76,7 @@ export const ReportModal = ({
   };
 
   return createPortal(
-    <div className="fixed inset-0 z-9999 flex items-center justify-center bg-black/50">
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50">
       <section className="w-[320px] bg-white rounded-2xl flex flex-col gap-4 pt-6 px-4 pb-4 items-center shadow-xl">
         <p className="text-center text-subtitle-03 text-text-primary">
           신고 사유 입력

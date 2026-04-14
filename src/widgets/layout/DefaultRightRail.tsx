@@ -19,6 +19,9 @@ import { NoticeSideBoard } from "@/widgets/sideBoard/NoticeSideBoard/NoticeSideB
 
 interface DefaultRightRailProps extends HTMLAttributes<HTMLDivElement> {
   events?: RightRailEventItem[];
+  hideEvent?: boolean;
+  hideNotice?: boolean;
+  hideWritingButton?: boolean;
   hotPosts?: RightRailHotPostItem[];
   notices?: RightRailNoticeItem[];
   onWriteClick?: () => void;
@@ -27,6 +30,9 @@ interface DefaultRightRailProps extends HTMLAttributes<HTMLDivElement> {
 export const DefaultRightRail = ({
   className,
   events,
+  hideEvent = false,
+  hideNotice = false,
+  hideWritingButton = false,
   hotPosts,
   notices,
   onWriteClick,
@@ -35,12 +41,12 @@ export const DefaultRightRail = ({
   const navigate = useNavigate();
   const { data: noticePosts } = usePostListQuery({
     boardType: "NOTICE",
-    enabled: notices === undefined,
+    enabled: notices === undefined && !hideNotice,
     size: 5,
   });
   const { data: eventPosts } = usePostListQuery({
     boardType: "EVENT",
-    enabled: events === undefined,
+    enabled: events === undefined && !hideEvent,
     size: 5,
   });
   const { data: hotPostData } = useHotPostsQuery({
@@ -73,26 +79,32 @@ export const DefaultRightRail = ({
 
   return (
     <div className={cn("space-y-6", className)} {...props}>
-      <WritingButton
-        aria-label="글 작성하기"
-        className="gap-2"
-        onClick={handleWriteClick}
-        variant="action"
-      >
-        글 작성하기
-      </WritingButton>
-      <NoticeSideBoard
-        notices={resolvedNotices}
-        onItemClick={(id) => navigate(`/post/${id}`)}
-      />
+      {!hideWritingButton && (
+        <WritingButton
+          aria-label="글 작성하기"
+          className="gap-2"
+          onClick={handleWriteClick}
+          variant="action"
+        >
+          글 작성하기
+        </WritingButton>
+      )}
+      {!hideNotice && (
+        <NoticeSideBoard
+          notices={resolvedNotices}
+          onItemClick={(id) => navigate(`/post/${id}`)}
+        />
+      )}
       <HotPostSideBoard
         posts={resolvedHotPosts}
         onItemClick={(id) => navigate(`/post/${id}`)}
       />
-      <EventSideBoard
-        events={resolvedEvents}
-        onItemClick={(id) => navigate(`/post/${id}`)}
-      />
+      {!hideEvent && (
+        <EventSideBoard
+          events={resolvedEvents}
+          onItemClick={(id) => navigate(`/post/${id}`)}
+        />
+      )}
     </div>
   );
 };

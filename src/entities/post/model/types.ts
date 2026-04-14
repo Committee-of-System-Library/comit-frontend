@@ -7,6 +7,7 @@ export interface PostSummary {
   contentPreview?: string | null;
   createdAt: string;
   id: number;
+  imageUrls?: string[];
   likeCount: number;
   tags: string[];
   title: string;
