@@ -1,4 +1,5 @@
 export interface Comment {
+  authorProfileImageUrl?: string | null;
   authorNickname: string;
   content: string;
   createdAt: string;
@@ -6,6 +7,7 @@ export interface Comment {
   likeCount: number;
   id: number;
   mine: boolean;
+  profileImageUrl?: string | null;
   replies: Comment[];
   updatedAt: string | null;
 }
