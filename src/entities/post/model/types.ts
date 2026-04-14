@@ -1,13 +1,16 @@
 export type BoardType = "EVENT" | "FREE" | "INFO" | "NOTICE" | "QNA";
 
 export interface PostSummary {
+  authorProfileImageUrl?: string | null;
   authorNickname: string;
   boardType: BoardType;
   commentCount: number;
   contentPreview?: string | null;
   createdAt: string;
   id: number;
+  imageUrls?: string[];
   likeCount: number;
+  profileImageUrl?: string | null;
   tags: string[];
   title: string;
 }
@@ -27,6 +30,7 @@ export interface PostListResponse {
 }
 
 export interface PostDetail {
+  authorProfileImageUrl?: string | null;
   authorNickname: string;
   boardType: BoardType;
   content: string;
@@ -35,6 +39,7 @@ export interface PostDetail {
   imageUrls?: string[];
   likeCount: number;
   likedByMe: boolean;
+  profileImageUrl?: string | null;
   tags: string[];
   title: string;
   updatedAt: string | null;

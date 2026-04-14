@@ -4,6 +4,8 @@ export interface MyProfile {
   studentNumber: string;
   studentNumberVisible: boolean;
   profileImageUrl: string | null;
+  major?: string | null;
+  majorTrack?: string | null;
 }
 
 export interface UpdateProfileRequest {

@@ -2,8 +2,11 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { client } from "@/apis/client";
 import type {
+  AdminCreatePostResponse,
+  AdminPostDetail,
   AdminListParams,
   AdminPostPageResponse,
+  AdminPostPayload,
   AdminVisibilityPayload,
   BoardType,
 } from "@/types/admin";
@@ -17,14 +20,26 @@ interface UpdatePostVisibilityParams {
   postId: number;
 }
 
+interface UpdateAdminPostParams {
+  payload: AdminPostPayload;
+  postId: number;
+}
+
 const HIDDEN_POST_COUNT_PAGE_SIZE = 100;
 
 const adminPostKeys = {
   all: ["admin", "posts"] as const,
   hiddenCount: () => [...adminPostKeys.all, "hidden-count"] as const,
+  detail: (postId: number) => [...adminPostKeys.all, "detail", postId] as const,
   list: (params: AdminPostListParams) =>
     [...adminPostKeys.all, params] as const,
 };
+
+const createPost = (payload: AdminPostPayload) =>
+  client.post<AdminCreatePostResponse>("/admin/posts", payload);
+
+const getAdminPost = (postId: number) =>
+  client.get<AdminPostDetail>(`/admin/posts/${postId}`);
 
 const getAdminPosts = (params: AdminPostListParams) =>
   client.get<AdminPostPageResponse>("/admin/posts", { params });
@@ -34,6 +49,9 @@ const deletePost = (postId: number) =>
 
 const patchPostVisibility = ({ payload, postId }: UpdatePostVisibilityParams) =>
   client.patch<void>(`/admin/posts/${postId}/visibility`, payload);
+
+const updateAdminPost = ({ payload, postId }: UpdateAdminPostParams) =>
+  client.patch<void>(`/admin/posts/${postId}`, payload);
 
 const getHiddenPostCount = async () => {
   const firstPage = await getAdminPosts({
@@ -75,6 +93,13 @@ export const useAdminPosts = (params: AdminPostListParams) =>
     queryFn: () => getAdminPosts(params),
   });
 
+export const useAdminPostDetail = (postId: number | null, enabled = true) =>
+  useQuery({
+    queryKey: adminPostKeys.detail(postId ?? -1),
+    queryFn: () => getAdminPost(postId as number),
+    enabled: enabled && postId !== null,
+  });
+
 export const useAdminHiddenPostCount = () =>
   useQuery({
     queryKey: adminPostKeys.hiddenCount(),
@@ -92,6 +117,17 @@ export const useDeletePost = () => {
   });
 };
 
+export const useCreateAdminPost = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: createPost,
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: adminPostKeys.all });
+    },
+  });
+};
+
 export const usePatchPostVisibility = () => {
   const queryClient = useQueryClient();
 
@@ -99,6 +135,20 @@ export const usePatchPostVisibility = () => {
     mutationFn: patchPostVisibility,
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: adminPostKeys.all });
+    },
+  });
+};
+
+export const useUpdateAdminPost = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: updateAdminPost,
+    onSuccess: (_data, variables) => {
+      void queryClient.invalidateQueries({ queryKey: adminPostKeys.all });
+      void queryClient.invalidateQueries({
+        queryKey: adminPostKeys.detail(variables.postId),
+      });
     },
   });
 };
