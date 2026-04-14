@@ -1,10 +1,16 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 
+import landingHeroLaptopImage from "@/assets/landing/Device - Macbook Pro.svg";
+import section2CardAImage from "@/assets/landing/section2-card-a.png";
+import section2CardBImage from "@/assets/landing/section2-card-b.png";
+import section3Card1Image from "@/assets/landing/section3-card-1.png";
+import section3Card2Image from "@/assets/landing/section3-card-2.png";
+import section3Card3Image from "@/assets/landing/section3-card-3.png";
+import section3Card4Image from "@/assets/landing/section3-card-4.png";
 import logoImage from "@/assets/Logo.svg";
 import mascotImage from "@/assets/Ori_Jump.svg";
 import { getSsoLoginUrl } from "@/entities/auth/api/logout";
 import { WritingButton } from "@/shared/ui/WritingButton/WritingButton";
-import { cn } from "@/utils/cn";
 
 const handleStartSsoLogin = () => {
   const redirectUri =
@@ -12,8 +18,57 @@ const handleStartSsoLogin = () => {
   window.location.assign(getSsoLoginUrl({ redirectUri }));
 };
 
-const PlaceholderBlock = ({ className = "" }: { className?: string }) => (
-  <div className={cn("bg-black", className)} />
+const FeatureRow = ({
+  description,
+  imageAlt,
+  imageSrc,
+  title,
+}: {
+  description: ReactNode;
+  imageAlt: string;
+  imageSrc: string;
+  title: ReactNode;
+}) => (
+  <article className="w-full rounded-xl bg-primary-50 px-6 py-8 md:px-10 xl:h-[406px] xl:px-[102px] xl:py-[37px]">
+    <div className="grid grid-cols-1 items-center gap-8 xl:h-full xl:grid-cols-[486px_minmax(0,1fr)] xl:gap-20">
+      <div className="h-[240px] overflow-hidden rounded-xl md:h-[300px] xl:h-[332px]">
+        <img
+          alt={imageAlt}
+          className="h-full w-full object-cover object-top"
+          src={imageSrc}
+        />
+      </div>
+      <div className="space-y-5 xl:max-w-[430px]">
+        <h2 className="text-head-02 text-text-primary">{title}</h2>
+        <p className="text-subtitle-01 text-text-tertiary">{description}</p>
+      </div>
+    </div>
+  </article>
+);
+
+const BoardPreviewCard = ({ imageAlt, imageSrc }: BoardPreviewCardProps) => (
+  <div className="h-[298px] overflow-hidden rounded-xl border-2 border-primary-200 bg-background-light">
+    <img
+      alt={imageAlt}
+      className="h-full w-full object-cover object-top"
+      src={imageSrc}
+    />
+  </div>
+);
+
+interface BoardPreviewCardProps {
+  imageAlt: string;
+  imageSrc: string;
+}
+
+const HeroLaptopPreview = () => (
+  <div className="h-auto w-full max-w-[900px] justify-self-end xl:translate-x-16">
+    <img
+      alt="Comit 노트북 미리보기"
+      className="h-full w-full object-contain xl:origin-right xl:scale-[1.2]"
+      src={landingHeroLaptopImage}
+    />
+  </div>
 );
 
 const LandingPage = () => {
@@ -62,7 +117,7 @@ const LandingPage = () => {
   }, []);
 
   return (
-    <main className="min-h-screen w-full bg-background-dark">
+    <main className="min-h-screen w-full overflow-x-hidden bg-background-dark">
       <div className="fixed inset-x-0 top-0 z-40">
         <div
           aria-label="랜딩 진행률"
@@ -80,104 +135,141 @@ const LandingPage = () => {
       </div>
 
       <div className="mx-auto w-full max-w-[1440px]">
-        <div className="px-[120px] pb-[160px] pt-[170px]">
-          <section className="flex flex-col items-center">
-            <div className="text-center">
-              <img
-                alt="Comit 로고"
-                className="mb-7 mx-auto h-[58px] w-auto object-contain"
-                src={logoImage}
+        <section className="flex min-h-screen items-center px-6 py-16 md:px-10 xl:px-[120px] 2xl:px-[170px]">
+          <div className="w-full">
+            <div className="grid grid-cols-1 items-center gap-10 xl:grid-cols-[560px_minmax(0,1fr)] xl:gap-4">
+              <div className="flex w-full justify-center xl:justify-start">
+                <div className="flex w-full max-w-[560px] flex-col items-center text-center">
+                  <img
+                    alt="Comit 로고"
+                    className="mx-auto h-[65.6px] w-[200px] object-contain"
+                    src={logoImage}
+                  />
+                  <h1 className="mt-7 text-center text-head-01 text-text-primary">
+                    <span className="whitespace-nowrap">
+                      경북대학교 컴퓨터학부만의 이야기,
+                    </span>
+                    <br />
+                    <span className="whitespace-nowrap">
+                      우리들의 소통 공간
+                    </span>
+                  </h1>
+                  <WritingButton
+                    className="mx-auto mt-10 h-[46px] w-[104px] rounded-xl px-6"
+                    fullWidth={false}
+                    icon={null}
+                    onClick={handleStartSsoLogin}
+                    variant="action"
+                  >
+                    시작하기
+                  </WritingButton>
+                </div>
+              </div>
+              <HeroLaptopPreview />
+            </div>
+          </div>
+        </section>
+
+        <div className="px-6 pb-24 pt-6 md:px-10 xl:px-[120px] xl:pb-[160px] xl:pt-10 2xl:px-[170px]">
+          <section className="mt-20 space-y-8 xl:mt-[120px] xl:space-y-20">
+            <FeatureRow
+              description={
+                <>
+                  <span className="whitespace-nowrap">
+                    시도위에서 학생들의 정보를 받아오기 때문에
+                  </span>
+                  <br />
+                  <span className="whitespace-nowrap">
+                    빠르게 시작해볼 수 있어요
+                  </span>
+                </>
+              }
+              imageAlt="학교 계정 연동 안내 화면"
+              imageSrc={section2CardBImage}
+              title={
+                <>
+                  <span className="whitespace-nowrap">학교 계정만 있다면</span>
+                  <br />
+                  <span className="whitespace-nowrap">
+                    별도의 회원가입 절차 없이 사용할 수 있어요
+                  </span>
+                </>
+              }
+            />
+            <FeatureRow
+              description={
+                <>
+                  <span className="whitespace-nowrap">
+                    외부인은 기능이 제한되기 때문에
+                  </span>
+                  <br />
+                  <span className="whitespace-nowrap">
+                    우리끼리 신뢰도 있는 이야기를 주고받을 수 있어요
+                  </span>
+                </>
+              }
+              imageAlt="컴퓨터학부 인증 안내 화면"
+              imageSrc={section2CardAImage}
+              title={
+                <>
+                  <span className="whitespace-nowrap">
+                    경북대학교 컴퓨터학부 학생들끼리
+                  </span>
+                  <br />
+                  <span className="whitespace-nowrap">
+                    신뢰도 있는 정보를 주고 받을 수 있어요
+                  </span>
+                </>
+              }
+            />
+          </section>
+
+          <section className="relative mt-20 rounded-xl bg-primary-50 px-6 py-10 md:px-10 xl:mt-[134px] xl:px-[102px] xl:py-[92px]">
+            <p className="text-head-01 text-text-primary">
+              <span className="whitespace-nowrap">다양한 게시판을 통해</span>
+              <br />
+              <span className="whitespace-nowrap">즐겁게 소통할 수 있어요</span>
+            </p>
+
+            <div className="mt-8 grid grid-cols-1 gap-6 xl:grid-cols-2">
+              <BoardPreviewCard
+                imageAlt="정보게시판 미리보기"
+                imageSrc={section3Card1Image}
               />
-              <h1 className="mt-2 text-center text-head-01 text-text-primary">
-                경북대학교 컴퓨터학부만의 이야기,
-                <br />
-                우리들의 소통 공간
-              </h1>
+              <BoardPreviewCard
+                imageAlt="Q&A 게시판 미리보기"
+                imageSrc={section3Card2Image}
+              />
+              <BoardPreviewCard
+                imageAlt="자유게시판 미리보기"
+                imageSrc={section3Card3Image}
+              />
+              <BoardPreviewCard
+                imageAlt="이벤트 게시판 미리보기"
+                imageSrc={section3Card4Image}
+              />
             </div>
 
+            <img
+              alt="Comit 마스코트"
+              className="pointer-events-none absolute right-6 bottom-4 h-[220px] w-[160px] object-contain md:right-8 md:bottom-6 md:h-[260px] md:w-[190px] xl:right-[5px] xl:bottom-[-20px] xl:h-[310px] xl:w-[222px]"
+              src={mascotImage}
+            />
+          </section>
+
+          <section className="mt-28 flex flex-col items-center gap-6 xl:mt-[220px]">
+            <p className="text-center text-[40px] leading-[1.2] font-bold text-text-primary">
+              지금 시작해 볼까요?
+            </p>
             <WritingButton
-              className="mt-10 h-[46px] rounded-xl px-6"
+              className="h-[46px] min-w-[274px] rounded-xl px-6"
               fullWidth={false}
               icon={null}
               onClick={handleStartSsoLogin}
               variant="action"
             >
-              시작하기
+              지금 바로 Comit의 세계로 빠져들기
             </WritingButton>
-
-            <PlaceholderBlock className="mt-[83px] h-[465px] w-[792px]" />
-          </section>
-
-          <section className="mt-[159px] space-y-[120px]">
-            <div className="grid grid-cols-[588px_1fr] items-center gap-6">
-              <PlaceholderBlock className="h-[332px] w-[588px]" />
-              <div className="space-y-6">
-                <p className="text-head-03 text-text-primary">
-                  경북대학교 컴퓨터학부 학생들끼리
-                  <br />
-                  신뢰도 있는 정보를 주고 받을 수 있어요
-                </p>
-                <p className="text-subtitle-01 text-text-secondary">
-                  외부인은 기능이 제한되기 때문에
-                  <br />
-                  우리끼리 신뢰도 있는 이야기를 주고받을 수 있어요
-                </p>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-[588px_1fr] items-center gap-6">
-              <PlaceholderBlock className="h-[332px] w-[588px]" />
-              <div className="space-y-6">
-                <p className="text-head-03 text-text-primary">
-                  학교 계정만 있다면
-                  <br />
-                  별도의 회원가입 절차 없이 사용할 수 있어요
-                </p>
-                <p className="text-subtitle-01 text-text-secondary">
-                  시도위에서 학생들의 정보를 받아오기 때문에
-                  <br />
-                  빠르게 시작해볼 수 있어요
-                </p>
-              </div>
-            </div>
-          </section>
-
-          <section className="mt-[134px]">
-            <p className="text-head-03 text-text-primary">
-              다양한 게시판을 통해
-              <br />
-              즐겁게 소통할 수 있어요
-            </p>
-
-            <div className="mt-7 grid grid-cols-2 gap-6">
-              <PlaceholderBlock className="h-[298px] w-[486px]" />
-              <PlaceholderBlock className="h-[298px] w-[486px]" />
-              <PlaceholderBlock className="h-[298px] w-[486px]" />
-              <PlaceholderBlock className="h-[298px] w-[486px]" />
-            </div>
-          </section>
-
-          <section className="mt-[340px] flex items-end justify-center gap-6">
-            <div className="flex flex-col items-center gap-6">
-              <p className="text-center text-head-01 text-text-primary">
-                지금 시작해 볼까요?
-              </p>
-              <WritingButton
-                className="h-[46px] min-w-[274px] rounded-xl px-6"
-                fullWidth={false}
-                icon={null}
-                onClick={handleStartSsoLogin}
-                variant="action"
-              >
-                지금 바로 Comit의 세계로 빠져들기
-              </WritingButton>
-            </div>
-
-            <img
-              alt="Comit 마스코트"
-              className="h-[221px] w-[158px] object-contain translate-y-12"
-              src={mascotImage}
-            />
           </section>
         </div>
       </div>
