@@ -87,9 +87,11 @@ const HeroLaptopPreview = () => (
 const LandingPage = () => {
   const [scrollProgress, setScrollProgress] = useState(0);
   const [isFeatureSectionVisible, setIsFeatureSectionVisible] = useState(false);
+  const [isBoardSectionVisible, setIsBoardSectionVisible] = useState(false);
   const [isFinalCtaVisible, setIsFinalCtaVisible] = useState(false);
 
   const featureSectionRef = useRef<HTMLElement | null>(null);
+  const boardSectionRef = useRef<HTMLElement | null>(null);
   const finalCtaRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
@@ -145,6 +147,13 @@ const LandingPage = () => {
             setIsFeatureSectionVisible(true);
           }
 
+          if (
+            entry.target === boardSectionRef.current &&
+            entry.isIntersecting
+          ) {
+            setIsBoardSectionVisible(true);
+          }
+
           if (entry.target === finalCtaRef.current && entry.isIntersecting) {
             setIsFinalCtaVisible(true);
           }
@@ -155,6 +164,10 @@ const LandingPage = () => {
 
     if (featureSectionRef.current) {
       observer.observe(featureSectionRef.current);
+    }
+
+    if (boardSectionRef.current) {
+      observer.observe(boardSectionRef.current);
     }
 
     if (finalCtaRef.current) {
@@ -279,35 +292,71 @@ const LandingPage = () => {
             />
           </section>
 
-          <section className="relative mt-20 rounded-xl bg-primary-50 px-6 py-10 md:px-10 xl:mt-[134px] xl:px-[102px] xl:py-[92px]">
-            <p className="text-head-01 text-text-primary">
+          <section
+            className={`relative mt-20 rounded-xl bg-primary-50 px-6 py-10 transition-all duration-700 ease-out md:px-10 xl:mt-[134px] xl:px-[102px] xl:py-[92px] ${
+              isBoardSectionVisible
+                ? "translate-y-0 opacity-100"
+                : "translate-y-12 opacity-0"
+            }`}
+            ref={boardSectionRef}
+          >
+            <p
+              className={`text-head-01 text-text-primary transition-all duration-700 ${
+                isBoardSectionVisible
+                  ? "translate-y-0 opacity-100"
+                  : "translate-y-6 opacity-0"
+              }`}
+            >
               <span className="whitespace-nowrap">다양한 게시판을 통해</span>
               <br />
               <span className="whitespace-nowrap">즐겁게 소통할 수 있어요</span>
             </p>
 
             <div className="mt-8 grid grid-cols-1 gap-6 xl:grid-cols-2">
-              <BoardPreviewCard
-                imageAlt="정보게시판 미리보기"
-                imageSrc={section3Card1Image}
-              />
-              <BoardPreviewCard
-                imageAlt="Q&A 게시판 미리보기"
-                imageSrc={section3Card2Image}
-              />
-              <BoardPreviewCard
-                imageAlt="자유게시판 미리보기"
-                imageSrc={section3Card3Image}
-              />
-              <BoardPreviewCard
-                imageAlt="이벤트 게시판 미리보기"
-                imageSrc={section3Card4Image}
-              />
+              {[
+                {
+                  imageAlt: "정보게시판 미리보기",
+                  imageSrc: section3Card1Image,
+                },
+                {
+                  imageAlt: "Q&A 게시판 미리보기",
+                  imageSrc: section3Card2Image,
+                },
+                {
+                  imageAlt: "자유게시판 미리보기",
+                  imageSrc: section3Card3Image,
+                },
+                {
+                  imageAlt: "이벤트 게시판 미리보기",
+                  imageSrc: section3Card4Image,
+                },
+              ].map((card, index) => (
+                <div
+                  key={card.imageAlt}
+                  className={`transition-all duration-700 ease-out ${
+                    isBoardSectionVisible
+                      ? "translate-x-0 opacity-100"
+                      : index % 2 === 0
+                        ? "-translate-x-10 opacity-0"
+                        : "translate-x-10 opacity-0"
+                  }`}
+                  style={{ transitionDelay: `${index * 120}ms` }}
+                >
+                  <BoardPreviewCard
+                    imageAlt={card.imageAlt}
+                    imageSrc={card.imageSrc}
+                  />
+                </div>
+              ))}
             </div>
 
             <img
               alt="Comit 마스코트"
-              className="pointer-events-none absolute right-6 bottom-4 h-[220px] w-[160px] object-contain md:right-8 md:bottom-6 md:h-[260px] md:w-[190px] xl:right-[5px] xl:bottom-[-20px] xl:h-[310px] xl:w-[222px]"
+              className={`pointer-events-none absolute right-6 bottom-4 h-[220px] w-[160px] object-contain transition-all duration-700 ease-out md:right-8 md:bottom-6 md:h-[260px] md:w-[190px] xl:right-[5px] xl:bottom-[-20px] xl:h-[310px] xl:w-[222px] ${
+                isBoardSectionVisible
+                  ? "translate-y-0 opacity-100"
+                  : "translate-y-8 opacity-0"
+              }`}
               src={mascotImage}
             />
           </section>
