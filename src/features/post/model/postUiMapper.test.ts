@@ -133,6 +133,7 @@ describe("Post Mappers", () => {
       title: "정보글",
       content: "본문 내용",
       user: "작성자",
+      userImage: undefined,
       heart: 50,
       likedByMe: true,
       comment: 0,
