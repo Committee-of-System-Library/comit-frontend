@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 
 import landingHeroLaptopImage from "@/assets/landing/Device - Macbook Pro.svg";
 import section2CardAImage from "@/assets/landing/section2-card-a.png";
@@ -20,16 +20,28 @@ const handleStartSsoLogin = () => {
 
 const FeatureRow = ({
   description,
+  direction = "left",
   imageAlt,
   imageSrc,
+  isVisible = false,
   title,
 }: {
   description: ReactNode;
+  direction?: "left" | "right";
   imageAlt: string;
   imageSrc: string;
+  isVisible?: boolean;
   title: ReactNode;
 }) => (
-  <article className="w-full rounded-xl bg-primary-50 px-6 py-8 md:px-10 xl:h-[406px] xl:px-[102px] xl:py-[37px]">
+  <article
+    className={`w-full rounded-xl bg-primary-50 px-6 py-8 transition-all duration-700 ease-out md:px-10 xl:h-[406px] xl:px-[102px] xl:py-[37px] ${
+      isVisible
+        ? "translate-x-0 opacity-100"
+        : direction === "left"
+          ? "-translate-x-16 opacity-0"
+          : "translate-x-16 opacity-0"
+    }`}
+  >
     <div className="grid grid-cols-1 items-center gap-8 xl:h-full xl:grid-cols-[486px_minmax(0,1fr)] xl:gap-20">
       <div className="h-[240px] overflow-hidden rounded-xl md:h-[300px] xl:h-[332px]">
         <img
@@ -62,17 +74,23 @@ interface BoardPreviewCardProps {
 }
 
 const HeroLaptopPreview = () => (
-  <div className="h-auto w-full max-w-[900px] justify-self-end xl:translate-x-16">
+  <div className="h-auto w-full max-w-[900px] justify-self-end xl:translate-x-16 xl:translate-y-6">
     <img
       alt="Comit 노트북 미리보기"
-      className="h-full w-full object-contain xl:origin-right xl:scale-[1.2]"
+      className="h-full w-full object-contain xl:origin-right"
       src={landingHeroLaptopImage}
+      style={{ animation: "landing-float 2.7s ease-in-out infinite" }}
     />
   </div>
 );
 
 const LandingPage = () => {
   const [scrollProgress, setScrollProgress] = useState(0);
+  const [isFeatureSectionVisible, setIsFeatureSectionVisible] = useState(false);
+  const [isFinalCtaVisible, setIsFinalCtaVisible] = useState(false);
+
+  const featureSectionRef = useRef<HTMLElement | null>(null);
+  const finalCtaRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     const updateScrollProgress = () => {
@@ -114,6 +132,36 @@ const LandingPage = () => {
       window.removeEventListener("scroll", handleScroll);
       window.removeEventListener("resize", updateScrollProgress);
     };
+  }, []);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (
+            entry.target === featureSectionRef.current &&
+            entry.isIntersecting
+          ) {
+            setIsFeatureSectionVisible(true);
+          }
+
+          if (entry.target === finalCtaRef.current && entry.isIntersecting) {
+            setIsFinalCtaVisible(true);
+          }
+        });
+      },
+      { root: null, threshold: 0.25 },
+    );
+
+    if (featureSectionRef.current) {
+      observer.observe(featureSectionRef.current);
+    }
+
+    if (finalCtaRef.current) {
+      observer.observe(finalCtaRef.current);
+    }
+
+    return () => observer.disconnect();
   }, []);
 
   return (
@@ -171,7 +219,10 @@ const LandingPage = () => {
         </section>
 
         <div className="px-6 pb-24 pt-6 md:px-10 xl:px-[120px] xl:pb-[160px] xl:pt-10 2xl:px-[170px]">
-          <section className="mt-20 space-y-8 xl:mt-[120px] xl:space-y-20">
+          <section
+            className="mt-20 space-y-8 xl:mt-[120px] xl:space-y-20"
+            ref={featureSectionRef}
+          >
             <FeatureRow
               description={
                 <>
@@ -184,8 +235,10 @@ const LandingPage = () => {
                   </span>
                 </>
               }
+              direction="left"
               imageAlt="학교 계정 연동 안내 화면"
               imageSrc={section2CardBImage}
+              isVisible={isFeatureSectionVisible}
               title={
                 <>
                   <span className="whitespace-nowrap">학교 계정만 있다면</span>
@@ -208,8 +261,10 @@ const LandingPage = () => {
                   </span>
                 </>
               }
+              direction="right"
               imageAlt="컴퓨터학부 인증 안내 화면"
               imageSrc={section2CardAImage}
+              isVisible={isFeatureSectionVisible}
               title={
                 <>
                   <span className="whitespace-nowrap">
@@ -257,7 +312,14 @@ const LandingPage = () => {
             />
           </section>
 
-          <section className="mt-28 flex flex-col items-center gap-6 xl:mt-[220px]">
+          <section
+            className={`mt-28 flex flex-col items-center gap-6 transition-all duration-700 ease-out xl:mt-[220px] ${
+              isFinalCtaVisible
+                ? "translate-y-0 opacity-100"
+                : "translate-y-10 opacity-0"
+            }`}
+            ref={finalCtaRef}
+          >
             <p className="text-center text-[40px] leading-[1.2] font-bold text-text-primary">
               지금 시작해 볼까요?
             </p>

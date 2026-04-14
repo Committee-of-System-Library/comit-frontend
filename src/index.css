@@ -143,3 +143,13 @@
   --color-border-default: var(--color-gray-300);
   --color-border-deactivated: var(--color-gray-200);
 }
+
+@keyframes landing-float {
+  0%,
+  100% {
+    transform: translateY(0px) scale(1.2);
+  }
+  50% {
+    transform: translateY(-16px) scale(1.2);
+  }
+}
