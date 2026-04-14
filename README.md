@@ -1,73 +1,88 @@
-# React + TypeScript + Vite
+# COMIT - 경북대학교 컴퓨터학부만의 이야기, 우리들의 소통 공간
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+<p align="center">
+  <img width="1441" height="684" alt="image" src="https://github.com/user-attachments/assets/685bbe05-0766-4716-935a-713270a5f8c3" />
+</p>
 
-Currently, two official plugins are available:
+> **"컴퓨터학부생임이 인증된 사람이 썼다"는 사실 하나로 정보에 컨텍스트와 신뢰를 부여하고, 이를 축적한다!**
+> 
+> 경북대학교 컴퓨터학부 1400명을 위한 인증 기반 커뮤니티 플랫폼
+<br />
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## 🔗 프로젝트 링크
+- **배포 주소**: [[(https://chcse.knu.ac.kr/)](https://chcse.knu.ac.kr/)]
 
-## React Compiler
+---
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 📑 목차
+1. [프로젝트 소개](#-프로젝트-소개)
+2. [주요 기능](#-주요-기능)
+3. [기술 스택](#-기술-스택)
+4. [시스템 아키텍처](#-시스템-아키텍처)
+5. [기술적 도전 및 해결](#-기술적-도전-및-해결)
+6. [팀원 소개](#-팀원-소개)
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## 📝 프로젝트 소개
+### 왜 이름이 Comit인가
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+세 가지 단어가 하나로 겹친다.
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+**Come + IT**
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+IT를 향해 들어오다.
+컴학생들이 모이는 공간.
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+**Commit**
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+git commit처럼,
+커뮤니티에 기여하고 흔적을 남기다.
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+**Com(puter Science) + it**
+
+컴학, 그 자체.
+
+<aside>
+💡
+
+어떤 의미로 읽어도 **"컴학생들이 기여하며 쌓아가는 커뮤니티"** 가 된다.
+
+</aside>
+
+- **개발 기간**: 2026.03.08 ~ 2025.04.15
+
+---
+
+## ✨ 주요 기능
+
+### 1️⃣ 학교 계정만 있다면 별도의 회원가입 절차 없이 사용할 수 있어요
+- **시스템도서위원회**에서 학생들의 정보를 받아오기 때문에 별도 가입 절차 없이 빠르게 시작해볼 수 있어요
+
+### 2️⃣ 경북대학교 컴퓨터학부 학생들끼리 신뢰도 있는 정보를 주고 받을 수 있어요
+- 외부인은 기능이 제한되기 때문에 **우리끼리 신뢰도 있는 이야기**를 주고받을 수 있어요
+
+### 3️⃣ 다양한 게시판을 통해 즐겁게 소통할 수 있어요
+- **자유 게시판**: 자유로운 주제로 소통해요
+- **QnA 게시판**: 궁금한 게 있다면 자유롭게 질문하고, 답변해요
+- **정보 게시판**: 유용한 정보들을 공유해요
+- **공지사항/이벤트 게시판**: 서비스의 공지사항/이벤트를 한 눈에 확인할 수 있어요
+
+---
+
+## 🛠 기술 스택
+
+### Frontend
+- **Framework**: 
+- **Language**: TypeScript
+- **State Management**: 
+- **Styling**: 
+- **Communication**:
+- 
+## 🏗 시스템 아키텍처
+
+## 🚀 기술적 도전 및 해결
+
+
+
+## 👥 팀원 소개
