@@ -1,7 +1,13 @@
-import { useState } from "react";
+import { useEffect, useRef, useState, type ChangeEvent } from "react";
 
 import { createPortal } from "react-dom";
 
+import toast from "react-hot-toast";
+
+import {
+  uploadImagesWithPresignedUrl,
+  validateImageFiles,
+} from "@/features/image/model/imageUpload";
 import { BoardSelectField } from "@/shared/ui/BoardSelectField/BoardSelectField";
 import { Button } from "@/shared/ui/button/Button";
 import { WriteTextareaField } from "@/shared/ui/WriteTextareaField/WriteTextareaField";
@@ -19,7 +25,7 @@ interface AdminPostEditorModalProps {
   isSubmitting?: boolean;
   mode: "create" | "edit";
   onClose: () => void;
-  onSubmit: (payload: AdminPostPayload) => void;
+  onSubmit: (payload: AdminPostPayload) => Promise<void>;
   open: boolean;
 }
 
@@ -50,31 +56,42 @@ export const AdminPostEditorModal = ({
   open,
 }: AdminPostEditorModalProps) => {
   const portalRoot = document.getElementById("modal-portal");
-  const initialValue =
-    mode === "edit" && detail
-      ? {
-          boardType: detail.boardType,
-          content: detail.content,
-          imageUrlsInput: detail.imageUrls.join("\n"),
-          tagsInput: joinList(detail.tags),
-          title: detail.title,
-        }
-      : {
-          boardType: DEFAULT_BOARD_TYPE,
-          content: "",
-          imageUrlsInput: "",
-          tagsInput: "",
-          title: "",
-        };
-  const [boardType, setBoardType] = useState<AdminEditableBoardType>(
-    initialValue.boardType,
-  );
-  const [title, setTitle] = useState(initialValue.title);
-  const [content, setContent] = useState(initialValue.content);
-  const [tagsInput, setTagsInput] = useState(initialValue.tagsInput);
-  const [imageUrlsInput, setImageUrlsInput] = useState(
-    initialValue.imageUrlsInput,
-  );
+  const [boardType, setBoardType] =
+    useState<AdminEditableBoardType>(DEFAULT_BOARD_TYPE);
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+  const [tagsInput, setTagsInput] = useState("");
+  const [imageUrlsInput, setImageUrlsInput] = useState("");
+  const [attachedImageFiles, setAttachedImageFiles] = useState<File[]>([]);
+  const [isUploadingImages, setIsUploadingImages] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
+
+    if (mode === "edit") {
+      if (!detail) {
+        return;
+      }
+
+      setBoardType(detail.boardType);
+      setTitle(detail.title);
+      setContent(detail.content);
+      setTagsInput(joinList(detail.tags));
+      setImageUrlsInput(detail.imageUrls.join("\n"));
+    } else {
+      setBoardType(DEFAULT_BOARD_TYPE);
+      setTitle("");
+      setContent("");
+      setTagsInput("");
+      setImageUrlsInput("");
+    }
+
+    setAttachedImageFiles([]);
+    setIsUploadingImages(false);
+  }, [detail, mode, open]);
 
   if (!portalRoot || !open) {
     return null;
@@ -82,10 +99,84 @@ export const AdminPostEditorModal = ({
 
   const canSubmit = title.trim().length > 0 && content.trim().length > 0;
 
+  const handleClickAttachImage = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleImageFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(event.target.files ?? []);
+    if (files.length === 0) {
+      return;
+    }
+
+    const errorMessage = validateImageFiles(files);
+    if (errorMessage) {
+      toast.error(errorMessage);
+      event.target.value = "";
+      return;
+    }
+
+    setAttachedImageFiles((prev) => {
+      const keyOf = (file: File) =>
+        `${file.name}-${file.size}-${file.lastModified}`;
+      const existingKeys = new Set(prev.map(keyOf));
+      const dedupedNewFiles = files.filter(
+        (file) => !existingKeys.has(keyOf(file)),
+      );
+      return [...prev, ...dedupedNewFiles];
+    });
+    event.target.value = "";
+  };
+
+  const handleRemoveAttachedImage = (index: number) => {
+    setAttachedImageFiles((prev) =>
+      prev.filter((_, fileIndex) => fileIndex !== index),
+    );
+  };
+
+  const handleSubmit = async () => {
+    if (!canSubmit || isSubmitting || isUploadingImages) {
+      return;
+    }
+
+    setIsUploadingImages(true);
+    let uploadedImageUrls: string[] = [];
+    try {
+      uploadedImageUrls =
+        attachedImageFiles.length > 0
+          ? await uploadImagesWithPresignedUrl(attachedImageFiles, "posts")
+          : [];
+    } catch (error) {
+      if (error instanceof Error && error.message.includes("이미지 업로드")) {
+        toast.error(
+          "이미지 업로드에 실패했습니다. 잠시 후 다시 시도해 주세요.",
+        );
+      }
+      setIsUploadingImages(false);
+      return;
+    }
+
+    const imageUrls = Array.from(
+      new Set([...parseList(imageUrlsInput), ...uploadedImageUrls]),
+    );
+
+    try {
+      await onSubmit({
+        boardType,
+        content: content.trim(),
+        imageUrls,
+        tags: parseList(tagsInput),
+        title: title.trim(),
+      });
+    } finally {
+      setIsUploadingImages(false);
+    }
+  };
+
   return createPortal(
-    <div className="fixed inset-0 z-9999 flex items-center justify-center bg-black/50 p-4">
-      <section className="w-full max-w-[720px] rounded-[28px] bg-white p-6 shadow-2xl">
-        <div className="flex items-start justify-between gap-4">
+    <div className="fixed inset-0 z-9999 flex items-start justify-center overflow-y-auto bg-black/50 p-4 py-6 sm:items-center">
+      <section className="flex max-h-[calc(100dvh-3rem)] w-full max-w-[720px] flex-col overflow-hidden rounded-[28px] bg-white p-6 shadow-2xl">
+        <div className="flex shrink-0 items-start justify-between gap-4">
           <div>
             <h2 className="text-subtitle-01 text-text-primary">
               {mode === "create" ? "관리자 게시글 등록" : "관리자 게시글 수정"}
@@ -109,75 +200,117 @@ export const AdminPostEditorModal = ({
             {errorMessage}
           </div>
         ) : (
-          <div className="mt-8 space-y-5">
-            <BoardSelectField
-              label="게시판"
-              onChange={(value) =>
-                setBoardType(value as AdminEditableBoardType)
-              }
-              options={BOARD_OPTIONS}
-              value={boardType}
-            />
+          <div className="mt-8 flex min-h-0 flex-1 flex-col">
+            <div className="min-h-0 flex-1 space-y-5 overflow-y-auto pr-1">
+              <BoardSelectField
+                label="게시판"
+                onChange={(value) =>
+                  setBoardType(value as AdminEditableBoardType)
+                }
+                options={BOARD_OPTIONS}
+                value={boardType}
+              />
 
-            <WriteTextInput
-              label="제목"
-              maxLength={100}
-              onChange={(event) => setTitle(event.target.value)}
-              placeholder="게시글 제목을 입력해 주세요"
-              showCount
-              value={title}
-            />
+              <WriteTextInput
+                label="제목"
+                maxLength={100}
+                onChange={(event) => setTitle(event.target.value)}
+                placeholder="게시글 제목을 입력해 주세요"
+                showCount
+                value={title}
+              />
 
-            <WriteTextareaField
-              label="내용"
-              maxLength={5000}
-              onChange={(event) => setContent(event.target.value)}
-              placeholder="게시글 본문을 입력해 주세요"
-              rows={10}
-              value={content}
-            />
+              <WriteTextareaField
+                label="내용"
+                maxLength={500}
+                onChange={(event) => setContent(event.target.value)}
+                placeholder="게시글 본문을 입력해 주세요"
+                rows={8}
+                value={content}
+              />
 
-            <WriteTextInput
-              helperText="쉼표(,) 또는 줄바꿈으로 여러 태그를 입력할 수 있습니다."
-              label="태그"
-              onChange={(event) => setTagsInput(event.target.value)}
-              placeholder="예: 세미나, 공지"
-              value={tagsInput}
-            />
+              <WriteTextInput
+                helperText="쉼표(,) 또는 줄바꿈으로 여러 태그를 입력할 수 있습니다."
+                label="태그"
+                onChange={(event) => setTagsInput(event.target.value)}
+                placeholder="예: 세미나, 공지"
+                value={tagsInput}
+              />
 
-            <WriteTextareaField
-              helperText="이미지 URL이 있다면 한 줄에 하나씩 입력해 주세요."
-              label="이미지 URL"
-              onChange={(event) => setImageUrlsInput(event.target.value)}
-              placeholder="https://..."
-              rows={4}
-              showCount={false}
-              value={imageUrlsInput}
-            />
+              <WriteTextareaField
+                helperText="이미지 URL이 있다면 한 줄에 하나씩 입력하거나, 아래 이미지 첨부 버튼으로 업로드할 수 있습니다."
+                label="이미지 URL"
+                onChange={(event) => setImageUrlsInput(event.target.value)}
+                placeholder="https://..."
+                rows={3}
+                showCount={false}
+                value={imageUrlsInput}
+              />
 
-            <div className="flex justify-end gap-2">
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <Button
+                    disabled={isSubmitting || isUploadingImages}
+                    onClick={handleClickAttachImage}
+                    variant="secondary"
+                  >
+                    이미지 첨부
+                  </Button>
+                  <span className="text-caption-01 text-text-secondary">
+                    {attachedImageFiles.length}개 선택됨
+                  </span>
+                </div>
+                <input
+                  ref={fileInputRef}
+                  accept="image/png,image/jpeg,image/jpg,image/webp,image/gif"
+                  className="hidden"
+                  multiple
+                  onChange={handleImageFileChange}
+                  type="file"
+                />
+                {attachedImageFiles.length > 0 ? (
+                  <ul className="rounded-xl border border-border-deactivated bg-background-dark p-3">
+                    {attachedImageFiles.map((file, index) => (
+                      <li
+                        key={`${file.name}-${file.size}-${file.lastModified}`}
+                        className="flex items-center justify-between py-1"
+                      >
+                        <span className="truncate text-caption-01 text-text-primary">
+                          {file.name}
+                        </span>
+                        <button
+                          className="ml-3 text-caption-02 text-error-02 hover:opacity-80"
+                          onClick={() => handleRemoveAttachedImage(index)}
+                          type="button"
+                        >
+                          제거
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                ) : null}
+              </div>
+            </div>
+
+            <div className="mt-5 flex shrink-0 justify-end gap-2 border-t border-border-deactivated pt-4">
               <Button onClick={onClose} variant="secondary">
                 취소
               </Button>
               <Button
-                disabled={!canSubmit || isSubmitting}
-                onClick={() =>
-                  onSubmit({
-                    boardType,
-                    content: content.trim(),
-                    imageUrls: parseList(imageUrlsInput),
-                    tags: parseList(tagsInput),
-                    title: title.trim(),
-                  })
-                }
+                disabled={!canSubmit || isSubmitting || isUploadingImages}
+                onClick={() => {
+                  void handleSubmit();
+                }}
               >
-                {isSubmitting
-                  ? mode === "create"
-                    ? "등록 중..."
-                    : "수정 중..."
-                  : mode === "create"
-                    ? "등록"
-                    : "수정"}
+                {isUploadingImages
+                  ? "이미지 업로드 중..."
+                  : isSubmitting
+                    ? mode === "create"
+                      ? "등록 중..."
+                      : "수정 중..."
+                    : mode === "create"
+                      ? "등록"
+                      : "수정"}
               </Button>
             </div>
           </div>

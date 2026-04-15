@@ -6,6 +6,7 @@ export interface MyProfile {
   profileImageUrl: string | null;
   major?: string | null;
   majorTrack?: string | null;
+  role: "ADMIN" | "STUDENT";
 }
 
 export interface UpdateProfileRequest {

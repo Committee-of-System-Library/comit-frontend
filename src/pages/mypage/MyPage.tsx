@@ -2,11 +2,13 @@ import { FileText, Heart, MessageCircleMore } from "lucide-react";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 
+import { checkNicknameDuplicate } from "@/entities/member/api/checkNicknameDuplicate";
 import { useLogoutMutation } from "@/features/auth/model/useLogoutMutation";
 import { useMyActivityQuery } from "@/features/member/model/useMyActivityQuery";
 import { useMyProfileQuery } from "@/features/member/model/useMyProfileQuery";
 import { useUpdateProfileMutation } from "@/features/member/model/useUpdateProfileMutation";
 import { useUpdateStudentNumberVisibilityMutation } from "@/features/member/model/useUpdateStudentNumberVisibilityMutation";
+import { isApiHttpError } from "@/shared/api/http-error";
 import { LogoutButton } from "@/shared/ui/LogoutButton/LogoutButton";
 import { StudentNumberVisibilityToggle } from "@/shared/ui/StudentNumberVisibilityToggle/StudentNumberVisibilityToggle";
 import { formatTimeAgo } from "@/utils/formatTime";
@@ -33,12 +35,36 @@ const MyPage = () => {
     userName: string;
     imageFile: File | null;
   }): Promise<void> => {
+    const trimmedUserName = userName.trim();
+
+    if (!trimmedUserName) {
+      toast.error("닉네임을 입력해 주세요.");
+      throw new Error("EMPTY_NICKNAME");
+    }
+
     try {
-      await updateProfile({ nickname: userName, imageFile });
+      const currentNickname = (profile?.nickname ?? "").trim();
+
+      if (trimmedUserName !== currentNickname) {
+        await checkNicknameDuplicate({ value: trimmedUserName });
+      }
+
+      await updateProfile({ nickname: trimmedUserName, imageFile });
       toast.success("프로필이 저장되었습니다.");
-    } catch {
+    } catch (error) {
+      if (isApiHttpError(error)) {
+        if (error.code === "DUPLICATE_NICKNAME" || error.status === 409) {
+          toast.error("이미 사용 중인 닉네임입니다.");
+          throw new Error("DUPLICATE_NICKNAME");
+        }
+      }
+
+      if (error instanceof Error && error.message === "EMPTY_NICKNAME") {
+        throw error;
+      }
+
       toast.error("프로필 저장에 실패했습니다. 다시 시도해 주세요.");
-      throw new Error();
+      throw new Error("PROFILE_SAVE_FAILED");
     }
   };
 

@@ -8,7 +8,7 @@ const HomePage = () => {
   const navigate = useNavigate();
   const { data: qnaData } = usePostListQuery({
     boardType: "QNA",
-    size: 5,
+    size: 3,
   });
   const { data: infoData } = usePostListQuery({
     boardType: "INFO",
@@ -16,7 +16,7 @@ const HomePage = () => {
   });
   const { data: freeData } = usePostListQuery({
     boardType: "FREE",
-    size: 3,
+    size: 5,
   });
 
   const qnaPosts = (qnaData?.posts ?? []).map(
@@ -32,10 +32,10 @@ const HomePage = () => {
   return (
     <div className="flex flex-col gap-9 w-full">
       <SectionBoard
-        title="Q&A"
-        posts={qnaPosts}
+        title="자유게시판"
+        posts={freePosts}
         onPostClick={(post) => navigate(`/post/${post.postId}`)}
-        onViewAll={() => navigate("/board/qna")}
+        onViewAll={() => navigate("/board/free")}
       />
 
       <div className="flex gap-6 w-full">
@@ -49,10 +49,10 @@ const HomePage = () => {
         </div>
         <div className="flex-1 min-w-0">
           <SectionBoard
-            title="자유게시판"
-            posts={freePosts}
+            title="Q&A"
+            posts={qnaPosts}
             onPostClick={(post) => navigate(`/post/${post.postId}`)}
-            onViewAll={() => navigate("/board/free")}
+            onViewAll={() => navigate("/board/qna")}
           />
         </div>
       </div>

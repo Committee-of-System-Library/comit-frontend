@@ -32,6 +32,8 @@ jobs:
           docker build \
             --build-arg VITE_API_BASE_URL=https://chcse.knu.ac.kr/comit-staging/api \
             --build-arg VITE_APP_BASE_URL=https://chcse.knu.ac.kr \
+            --build-arg VITE_POSTHOG_KEY=${{ secrets.VITE_POSTHOG_KEY }} \
+            --build-arg VITE_POSTHOG_HOST=https://us.i.posthog.com \
             -t $REGISTRY/$ORG/$IMAGE_NAME:latest \
             -t $REGISTRY/$ORG/$IMAGE_NAME:$(date +%Y%m%d%H%M%S) \
             .

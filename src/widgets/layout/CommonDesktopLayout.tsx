@@ -40,7 +40,7 @@ export const CommonDesktopLayout = ({
       <Header {...headerProps} />
       <main
         className={cn(
-          "mx-auto flex w-full max-w-[1920px] flex-1 flex-col items-center px-4 py-6 min-[1200px]:px-6",
+          "mx-auto flex w-full max-w-[1920px] flex-1 flex-col items-center px-4 py-6 pb-20 min-[1200px]:px-6",
           contentClassName,
         )}
       >

@@ -44,7 +44,6 @@ const mocks = vi.hoisted(() => ({
         id: 3,
         time: "방금",
         title: "인기글 제목",
-        views: 10,
       },
     ],
   })),

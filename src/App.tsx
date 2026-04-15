@@ -33,9 +33,11 @@ import LandingPage from "@/pages/landing/LandingPage";
 import MyActivityPage from "@/pages/mypage/MyActivityPage";
 import MyPage from "@/pages/mypage/MyPage";
 import PostPage from "@/pages/PostPage";
+import SearchResultPage from "@/pages/search/SearchResultPage";
 import WritePage from "@/pages/write/WritePage";
 import { isApiHttpError } from "@/shared/api/http-error";
 import { queryKeys } from "@/shared/api/query-keys";
+import { AdminRoute } from "@/shared/ui/AdminRoute/AdminRoute";
 import { Banner } from "@/widgets/home/Banner/Banner";
 import { DefaultRightRail } from "@/widgets/layout/DefaultRightRail";
 import { SignupGuideModal } from "@/widgets/signup/SignupGuideModal";
@@ -253,6 +255,7 @@ const AppContent = ({
           <Route element={<PostPage />} path="/post/:postId" />
           <Route element={<MyPage />} path="/mypage" />
           <Route element={<MyActivityPage />} path="/mypage/activity" />
+          <Route element={<SearchResultPage />} path="/search" />
           <Route
             element={<Navigate replace to="/error/not-found" />}
             path="*"
@@ -339,8 +342,23 @@ function App() {
       <BrowserRouter>
         <AppErrorBoundary>
           <Routes>
-            <Route element={<LandingPage />} path="/landing" />
-            <Route element={<AdminApp />} path="/admin/*" />
+            <Route
+              element={
+                <LandingPage
+                  isAuthenticated={isAuthenticated}
+                  isAuthChecking={isAuthChecking}
+                />
+              }
+              path="/landing"
+            />
+            <Route
+              element={
+                <AdminRoute>
+                  <AdminApp />
+                </AdminRoute>
+              }
+              path="/admin/*"
+            />
             <Route element={<NotFoundPage />} path="/error/not-found" />
             <Route
               element={<NetworkErrorPage onRetry={handleRetryMyProfile} />}

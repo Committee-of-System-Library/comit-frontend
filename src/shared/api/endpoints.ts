@@ -18,6 +18,7 @@ export const API_ENDPOINTS = {
     presigned: "/images/presigned",
   },
   member: {
+    nicknameCheck: "/members/nicknames/check",
     me: "/members/me",
     studentNumberVisibility: "/members/me/student-number-visibility",
     myActivity: "/members/me/activity",
@@ -32,6 +33,7 @@ export const API_ENDPOINTS = {
     hot: "/posts/hot",
     like: (postId: number) => `/posts/${postId}/like`,
     report: (postId: number) => `/posts/${postId}/reports`,
+    search: "/posts/search",
     update: (postId: number) => `/posts/${postId}`,
   },
 } as const;
