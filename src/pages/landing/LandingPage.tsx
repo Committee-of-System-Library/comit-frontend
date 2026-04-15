@@ -8,7 +8,7 @@ import {
 
 import { useNavigate } from "react-router-dom";
 
-import landingHeroLaptopImage from "@/assets/landing/Device - Macbook Pro.svg";
+import landingHeroLaptopImage from "@/assets/landing/Device - Macbook Pro2.svg";
 import section2CardAImage from "@/assets/landing/section2-card-a.png";
 import section2CardBImage from "@/assets/landing/section2-card-b.png";
 import section3Card1Image from "@/assets/landing/section3-card-1.png";
