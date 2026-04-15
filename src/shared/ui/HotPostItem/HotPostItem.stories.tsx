@@ -18,7 +18,6 @@ const defaultArgs = {
   rank: 1,
   title: "인기 게시글 제목입니다",
   author: "사용자명",
-  views: 1300,
   time: "방금",
 };
 
@@ -44,7 +43,6 @@ export const EdgeCase: Story = {
     title:
       "매우 매우 매우 매우 매우 매우 매우 매우 매우 매우 매우 매우 긴 제목입니다",
     author: "매우긴이름의사용자명",
-    views: "99.9k",
     time: "1년 전",
   },
 };

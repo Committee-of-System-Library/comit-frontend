@@ -1,12 +1,11 @@
 import type { HTMLAttributes } from "react";
 
-import { UserRound, Eye } from "lucide-react";
+import { UserRound } from "lucide-react";
 
 interface HotPostItemProps extends HTMLAttributes<HTMLDivElement> {
   rank: number | string;
   title: string;
   author: string;
-  views: number | string;
   time: string;
 }
 
@@ -14,7 +13,6 @@ export const HotPostItem = ({
   rank,
   title,
   author,
-  views,
   time,
   className = "",
   ...props
@@ -40,12 +38,6 @@ export const HotPostItem = ({
             <UserRound className="w-4 h-4" />
             <span className="text-caption-02 leading-[1.4] whitespace-nowrap">
               {author}
-            </span>
-          </div>
-          <div className="flex flex-row items-center text-text-placeholder gap-0.5 h-4.25">
-            <Eye className="w-4 h-4" />
-            <span className="text-caption-02 leading-[1.4] whitespace-nowrap">
-              {views}
             </span>
           </div>
         </div>

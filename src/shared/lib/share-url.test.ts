@@ -1,11 +1,16 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { buildPostShareUrl, resolveAppBaseUrl } from "@/shared/lib/share-url";
 
 describe("share-url", () => {
   const originalLocation = window.location;
 
+  beforeEach(() => {
+    vi.stubEnv("VITE_APP_BASE_URL", "");
+  });
+
   afterEach(() => {
+    vi.unstubAllEnvs();
     Object.defineProperty(window, "location", {
       configurable: true,
       value: originalLocation,
