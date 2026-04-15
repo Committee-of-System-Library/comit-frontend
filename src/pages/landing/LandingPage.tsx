@@ -1,4 +1,12 @@
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
+
+import { useNavigate } from "react-router-dom";
 
 import landingHeroLaptopImage from "@/assets/landing/Device - Macbook Pro.svg";
 import section2CardAImage from "@/assets/landing/section2-card-a.png";
@@ -12,11 +20,10 @@ import mascotImage from "@/assets/Ori_Jump.svg";
 import { getSsoLoginUrl } from "@/entities/auth/api/logout";
 import { WritingButton } from "@/shared/ui/WritingButton/WritingButton";
 
-const handleStartSsoLogin = () => {
-  const redirectUri =
-    typeof window !== "undefined" ? window.location.origin : undefined;
-  window.location.assign(getSsoLoginUrl({ redirectUri }));
-};
+interface LandingPageProps {
+  isAuthenticated?: boolean;
+  isAuthChecking?: boolean;
+}
 
 const FeatureRow = ({
   description,
@@ -84,7 +91,11 @@ const HeroLaptopPreview = () => (
   </div>
 );
 
-const LandingPage = () => {
+const LandingPage = ({
+  isAuthenticated = false,
+  isAuthChecking = false,
+}: LandingPageProps) => {
+  const navigate = useNavigate();
   const [scrollProgress, setScrollProgress] = useState(0);
   const [isFeatureSectionVisible, setIsFeatureSectionVisible] = useState(false);
   const [isBoardSectionVisible, setIsBoardSectionVisible] = useState(false);
@@ -93,6 +104,21 @@ const LandingPage = () => {
   const featureSectionRef = useRef<HTMLElement | null>(null);
   const boardSectionRef = useRef<HTMLElement | null>(null);
   const finalCtaRef = useRef<HTMLElement | null>(null);
+
+  const handleStartSsoLogin = useCallback(() => {
+    if (isAuthChecking) {
+      return;
+    }
+
+    if (isAuthenticated) {
+      navigate("/", { replace: true });
+      return;
+    }
+
+    const redirectUri =
+      typeof window !== "undefined" ? window.location.origin : undefined;
+    window.location.assign(getSsoLoginUrl({ redirectUri }));
+  }, [isAuthChecking, isAuthenticated, navigate]);
 
   useEffect(() => {
     const updateScrollProgress = () => {
@@ -217,6 +243,7 @@ const LandingPage = () => {
                   </h1>
                   <WritingButton
                     className="mx-auto mt-10 h-[46px] w-[104px] rounded-xl px-6"
+                    disabled={isAuthChecking}
                     fullWidth={false}
                     icon={null}
                     onClick={handleStartSsoLogin}
@@ -374,6 +401,7 @@ const LandingPage = () => {
             </p>
             <WritingButton
               className="h-[46px] min-w-[274px] rounded-xl px-6"
+              disabled={isAuthChecking}
               fullWidth={false}
               icon={null}
               onClick={handleStartSsoLogin}
