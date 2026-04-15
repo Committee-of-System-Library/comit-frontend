@@ -40,7 +40,6 @@ export interface RightRailEventItem {
 export interface RightRailHotPostItem {
   id: number;
   author: string;
-  views: number;
   time: string;
   title: string;
 }
@@ -127,8 +126,6 @@ export const mapHotPostSummaryToHotPost = (
   return {
     id: post.id,
     author: post.authorNickname,
-    // hot post 응답에 viewCount가 없어 likeCount를 우선 노출합니다.
-    views: post.likeCount,
     time: formatTimeAgo(post.createdAt),
     title: post.title,
   };

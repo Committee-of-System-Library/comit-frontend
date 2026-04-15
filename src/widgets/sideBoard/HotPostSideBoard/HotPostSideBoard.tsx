@@ -8,7 +8,6 @@ export interface HotPostSideBoardItem {
   id: number;
   title: string;
   author: string;
-  views: number;
   time: string;
 }
 
@@ -41,7 +40,6 @@ export const HotPostSideBoard = ({
             rank={index + 1}
             title={post.title}
             author={post.author}
-            views={post.views}
             time={post.time}
             className={
               index === Math.min(posts.length, 5) - 1 ? "border-b-0" : ""

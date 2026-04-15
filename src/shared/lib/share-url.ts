@@ -1,10 +1,10 @@
-const APP_BASE_URL = (import.meta.env.VITE_APP_BASE_URL ?? "").trim();
-
 const trimTrailingSlash = (value: string) => value.replace(/\/+$/, "");
 
 export const resolveAppBaseUrl = () => {
-  if (APP_BASE_URL.length > 0) {
-    return trimTrailingSlash(APP_BASE_URL);
+  const appBaseUrl = (import.meta.env.VITE_APP_BASE_URL ?? "").trim();
+
+  if (appBaseUrl.length > 0) {
+    return trimTrailingSlash(appBaseUrl);
   }
 
   if (typeof window !== "undefined" && window.location.origin) {

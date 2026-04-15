@@ -1,3 +1,8 @@
+import { useRef } from "react";
+
+import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
+
 import logoImage from "@/assets/Logo.svg";
 import { getSsoLoginUrl } from "@/entities/auth/api/logout";
 import { Button } from "@/shared/ui/button/Button";
@@ -30,6 +35,8 @@ export const Header = ({
   isAuthenticated = false,
   navItems = defaultNavItems,
 }: HeaderProps) => {
+  const navigate = useNavigate();
+  const searchInputRef = useRef<HTMLInputElement>(null);
   const authButtonClassName = "h-9 px-3 shrink-0 whitespace-nowrap";
 
   const currentPath = (() => {
@@ -59,6 +66,16 @@ export const Header = ({
       typeof window !== "undefined" ? window.location.origin : undefined;
 
     window.location.assign(getSsoLoginUrl({ redirectUri }));
+  };
+
+  const handleSearchSubmit = (e: { preventDefault(): void }) => {
+    e.preventDefault();
+    const keyword = searchInputRef.current?.value.trim() ?? "";
+    if (!keyword) {
+      toast.error("검색어를 입력해 주세요.");
+      return;
+    }
+    navigate(`/search?keyword=${encodeURIComponent(keyword)}`);
   };
 
   return (
@@ -105,12 +122,18 @@ export const Header = ({
         </div>
 
         <div className="flex flex-1 items-center justify-end gap-6 min-w-0">
-          <SearchInput
-            aria-label="게시글 검색"
-            className="border-border-deactivated min-w-0 bg-gray-50 text-label-04 text-text-primary placeholder:text-text-placeholder"
-            containerClassName="flex flex-1 min-w-[120px] max-w-[417px]"
-            placeholder="검색어를 입력하세요"
-          />
+          <form
+            onSubmit={handleSearchSubmit}
+            className="flex flex-1 min-w-[120px] max-w-[417px]"
+          >
+            <SearchInput
+              ref={searchInputRef}
+              aria-label="게시글 검색"
+              className="border-border-deactivated min-w-0 bg-gray-50 text-label-04 text-text-primary placeholder:text-text-placeholder"
+              containerClassName="w-full"
+              placeholder="검색어를 입력하세요"
+            />
+          </form>
 
           <div className="flex items-center">
             {isAuthenticated ? (

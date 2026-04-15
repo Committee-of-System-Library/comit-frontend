@@ -106,7 +106,6 @@ describe("Post Mappers", () => {
       id: 1,
       title: "테스트 제목",
       author: "테스트유저",
-      views: 10, // likeCount가 views로 매핑됨
       time: "방금 전",
     });
   });

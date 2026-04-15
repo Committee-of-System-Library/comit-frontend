@@ -33,6 +33,7 @@ export const API_ENDPOINTS = {
     hot: "/posts/hot",
     like: (postId: number) => `/posts/${postId}/like`,
     report: (postId: number) => `/posts/${postId}/reports`,
+    search: "/posts/search",
     update: (postId: number) => `/posts/${postId}`,
   },
 } as const;
