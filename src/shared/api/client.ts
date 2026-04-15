@@ -124,7 +124,12 @@ const request = async <TResponse = unknown>(
 
   posthog.capture("api_request", {
     method,
-    path: new URL(requestUrl, window.location.origin).pathname,
+    path: new URL(
+      requestUrl,
+      typeof window !== "undefined"
+        ? window.location.origin
+        : "http://localhost",
+    ).pathname,
   });
 
   let response: Response;
