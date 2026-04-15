@@ -13,6 +13,7 @@ import { useNavigate } from "react-router-dom";
 import defaultMascotImage from "@/assets/Ori_defualt.svg";
 import greetingMascotImage from "@/assets/Ori_happy.svg";
 import sadMascotImage from "@/assets/Ori_sad.svg";
+import { checkNicknameDuplicate } from "@/entities/member/api/checkNicknameDuplicate";
 import { validateImageFile } from "@/features/image/model/imageUpload";
 import { useRegisterMutation } from "@/features/signup/model/useRegisterMutation";
 import { useRegisterPrefillQuery } from "@/features/signup/model/useRegisterPrefillQuery";
@@ -27,8 +28,6 @@ import { cn } from "@/utils/cn";
 type SignupStep = 1 | 2;
 type NicknameValidationStatus = "idle" | "error" | "success";
 type SignupGuideMode = "preview" | "register";
-
-const DUPLICATED_NICKNAME_SET = new Set(["admin", "comit", "관리자", "운영자"]);
 
 export interface SignupGuideModalProps {
   className?: string;
@@ -64,6 +63,7 @@ export const SignupGuideModal = ({
     useState<NicknameValidationStatus>("idle");
   const [nicknameValidationMessage, setNicknameValidationMessage] =
     useState("");
+  const [isCheckingNickname, setIsCheckingNickname] = useState(false);
 
   const [profileImageFile, setProfileImageFile] = useState<File | null>(null);
   const [profileImageUrl, setProfileImageUrl] = useState<string | null>(null);
@@ -106,6 +106,7 @@ export const SignupGuideModal = ({
     setNickname("");
     setNicknameValidationStatus("idle");
     setNicknameValidationMessage("");
+    setIsCheckingNickname(false);
 
     if (profileImageUrl?.startsWith("blob:")) {
       URL.revokeObjectURL(profileImageUrl);
@@ -199,7 +200,7 @@ export const SignupGuideModal = ({
     }
   };
 
-  const handleNicknameDuplicateCheck = () => {
+  const handleNicknameDuplicateCheck = async () => {
     const trimmedNickname = nickname.trim();
 
     if (!trimmedNickname) {
@@ -208,16 +209,36 @@ export const SignupGuideModal = ({
       return;
     }
 
-    const normalizedNickname = trimmedNickname.toLowerCase();
-
-    if (DUPLICATED_NICKNAME_SET.has(normalizedNickname)) {
-      setNicknameValidationStatus("error");
-      setNicknameValidationMessage("이미 존재하는 닉네임입니다");
+    setIsCheckingNickname(true);
+    try {
+      await checkNicknameDuplicate({ value: trimmedNickname });
+      setNicknameValidationStatus("success");
+      setNicknameValidationMessage("사용 가능한 닉네임입니다");
       return;
-    }
+    } catch (error) {
+      if (isApiHttpError(error)) {
+        if (error.code === "DUPLICATE_NICKNAME" || error.status === 409) {
+          setNicknameValidationStatus("error");
+          setNicknameValidationMessage("이미 존재하는 닉네임입니다");
+          return;
+        }
 
-    setNicknameValidationStatus("success");
-    setNicknameValidationMessage("사용 가능한 닉네임입니다");
+        if (error.status === 400) {
+          setNicknameValidationStatus("error");
+          setNicknameValidationMessage("닉네임 형식을 다시 확인해 주세요");
+          return;
+        }
+      }
+
+      toast.error(
+        "닉네임 중복 확인에 실패했습니다. 잠시 후 다시 시도해 주세요.",
+      );
+      setNicknameValidationStatus("error");
+      setNicknameValidationMessage("중복 확인에 실패했습니다");
+      return;
+    } finally {
+      setIsCheckingNickname(false);
+    }
   };
 
   const handleProfileImageUploadClick = () => {
@@ -518,9 +539,12 @@ export const SignupGuideModal = ({
                   닉네임 <span className="text-error-03">*</span>
                 </label>
                 <SignupTextInput
-                  actionLabel="중복 확인"
+                  actionDisabled={isCheckingNickname}
+                  actionLabel={isCheckingNickname ? "확인 중..." : "중복 확인"}
                   id="signup-nickname"
-                  onActionClick={handleNicknameDuplicateCheck}
+                  onActionClick={() => {
+                    void handleNicknameDuplicateCheck();
+                  }}
                   onChange={handleNicknameChange}
                   placeholder="닉네임을 입력해 주세요"
                   value={nickname}

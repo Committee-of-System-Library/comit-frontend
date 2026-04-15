@@ -342,7 +342,15 @@ function App() {
       <BrowserRouter>
         <AppErrorBoundary>
           <Routes>
-            <Route element={<LandingPage />} path="/landing" />
+            <Route
+              element={
+                <LandingPage
+                  isAuthenticated={isAuthenticated}
+                  isAuthChecking={isAuthChecking}
+                />
+              }
+              path="/landing"
+            />
             <Route
               element={
                 <AdminRoute>
