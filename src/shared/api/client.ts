@@ -1,3 +1,5 @@
+import { posthog } from "posthog-js";
+
 import {
   createApiHttpError,
   isAbortFetchError,
@@ -120,6 +122,8 @@ const request = async <TResponse = unknown>(
     normalizedHeaders.set("Content-Type", "application/json");
   }
 
+  posthog.capture("api_request", { method, url: requestUrl, params });
+
   let response: Response;
 
   try {
@@ -154,6 +158,12 @@ const request = async <TResponse = unknown>(
   const payload = await readResponsePayload(response);
 
   if (!response.ok) {
+    posthog.capture("api_error", {
+      method,
+      status: response.status,
+      url: requestUrl,
+    });
+
     throw createApiHttpError({
       method,
       payload,
