@@ -122,7 +122,10 @@ const request = async <TResponse = unknown>(
     normalizedHeaders.set("Content-Type", "application/json");
   }
 
-  posthog.capture("api_request", { method, url: requestUrl, params });
+  posthog.capture("api_request", {
+    method,
+    path: new URL(requestUrl, window.location.origin).pathname,
+  });
 
   let response: Response;
 
