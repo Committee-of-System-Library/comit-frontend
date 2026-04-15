@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm, useWatch } from "react-hook-form";
@@ -79,15 +79,27 @@ const API_FIELD_TO_FORM_FIELD: Partial<
 };
 
 const BOARD_TYPE_MAP: Record<string, BoardType> = {
+  event: "EVENT",
   free: "FREE",
   info: "INFO",
+  notice: "NOTICE",
   qna: "QNA",
 };
 
 const BOARD_TYPE_REVERSE_MAP: Partial<Record<string, string>> = {
+  EVENT: "event",
   FREE: "free",
   INFO: "info",
+  NOTICE: "notice",
   QNA: "qna",
+};
+
+const BOARD_VALUE_LABEL_MAP: Record<string, string> = {
+  event: "이벤트",
+  free: "자유게시판",
+  info: "정보게시판",
+  notice: "공지사항",
+  qna: "Q&A 게시판",
 };
 
 const createUploadItems = (selectedFiles: File[]) =>
@@ -179,6 +191,34 @@ const WritePage = () => {
       });
     }
   }, [existingPost, isEditMode, reset]);
+
+  const resolvedWriteBoardOptions = useMemo(() => {
+    if (!isEditMode || !existingPost) {
+      return writeBoardOptions;
+    }
+
+    const editBoardValue = BOARD_TYPE_REVERSE_MAP[existingPost.boardType];
+
+    if (!editBoardValue) {
+      return writeBoardOptions;
+    }
+
+    const hasBoardOption = writeBoardOptions.some(
+      (option) => option.value === editBoardValue,
+    );
+
+    if (hasBoardOption) {
+      return writeBoardOptions;
+    }
+
+    return [
+      ...writeBoardOptions,
+      {
+        label: BOARD_VALUE_LABEL_MAP[editBoardValue] ?? editBoardValue,
+        value: editBoardValue,
+      },
+    ];
+  }, [existingPost, isEditMode]);
 
   const handleToggleTag = (tag: string) => {
     const previousTags = getValues("tags");
@@ -417,7 +457,7 @@ const WritePage = () => {
                   </>
                 }
                 onChange={field.onChange}
-                options={writeBoardOptions}
+                options={resolvedWriteBoardOptions}
                 placeholder="게시판 선택하기"
                 value={field.value}
               />
