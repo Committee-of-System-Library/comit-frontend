@@ -83,9 +83,9 @@ export const AdminPostEditorModal = ({
   const canSubmit = title.trim().length > 0 && content.trim().length > 0;
 
   return createPortal(
-    <div className="fixed inset-0 z-9999 flex items-center justify-center bg-black/50 p-4">
-      <section className="w-full max-w-[720px] rounded-[28px] bg-white p-6 shadow-2xl">
-        <div className="flex items-start justify-between gap-4">
+    <div className="fixed inset-0 z-9999 flex items-start justify-center overflow-y-auto bg-black/50 p-4 py-6 sm:items-center">
+      <section className="flex max-h-[calc(100dvh-3rem)] w-full max-w-[720px] flex-col overflow-hidden rounded-[28px] bg-white p-6 shadow-2xl">
+        <div className="flex shrink-0 items-start justify-between gap-4">
           <div>
             <h2 className="text-subtitle-01 text-text-primary">
               {mode === "create" ? "관리자 게시글 등록" : "관리자 게시글 수정"}
@@ -109,53 +109,55 @@ export const AdminPostEditorModal = ({
             {errorMessage}
           </div>
         ) : (
-          <div className="mt-8 space-y-5">
-            <BoardSelectField
-              label="게시판"
-              onChange={(value) =>
-                setBoardType(value as AdminEditableBoardType)
-              }
-              options={BOARD_OPTIONS}
-              value={boardType}
-            />
+          <div className="mt-8 flex min-h-0 flex-1 flex-col">
+            <div className="min-h-0 flex-1 space-y-5 overflow-y-auto pr-1">
+              <BoardSelectField
+                label="게시판"
+                onChange={(value) =>
+                  setBoardType(value as AdminEditableBoardType)
+                }
+                options={BOARD_OPTIONS}
+                value={boardType}
+              />
 
-            <WriteTextInput
-              label="제목"
-              maxLength={100}
-              onChange={(event) => setTitle(event.target.value)}
-              placeholder="게시글 제목을 입력해 주세요"
-              showCount
-              value={title}
-            />
+              <WriteTextInput
+                label="제목"
+                maxLength={100}
+                onChange={(event) => setTitle(event.target.value)}
+                placeholder="게시글 제목을 입력해 주세요"
+                showCount
+                value={title}
+              />
 
-            <WriteTextareaField
-              label="내용"
-              maxLength={5000}
-              onChange={(event) => setContent(event.target.value)}
-              placeholder="게시글 본문을 입력해 주세요"
-              rows={10}
-              value={content}
-            />
+              <WriteTextareaField
+                label="내용"
+                maxLength={5000}
+                onChange={(event) => setContent(event.target.value)}
+                placeholder="게시글 본문을 입력해 주세요"
+                rows={8}
+                value={content}
+              />
 
-            <WriteTextInput
-              helperText="쉼표(,) 또는 줄바꿈으로 여러 태그를 입력할 수 있습니다."
-              label="태그"
-              onChange={(event) => setTagsInput(event.target.value)}
-              placeholder="예: 세미나, 공지"
-              value={tagsInput}
-            />
+              <WriteTextInput
+                helperText="쉼표(,) 또는 줄바꿈으로 여러 태그를 입력할 수 있습니다."
+                label="태그"
+                onChange={(event) => setTagsInput(event.target.value)}
+                placeholder="예: 세미나, 공지"
+                value={tagsInput}
+              />
 
-            <WriteTextareaField
-              helperText="이미지 URL이 있다면 한 줄에 하나씩 입력해 주세요."
-              label="이미지 URL"
-              onChange={(event) => setImageUrlsInput(event.target.value)}
-              placeholder="https://..."
-              rows={4}
-              showCount={false}
-              value={imageUrlsInput}
-            />
+              <WriteTextareaField
+                helperText="이미지 URL이 있다면 한 줄에 하나씩 입력해 주세요."
+                label="이미지 URL"
+                onChange={(event) => setImageUrlsInput(event.target.value)}
+                placeholder="https://..."
+                rows={3}
+                showCount={false}
+                value={imageUrlsInput}
+              />
+            </div>
 
-            <div className="flex justify-end gap-2">
+            <div className="mt-5 flex shrink-0 justify-end gap-2 border-t border-border-deactivated pt-4">
               <Button onClick={onClose} variant="secondary">
                 취소
               </Button>
