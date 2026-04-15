@@ -21,6 +21,6 @@ export const useSearchPostsQuery = ({
     enabled: keyword.trim().length > 0,
     queryFn: () =>
       searchPosts({ keyword: keyword.trim(), boardType, cursor, size }),
-    queryKey: queryKeys.post.search(keyword.trim(), cursor),
+    queryKey: queryKeys.post.search(keyword.trim(), cursor, boardType, size),
   });
 };

@@ -27,7 +27,7 @@ describe("useSearchPostsQuery", () => {
 
     expect(useQuery).toHaveBeenCalledWith(
       expect.objectContaining({
-        queryKey: queryKeys.post.search("React", undefined),
+        queryKey: queryKeys.post.search("React", undefined, undefined, 10),
       }),
     );
   });
