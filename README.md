@@ -54,15 +54,18 @@
 
 ### 1️⃣ 학교 계정만 있다면 별도의 회원가입 절차 없이 사용할 수 있어요
 - **시스템도서위원회**에서 학생들의 정보를 받아오기 때문에 별도 가입 절차 없이 빠르게 시작해볼 수 있어요
+<img width="486*2" height="332*2" alt="Frame 1181" src="https://github.com/user-attachments/assets/22fac03c-3846-4245-afe1-7e36b45b68ed" />
 
 ### 2️⃣ 경북대학교 컴퓨터학부 학생들끼리 신뢰도 있는 정보를 주고 받을 수 있어요
 - 외부인은 기능이 제한되기 때문에 **우리끼리 신뢰도 있는 이야기**를 주고받을 수 있어요
+<img width="486*2" height="332*2" alt="Frame 103" src="https://github.com/user-attachments/assets/75210b04-2901-4ed7-a67c-3b079fc0d144" />
 
 ### 3️⃣ 다양한 게시판을 통해 즐겁게 소통할 수 있어요
 - **자유 게시판**: 자유로운 주제로 소통해요
 - **QnA 게시판**: 궁금한 게 있다면 자유롭게 질문하고, 답변해요
 - **정보 게시판**: 유용한 정보들을 공유해요
 - **공지사항/이벤트 게시판**: 서비스의 공지사항/이벤트를 한 눈에 확인할 수 있어요
+<img width="1009" height="679" alt="image" src="https://github.com/user-attachments/assets/9f2f5809-088c-4c46-a33b-813fc2e7dbfb" />
 
 ---
 
