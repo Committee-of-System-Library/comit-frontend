@@ -163,7 +163,13 @@
 
 ## 🚀 기술적 도전 및 해결
 
-### 공통 API 호출 구조를 도입
+### 1. 공통 API 호출 구조 도입
+> 📄 ADR 문서: [공통 API 호출 구조 도입 (ADR-0003)](https://github.com/Committee-of-System-Library/knu-cse-comit-client/discussions/40)
+* 컴포넌트별 직접 `fetch` 호출로 인해 URL, 에러 처리, 캐시 관리 방식이 제각각이었음
+* `shared/api`, `entities/*/api`, `features/*/model`로 역할을 분리한 공통 API 구조 도입
+* endpoint, query key, 에러 처리 규칙을 중앙화해 협업 효율과 유지보수성 향상
+* 서버 스펙 변경 시 페이지 전역 수정 대신 API 레이어 중심으로 대응 가능
+
 
 ## 👥 팀원 소개
 
