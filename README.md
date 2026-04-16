@@ -18,9 +18,8 @@
 1. [프로젝트 소개](#-프로젝트-소개)
 2. [주요 기능](#-주요-기능)
 3. [기술 스택](#-기술-스택)
-4. [시스템 아키텍처](#-시스템-아키텍처)
-5. [기술적 도전 및 해결](#-기술적-도전-및-해결)
-6. [팀원 소개](#-팀원-소개)
+4. [기술적 도전 및 논의](#-기술적-도전-및-논의)
+5. [팀원 소개](#-팀원-소개)
 
 ---
 
@@ -161,11 +160,22 @@
 
 </table>
 
-## 🏗 시스템 아키텍처
+## 🚀 기술적 도전 및 논의
+### 1. 공통 레이아웃 적용 방식 
+> 📄 ADR 문서: [[아키텍처 논의] 공통 레이아웃 적용 방식 결정 (App 1회 래핑 vs 페이지별 래핑)](https://github.com/Committee-of-System-Library/knu-cse-comit-client/discussions/12)
+* A안(App 1회 래핑), B안(페이지별 직접 래핑), C안(라우트 레이아웃 분리)을 비교한 결과, 공통 구조 관리 및 예외 페이지 대응을 함께 고려할 수 있는 C안 채택
+* 결과적으로 `App.tsx`에서 `LandingPage`, `AdminApp`, 일반 사용자 영역을 라우트 단위로 분리 및 일반 영역은 `AppDesktopShell`로 공통 래핑하는 방식으로 구현함
+* 페이지별 차이는 별도 레이아웃을 늘리지 않고 `rightRail`, `topBanner`, `mainClassName`과 DefaultRightRail 조합으로 제어하여 구조 중복과 분기 복잡도를 줄임
+* 이를 통해 각 페이지는 본문 구현에 집중하고, 공통 레이아웃 변경은 `App.tsx`와 `AppDesktopShell` 중심으로 관리할 수 있도록 하여 협업 효율과 유지보수성을 높임
 
-## 🚀 기술적 도전 및 해결
+### 2. HTTP 클라이언트로 axios 대신 fetch를 기본 채택
+> 📄 ADR 문서: [HTTP 클라이언트로 axios 대신 fetch를 기본 채택한다 (ADR-0002)](https://github.com/Committee-of-System-Library/knu-cse-comit-client/discussions/40)
+* `fetch`(브라우저 표준) vs `axios`(외부 라이브러리) 비교 결과, 초기 학습 용이성과 의존성 리스크 최소화를 기준으로 `fetch`를 기본 클라이언트로 선택
+* `fetch`는 `response.ok`, `json()`, `headers` 등 HTTP 요청/응답 흐름을 직접 다루게 하여 공통 API 규칙(shared/api) 설계 및 온보딩에 유리
+* 자동 처리(에러 reject, 인터셉터 등)가 없기 때문에 에러 처리, 응답 언랩, 인증 로직을 공통 레이어에서 명시적으로 통일 가능
+* `AbortController` 기반 `timeout`, 공통 에러 처리, 재시도 로직 등은 `shared/api` 레이어에서 점진적으로 보완하며, 복잡도가 증가할 경우 `axios` 도입을 재검토함
 
-### 1. 공통 API 호출 구조 도입
+### 3. 공통 API 호출 구조 도입
 > 📄 ADR 문서: [공통 API 호출 구조 도입 (ADR-0003)](https://github.com/Committee-of-System-Library/knu-cse-comit-client/discussions/40)
 * 컴포넌트별 직접 `fetch` 호출로 인해 URL, 에러 처리, 캐시 관리 방식이 제각각이었음
 * `shared/api`, `entities/*/api`, `features/*/model`로 역할을 분리한 공통 API 구조 도입
