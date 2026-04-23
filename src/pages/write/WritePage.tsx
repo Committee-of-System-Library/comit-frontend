@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm, useWatch } from "react-hook-form";
@@ -117,6 +117,28 @@ const revokePreviewUrl = (thumbnailUrl?: string) => {
   }
 };
 
+type ContentFormatAction =
+  | "heading1"
+  | "heading2"
+  | "bold"
+  | "blue"
+  | "red"
+  | "list"
+  | "quote";
+
+const FORMAT_TOOLBAR_ITEMS: Array<{
+  action: ContentFormatAction;
+  label: string;
+}> = [
+  { action: "heading1", label: "H1" },
+  { action: "heading2", label: "H2" },
+  { action: "bold", label: "굵게" },
+  { action: "blue", label: "파랑" },
+  { action: "red", label: "빨강" },
+  { action: "list", label: "목록" },
+  { action: "quote", label: "인용" },
+];
+
 const WritePage = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -160,6 +182,7 @@ const WritePage = () => {
     name: "images",
     defaultValue: [],
   });
+  const contentTextareaRef = useRef<HTMLTextAreaElement | null>(null);
   const imageItemsRef = useRef<WriteImageUploadItem[]>(currentImages);
 
   useEffect(() => {
@@ -307,6 +330,124 @@ const WritePage = () => {
     });
 
     clearErrors("images");
+  };
+
+  const applyWrappedFormat = useCallback(
+    (
+      action: "bold" | "blue" | "red",
+      placeholder: string,
+      textarea: HTMLTextAreaElement,
+    ) => {
+      const value = getValues("content");
+      const selectionStart = textarea.selectionStart;
+      const selectionEnd = textarea.selectionEnd;
+      const selectedText = value.slice(selectionStart, selectionEnd);
+      const text = selectedText || placeholder;
+
+      const wrapper =
+        action === "bold"
+          ? { close: "**", open: "**" }
+          : action === "blue"
+            ? { close: "[/blue]", open: "[blue]" }
+            : { close: "[/red]", open: "[red]" };
+
+      const nextValue =
+        value.slice(0, selectionStart) +
+        wrapper.open +
+        text +
+        wrapper.close +
+        value.slice(selectionEnd);
+
+      setValue("content", nextValue, {
+        shouldDirty: true,
+        shouldValidate: true,
+      });
+      clearErrors("content");
+
+      requestAnimationFrame(() => {
+        textarea.focus();
+        const start = selectionStart + wrapper.open.length;
+        const end = start + text.length;
+        textarea.setSelectionRange(start, end);
+      });
+    },
+    [clearErrors, getValues, setValue],
+  );
+
+  const toggleLinePrefix = useCallback(
+    (prefix: string, textarea: HTMLTextAreaElement) => {
+      const value = getValues("content");
+      const selectionStart = textarea.selectionStart;
+      const selectionEnd = textarea.selectionEnd;
+      const start = value.lastIndexOf("\n", selectionStart - 1) + 1;
+      const endLineBreak = value.indexOf("\n", selectionEnd);
+      const end = endLineBreak === -1 ? value.length : endLineBreak;
+      const selectedBlock = value.slice(start, end);
+      const lines = selectedBlock.split("\n");
+      const shouldRemovePrefix = lines
+        .filter((line) => line.trim().length > 0)
+        .every((line) => line.startsWith(prefix));
+
+      const nextLines = lines.map((line) => {
+        if (!line.trim()) {
+          return line;
+        }
+
+        if (shouldRemovePrefix) {
+          return line.startsWith(prefix) ? line.slice(prefix.length) : line;
+        }
+
+        return `${prefix}${line}`;
+      });
+
+      const nextBlock = nextLines.join("\n");
+      const nextValue = value.slice(0, start) + nextBlock + value.slice(end);
+
+      setValue("content", nextValue, {
+        shouldDirty: true,
+        shouldValidate: true,
+      });
+      clearErrors("content");
+
+      requestAnimationFrame(() => {
+        textarea.focus();
+        textarea.setSelectionRange(start, start + nextBlock.length);
+      });
+    },
+    [clearErrors, getValues, setValue],
+  );
+
+  const handleApplyContentFormat = (action: ContentFormatAction) => {
+    const textarea = contentTextareaRef.current;
+    if (!textarea) {
+      return;
+    }
+
+    switch (action) {
+      case "bold":
+        applyWrappedFormat("bold", "강조 텍스트", textarea);
+        return;
+      case "blue":
+        applyWrappedFormat("blue", "파란 텍스트", textarea);
+        return;
+      case "red":
+        applyWrappedFormat("red", "빨간 텍스트", textarea);
+        return;
+      case "heading1":
+        toggleLinePrefix("# ", textarea);
+        return;
+      case "heading2":
+        toggleLinePrefix("## ", textarea);
+        return;
+      case "list":
+        toggleLinePrefix("- ", textarea);
+        return;
+      case "quote":
+        toggleLinePrefix("> ", textarea);
+        return;
+      default:
+        return;
+    }
   };
 
   const onSubmit = async (values: WritePostFormValues) => {
@@ -488,6 +629,22 @@ const WritePage = () => {
         </div>
 
         <div className="w-full">
+          <div className="mb-2 flex flex-wrap items-center gap-2 rounded-xl border border-border-deactivated bg-background-light p-2">
+            {FORMAT_TOOLBAR_ITEMS.map((item) => (
+              <button
+                key={item.action}
+                className="rounded-md border border-border-deactivated bg-white px-2.5 py-1 text-caption-02 text-text-secondary transition-colors hover:bg-gray-50"
+                onClick={() => handleApplyContentFormat(item.action)}
+                type="button"
+              >
+                {item.label}
+              </button>
+            ))}
+            <p className="pl-1 text-caption-02 text-text-placeholder">
+              예: **굵게**, [blue]파랑[/blue], [red]빨강[/red], # 헤더
+            </p>
+          </div>
+
           <Controller
             control={control}
             name="content"
@@ -499,6 +656,10 @@ const WritePage = () => {
                 inlineError
                 label="내용"
                 maxLength={WRITE_POST_MAX_CONTENT_LENGTH}
+                ref={(element) => {
+                  contentTextareaRef.current = element;
+                  field.ref(element);
+                }}
                 placeholder="게시판의 성격에 맞지 않는 글은 삭제될 수 있습니다"
               />
             )}
