@@ -873,7 +873,7 @@ const WritePage = () => {
 
       {floatingToolbar.visible ? (
         <div
-          className="fixed z-50 -translate-x-1/2 rounded-xl border border-border-deactivated bg-gray-900 p-2 shadow-[0px_10px_24px_rgba(0,0,0,0.28)]"
+          className="fixed z-50 -translate-x-1/2 rounded-xl border border-primary-600 bg-background-light p-2 shadow-[0px_10px_24px_rgba(39,64,159,0.18)]"
           style={{
             left: floatingToolbar.left,
             top: floatingToolbar.top,
@@ -884,7 +884,7 @@ const WritePage = () => {
               <button
                 key={item.action}
                 data-floating-format-toolbar="true"
-                className="rounded-md px-2 py-1 text-caption-02 text-white transition-colors hover:bg-white/15"
+                className="rounded-md px-2 py-1 text-caption-02 text-primary-800 transition-colors hover:bg-primary-200 hover:text-primary-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-600"
                 onMouseDown={(event) => {
                   event.preventDefault();
                 }}
