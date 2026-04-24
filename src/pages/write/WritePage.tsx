@@ -126,19 +126,6 @@ type ContentFormatAction =
   | "list"
   | "quote";
 
-const FORMAT_TOOLBAR_ITEMS: Array<{
-  action: ContentFormatAction;
-  label: string;
-}> = [
-  { action: "heading1", label: "H1" },
-  { action: "heading2", label: "H2" },
-  { action: "bold", label: "굵게" },
-  { action: "blue", label: "파랑" },
-  { action: "red", label: "빨강" },
-  { action: "list", label: "목록" },
-  { action: "quote", label: "인용" },
-];
-
 const FLOATING_TOOLBAR_ITEMS: Array<{
   action: ContentFormatAction;
   label: string;
@@ -796,22 +783,6 @@ const WritePage = () => {
         </div>
 
         <div className="w-full">
-          <div className="mb-2 flex flex-wrap items-center gap-2 rounded-xl border border-border-deactivated bg-background-light p-2">
-            {FORMAT_TOOLBAR_ITEMS.map((item) => (
-              <button
-                key={item.action}
-                className="rounded-md border border-border-deactivated bg-white px-2.5 py-1 text-caption-02 text-text-secondary transition-colors hover:bg-gray-50"
-                onClick={() => handleApplyContentFormat(item.action)}
-                type="button"
-              >
-                {item.label}
-              </button>
-            ))}
-            <p className="pl-1 text-caption-02 text-text-placeholder">
-              예: **굵게**, [blue]파랑[/blue], [red]빨강[/red], # 헤더
-            </p>
-          </div>
-
           <Controller
             control={control}
             name="content"
