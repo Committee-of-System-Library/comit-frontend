@@ -39,8 +39,8 @@ jobs:
             --build-arg VITE_APP_BASE_URL=__VITE_APP_BASE_URL__ \
             --build-arg VITE_POSTHOG_KEY=__VITE_POSTHOG_KEY__ \
             --build-arg VITE_POSTHOG_HOST=__VITE_POSTHOG_HOST__ \
-            -t $REGISTRY/$ORG/$IMAGE_NAME:latest \
-            -t $REGISTRY/$ORG/$IMAGE_NAME:$(date +%Y%m%d%H%M%S) \
+            -t $REGISTRY/$ORG_LC/$IMAGE_NAME:latest \
+            -t $REGISTRY/$ORG_LC/$IMAGE_NAME:$(date +%Y%m%d%H%M%S) \
             .
           docker push $REGISTRY/$ORG_LC/$IMAGE_NAME --all-tags
 
