@@ -15,8 +15,9 @@ permissions:
 
 env:
   REGISTRY: ghcr.io
-  ORG: committee-of-system-library
-  IMAGE_NAME: knu-cse-comit-client
+  ORG: ${{ github.repository_owner }}
+  IMAGE_NAME: ${{ github.event.repository.name }}
+  CONT_NAME: ${{ github.event.repository.name }}
 
 jobs:
   build-and-push:
@@ -24,32 +25,58 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Set organization name to lowercase
+        run: |
+          echo "ORG_LC=${ORG,,}" >> $GITHUB_ENV
+
       - name: Login to GHCR
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login $REGISTRY -u ${{ github.actor }} --password-stdin
 
       - name: Build and push image
         run: |
           docker build \
-            --build-arg VITE_API_BASE_URL=https://chcse.knu.ac.kr/comit-staging/api \
-            --build-arg VITE_APP_BASE_URL=https://chcse.knu.ac.kr \
-            --build-arg VITE_POSTHOG_KEY=${{ secrets.VITE_POSTHOG_KEY }} \
-            --build-arg VITE_POSTHOG_HOST=https://us.i.posthog.com \
+            --build-arg VITE_API_BASE_URL=__VITE_API_BASE_URL__ \
+            --build-arg VITE_APP_BASE_URL=__VITE_APP_BASE_URL__ \
+            --build-arg VITE_POSTHOG_KEY=__VITE_POSTHOG_KEY__ \
+            --build-arg VITE_POSTHOG_HOST=__VITE_POSTHOG_HOST__ \
             -t $REGISTRY/$ORG/$IMAGE_NAME:latest \
             -t $REGISTRY/$ORG/$IMAGE_NAME:$(date +%Y%m%d%H%M%S) \
             .
-          docker push $REGISTRY/$ORG/$IMAGE_NAME --all-tags
+          docker push $REGISTRY/$ORG_LC/$IMAGE_NAME --all-tags
 
   deploy:
     needs: build-and-push
     runs-on: [ 'self-hosted', 'frontend' ]
+    env:
+      TZ: Asia/Seoul
     steps:
+      - name: Set organization name to lowercase
+        run: |
+          echo "ORG_LC=${ORG,,}" >> $GITHUB_ENV
+          
       - name: Login to GHCR
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login $REGISTRY -u ${{ github.actor }} --password-stdin
-
-      - name: Pull and restart
+          
+      - name: Getting current image name
+        id: current_img
         run: |
-          docker pull $REGISTRY/$ORG/$IMAGE_NAME:latest
-          docker compose -f /opt/docker/compose/docker-compose.services.yml up -d knu-cse-comit-client
+          CURRENT_IMG=$(docker inspect $CONT_NAME --format='{{.Config.Image}}' 2>/dev/null || echo "")
+          echo "image=$CURRENT_IMG" >> $GITHUB_OUTPUT
 
-      - name: Cleanup
-        run: docker image prune -f
+      - name: Pulling latest image
+        run: docker pull $REGISTRY/$ORG_LC/$IMAGE_NAME:latest
+
+      - name: Executing container using Docker Compose
+        run: |
+          docker compose \
+          -f ${{ secrets.COMIT_DOCKER_COMPOSE_FILE_PATH }} \
+          --env-file ${{ secrets.COMIT_ENV_PATH }} \
+          up -d --no-build --pull never \
+          $CONT_NAME
+
+      - name: Removing old image
+        if: success() && steps.current_img.outputs.image != ''
+        run: docker image rm ${{ steps.current_img.outputs.image }} || true
+
+      - name: Flushing docker cache
+        run: docker buildx prune -f
