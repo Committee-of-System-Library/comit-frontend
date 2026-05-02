@@ -5,6 +5,7 @@ import { DetailButton } from "@/shared/ui/DetailButton/DetailButton";
 import { HeartButton } from "@/shared/ui/HeartButton/HeartButton";
 import { ImageViewerModal } from "@/shared/ui/ImageViewerModal/ImageViewerModal";
 import { OptionList } from "@/shared/ui/OptionList/OptionList";
+import { RichTextContent } from "@/shared/ui/RichTextContent/RichTextContent";
 import { ShareButton } from "@/shared/ui/ShareButton/ShareButton";
 import type { Post } from "@/types/post";
 
@@ -108,9 +109,7 @@ export const PostDetailCard = ({
         <h2 className="text-head-03 text-text-primary wrap-break-word">
           {title}
         </h2>
-        <p className="text-body-01 text-text-tertiary whitespace-pre-wrap wrap-break-word">
-          {content}
-        </p>
+        <RichTextContent className="wrap-break-word" content={content} />
       </div>
 
       {image.length > 0 && (

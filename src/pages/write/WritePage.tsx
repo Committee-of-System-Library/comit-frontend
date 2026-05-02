@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm, useWatch } from "react-hook-form";
@@ -33,6 +33,10 @@ import { WriteTagInputField } from "@/shared/ui/WriteTagInputField/WriteTagInput
 import { WriteTextareaField } from "@/shared/ui/WriteTextareaField/WriteTextareaField";
 import { WriteTextInput } from "@/shared/ui/WriteTextInput/WriteTextInput";
 import { WritingButton } from "@/shared/ui/WritingButton/WritingButton";
+import {
+  applyBlockContentFormat,
+  applyInlineContentFormat,
+} from "@/utils/writeContentFormat";
 
 const writePostFormSchema = z.object({
   board: z.string().min(1, "게시판은 반드시 선택해야 합니다"),
@@ -117,6 +121,109 @@ const revokePreviewUrl = (thumbnailUrl?: string) => {
   }
 };
 
+type ContentFormatAction =
+  | "heading1"
+  | "heading2"
+  | "bold"
+  | "blue"
+  | "red"
+  | "list"
+  | "quote";
+
+const FLOATING_TOOLBAR_ITEMS: Array<{
+  action: ContentFormatAction;
+  label: string;
+}> = [
+  { action: "bold", label: "B" },
+  { action: "blue", label: "파랑" },
+  { action: "red", label: "빨강" },
+  { action: "heading1", label: "H1" },
+  { action: "heading2", label: "H2" },
+  { action: "list", label: "목록" },
+  { action: "quote", label: "인용" },
+];
+
+interface FloatingToolbarState {
+  left: number;
+  top: number;
+  visible: boolean;
+}
+
+const createMirrorStyleText = (textarea: HTMLTextAreaElement) => {
+  const style = window.getComputedStyle(textarea);
+  const props = [
+    "boxSizing",
+    "fontFamily",
+    "fontSize",
+    "fontWeight",
+    "fontStyle",
+    "fontVariant",
+    "lineHeight",
+    "letterSpacing",
+    "textTransform",
+    "textIndent",
+    "textDecoration",
+    "textAlign",
+    "whiteSpace",
+    "wordBreak",
+    "wordSpacing",
+    "overflowWrap",
+    "paddingTop",
+    "paddingRight",
+    "paddingBottom",
+    "paddingLeft",
+    "borderTopWidth",
+    "borderRightWidth",
+    "borderBottomWidth",
+    "borderLeftWidth",
+    "borderTopStyle",
+    "borderRightStyle",
+    "borderBottomStyle",
+    "borderLeftStyle",
+  ] as const;
+
+  return props.map((prop) => `${prop}:${style[prop]};`).join("");
+};
+
+const getTextareaCaretPosition = (
+  textarea: HTMLTextAreaElement,
+  selectionIndex: number,
+) => {
+  const mirror = document.createElement("div");
+  mirror.setAttribute("aria-hidden", "true");
+  mirror.style.cssText = `
+    position: absolute;
+    top: 0;
+    left: -9999px;
+    visibility: hidden;
+    pointer-events: none;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    overflow: hidden;
+    ${createMirrorStyleText(textarea)}
+    width: ${textarea.clientWidth}px;
+  `;
+
+  mirror.textContent = textarea.value.slice(0, selectionIndex);
+
+  const marker = document.createElement("span");
+  marker.textContent = textarea.value.slice(selectionIndex) || ".";
+  mirror.appendChild(marker);
+  document.body.appendChild(mirror);
+
+  const markerRect = marker.getBoundingClientRect();
+  const mirrorRect = mirror.getBoundingClientRect();
+
+  const left = markerRect.left - mirrorRect.left - textarea.scrollLeft;
+  const top = markerRect.top - mirrorRect.top - textarea.scrollTop;
+  const height = markerRect.height;
+
+  document.body.removeChild(mirror);
+
+  return { height, left, top };
+};
+
 const WritePage = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -160,7 +267,17 @@ const WritePage = () => {
     name: "images",
     defaultValue: [],
   });
+  const contentTextareaRef = useRef<HTMLTextAreaElement | null>(null);
+  const updateFloatingToolbarPositionRef = useRef<() => void>(() => {});
+  const floatingToolbarRangeRef = useRef<{ end: number; start: number } | null>(
+    null,
+  );
   const imageItemsRef = useRef<WriteImageUploadItem[]>(currentImages);
+  const [floatingToolbar, setFloatingToolbar] = useState<FloatingToolbarState>({
+    left: 0,
+    top: 0,
+    visible: false,
+  });
 
   useEffect(() => {
     imageItemsRef.current = currentImages;
@@ -308,6 +425,220 @@ const WritePage = () => {
 
     clearErrors("images");
   };
+
+  const updateContentSelection = useCallback(
+    (
+      textarea: HTMLTextAreaElement,
+      nextValue: string,
+      nextSelectionStart: number,
+      nextSelectionEnd: number,
+    ) => {
+      setValue("content", nextValue, {
+        shouldDirty: true,
+        shouldValidate: true,
+      });
+      clearErrors("content");
+
+      requestAnimationFrame(() => {
+        textarea.focus();
+        textarea.setSelectionRange(nextSelectionStart, nextSelectionEnd);
+      });
+    },
+    [clearErrors, setValue],
+  );
+
+  const handleApplyContentFormat = (action: ContentFormatAction) => {
+    const textarea = contentTextareaRef.current;
+    if (!textarea) {
+      return;
+    }
+
+    const value = getValues("content");
+    const selectionStart = textarea.selectionStart;
+    const selectionEnd = textarea.selectionEnd;
+
+    switch (action) {
+      case "bold": {
+        const result = applyInlineContentFormat({
+          action: "bold",
+          placeholder: "강조 텍스트",
+          selectionEnd,
+          selectionStart,
+          value,
+        });
+        updateContentSelection(
+          textarea,
+          result.nextValue,
+          result.selectionStart,
+          result.selectionEnd,
+        );
+        return;
+      }
+      case "blue": {
+        const result = applyInlineContentFormat({
+          action: "blue",
+          placeholder: "파란 텍스트",
+          selectionEnd,
+          selectionStart,
+          value,
+        });
+        updateContentSelection(
+          textarea,
+          result.nextValue,
+          result.selectionStart,
+          result.selectionEnd,
+        );
+        return;
+      }
+      case "red": {
+        const result = applyInlineContentFormat({
+          action: "red",
+          placeholder: "빨간 텍스트",
+          selectionEnd,
+          selectionStart,
+          value,
+        });
+        updateContentSelection(
+          textarea,
+          result.nextValue,
+          result.selectionStart,
+          result.selectionEnd,
+        );
+        return;
+      }
+      case "heading1": {
+        const result = applyBlockContentFormat({
+          action: "heading1",
+          selectionEnd,
+          selectionStart,
+          value,
+        });
+        updateContentSelection(
+          textarea,
+          result.nextValue,
+          result.selectionStart,
+          result.selectionEnd,
+        );
+        return;
+      }
+      case "heading2": {
+        const result = applyBlockContentFormat({
+          action: "heading2",
+          selectionEnd,
+          selectionStart,
+          value,
+        });
+        updateContentSelection(
+          textarea,
+          result.nextValue,
+          result.selectionStart,
+          result.selectionEnd,
+        );
+        return;
+      }
+      case "list": {
+        const result = applyBlockContentFormat({
+          action: "list",
+          selectionEnd,
+          selectionStart,
+          value,
+        });
+        updateContentSelection(
+          textarea,
+          result.nextValue,
+          result.selectionStart,
+          result.selectionEnd,
+        );
+        return;
+      }
+      case "quote": {
+        const result = applyBlockContentFormat({
+          action: "quote",
+          selectionEnd,
+          selectionStart,
+          value,
+        });
+        updateContentSelection(
+          textarea,
+          result.nextValue,
+          result.selectionStart,
+          result.selectionEnd,
+        );
+        return;
+      }
+      default:
+        return;
+    }
+  };
+
+  const hideFloatingToolbar = useCallback(() => {
+    floatingToolbarRangeRef.current = null;
+    setFloatingToolbar((prev) =>
+      prev.visible ? { ...prev, visible: false } : prev,
+    );
+  }, []);
+
+  const updateFloatingToolbarPosition = () => {
+    const textarea = contentTextareaRef.current;
+    if (!textarea || document.activeElement !== textarea) {
+      hideFloatingToolbar();
+      return;
+    }
+
+    const selectionStart = textarea.selectionStart;
+    const selectionEnd = textarea.selectionEnd;
+
+    if (selectionEnd <= selectionStart) {
+      hideFloatingToolbar();
+      return;
+    }
+
+    const startPos = getTextareaCaretPosition(textarea, selectionStart);
+    const endPos = getTextareaCaretPosition(textarea, selectionEnd);
+    const rect = textarea.getBoundingClientRect();
+
+    const anchorX = rect.left + (startPos.left + endPos.left) / 2;
+    const anchorY =
+      rect.top + Math.min(startPos.top, endPos.top) - startPos.height - 12;
+
+    const safeTop = Math.max(window.scrollY + 12, anchorY + window.scrollY);
+    const safeLeft = Math.min(
+      window.scrollX + window.innerWidth - 16,
+      Math.max(window.scrollX + 16, anchorX + window.scrollX),
+    );
+
+    floatingToolbarRangeRef.current = {
+      end: selectionEnd,
+      start: selectionStart,
+    };
+    setFloatingToolbar({
+      left: safeLeft,
+      top: safeTop,
+      visible: true,
+    });
+  };
+
+  useEffect(() => {
+    updateFloatingToolbarPositionRef.current = updateFloatingToolbarPosition;
+  });
+
+  useEffect(() => {
+    if (!floatingToolbar.visible) {
+      return;
+    }
+
+    const handleWindowChange = () => {
+      updateFloatingToolbarPositionRef.current();
+    };
+
+    window.addEventListener("resize", handleWindowChange);
+    window.addEventListener("scroll", handleWindowChange, true);
+
+    return () => {
+      window.removeEventListener("resize", handleWindowChange);
+      window.removeEventListener("scroll", handleWindowChange, true);
+    };
+  }, [floatingToolbar.visible]);
 
   const onSubmit = async (values: WritePostFormValues) => {
     if (isEditMode) {
@@ -499,6 +830,31 @@ const WritePage = () => {
                 inlineError
                 label="내용"
                 maxLength={WRITE_POST_MAX_CONTENT_LENGTH}
+                onBlur={(event) => {
+                  field.onBlur();
+                  if (event.relatedTarget instanceof HTMLElement) {
+                    const isFloatingToolbarButton = event.relatedTarget.closest(
+                      "[data-floating-format-toolbar='true']",
+                    );
+                    if (isFloatingToolbarButton) {
+                      return;
+                    }
+                  }
+                  hideFloatingToolbar();
+                }}
+                onKeyUp={() => {
+                  updateFloatingToolbarPosition();
+                }}
+                onMouseUp={() => {
+                  updateFloatingToolbarPosition();
+                }}
+                onSelect={() => {
+                  updateFloatingToolbarPosition();
+                }}
+                ref={(element) => {
+                  contentTextareaRef.current = element;
+                  field.ref(element);
+                }}
                 placeholder="게시판의 성격에 맞지 않는 글은 삭제될 수 있습니다"
               />
             )}
@@ -550,6 +906,44 @@ const WritePage = () => {
           {isEditMode ? "수정 완료" : "작성 완료"}
         </WritingButton>
       </form>
+
+      {floatingToolbar.visible ? (
+        <div
+          className="fixed z-50 -translate-x-1/2 rounded-xl border border-primary-600 bg-background-light p-2 shadow-[0px_10px_24px_rgba(39,64,159,0.18)]"
+          style={{
+            left: floatingToolbar.left,
+            top: floatingToolbar.top,
+          }}
+        >
+          <div className="flex items-center gap-1">
+            {FLOATING_TOOLBAR_ITEMS.map((item) => (
+              <button
+                key={item.action}
+                data-floating-format-toolbar="true"
+                className="rounded-md px-2 py-1 text-caption-02 text-primary-800 transition-colors hover:bg-primary-200 hover:text-primary-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-600"
+                onMouseDown={(event) => {
+                  event.preventDefault();
+                }}
+                onClick={() => {
+                  const textarea = contentTextareaRef.current;
+                  const range = floatingToolbarRangeRef.current;
+
+                  if (textarea && range) {
+                    textarea.focus();
+                    textarea.setSelectionRange(range.start, range.end);
+                  }
+
+                  handleApplyContentFormat(item.action);
+                  updateFloatingToolbarPosition();
+                }}
+                type="button"
+              >
+                {item.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      ) : null}
     </section>
   );
 };
