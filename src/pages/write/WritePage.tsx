@@ -264,6 +264,7 @@ const WritePage = () => {
     defaultValue: [],
   });
   const contentTextareaRef = useRef<HTMLTextAreaElement | null>(null);
+  const updateFloatingToolbarPositionRef = useRef<() => void>(() => {});
   const floatingToolbarRangeRef = useRef<{ end: number; start: number } | null>(
     null,
   );
@@ -539,12 +540,12 @@ const WritePage = () => {
     }
   };
 
-  const hideFloatingToolbar = () => {
+  const hideFloatingToolbar = useCallback(() => {
     floatingToolbarRangeRef.current = null;
     setFloatingToolbar((prev) =>
       prev.visible ? { ...prev, visible: false } : prev,
     );
-  };
+  }, []);
 
   const updateFloatingToolbarPosition = () => {
     const textarea = contentTextareaRef.current;
@@ -587,12 +588,16 @@ const WritePage = () => {
   };
 
   useEffect(() => {
+    updateFloatingToolbarPositionRef.current = updateFloatingToolbarPosition;
+  });
+
+  useEffect(() => {
     if (!floatingToolbar.visible) {
       return;
     }
 
     const handleWindowChange = () => {
-      updateFloatingToolbarPosition();
+      updateFloatingToolbarPositionRef.current();
     };
 
     window.addEventListener("resize", handleWindowChange);
