@@ -5,6 +5,7 @@ import { useMyLikesQuery } from "@/features/member/model/useMyLikesQuery";
 import { useMyPostsQuery } from "@/features/member/model/useMyPostsQuery";
 import { MyActivityCategory } from "@/shared/ui/MyActivityCategory/MyActivityCategory";
 import { PostPreviewItem } from "@/shared/ui/PostPreviewItem/PostPreviewItem";
+import { resolveContentPreview } from "@/utils/contentPreview";
 import { formatTimeAgo } from "@/utils/formatTime";
 
 type CategoryType = "posts" | "comments" | "likes";
@@ -57,7 +58,7 @@ const MyActivityPage = () => {
       items: (postsData?.items ?? []).map((post) => ({
         id: post.id,
         title: post.title,
-        content: post.contentPreview,
+        content: resolveContentPreview(post.contentPreview),
         likes: post.likeCount,
         comments: post.commentCount,
         time: formatTimeAgo(post.createdAt),
