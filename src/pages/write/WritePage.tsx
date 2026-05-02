@@ -33,6 +33,10 @@ import { WriteTagInputField } from "@/shared/ui/WriteTagInputField/WriteTagInput
 import { WriteTextareaField } from "@/shared/ui/WriteTextareaField/WriteTextareaField";
 import { WriteTextInput } from "@/shared/ui/WriteTextInput/WriteTextInput";
 import { WritingButton } from "@/shared/ui/WritingButton/WritingButton";
+import {
+  applyBlockContentFormat,
+  applyInlineContentFormat,
+} from "@/utils/writeContentFormat";
 
 const writePostFormSchema = z.object({
   board: z.string().min(1, "게시판은 반드시 선택해야 합니다"),
@@ -422,32 +426,13 @@ const WritePage = () => {
     clearErrors("images");
   };
 
-  const applyWrappedFormat = useCallback(
+  const updateContentSelection = useCallback(
     (
-      action: "bold" | "blue" | "red",
-      placeholder: string,
       textarea: HTMLTextAreaElement,
+      nextValue: string,
+      nextSelectionStart: number,
+      nextSelectionEnd: number,
     ) => {
-      const value = getValues("content");
-      const selectionStart = textarea.selectionStart;
-      const selectionEnd = textarea.selectionEnd;
-      const selectedText = value.slice(selectionStart, selectionEnd);
-      const text = selectedText || placeholder;
-
-      const wrapper =
-        action === "bold"
-          ? { close: "**", open: "**" }
-          : action === "blue"
-            ? { close: "[/blue]", open: "[blue]" }
-            : { close: "[/red]", open: "[red]" };
-
-      const nextValue =
-        value.slice(0, selectionStart) +
-        wrapper.open +
-        text +
-        wrapper.close +
-        value.slice(selectionEnd);
-
       setValue("content", nextValue, {
         shouldDirty: true,
         shouldValidate: true,
@@ -456,55 +441,10 @@ const WritePage = () => {
 
       requestAnimationFrame(() => {
         textarea.focus();
-        const start = selectionStart + wrapper.open.length;
-        const end = start + text.length;
-        textarea.setSelectionRange(start, end);
+        textarea.setSelectionRange(nextSelectionStart, nextSelectionEnd);
       });
     },
-    [clearErrors, getValues, setValue],
-  );
-
-  const toggleLinePrefix = useCallback(
-    (prefix: string, textarea: HTMLTextAreaElement) => {
-      const value = getValues("content");
-      const selectionStart = textarea.selectionStart;
-      const selectionEnd = textarea.selectionEnd;
-      const start = value.lastIndexOf("\n", selectionStart - 1) + 1;
-      const endLineBreak = value.indexOf("\n", selectionEnd);
-      const end = endLineBreak === -1 ? value.length : endLineBreak;
-      const selectedBlock = value.slice(start, end);
-      const lines = selectedBlock.split("\n");
-      const shouldRemovePrefix = lines
-        .filter((line) => line.trim().length > 0)
-        .every((line) => line.startsWith(prefix));
-
-      const nextLines = lines.map((line) => {
-        if (!line.trim()) {
-          return line;
-        }
-
-        if (shouldRemovePrefix) {
-          return line.startsWith(prefix) ? line.slice(prefix.length) : line;
-        }
-
-        return `${prefix}${line}`;
-      });
-
-      const nextBlock = nextLines.join("\n");
-      const nextValue = value.slice(0, start) + nextBlock + value.slice(end);
-
-      setValue("content", nextValue, {
-        shouldDirty: true,
-        shouldValidate: true,
-      });
-      clearErrors("content");
-
-      requestAnimationFrame(() => {
-        textarea.focus();
-        textarea.setSelectionRange(start, start + nextBlock.length);
-      });
-    },
-    [clearErrors, getValues, setValue],
+    [clearErrors, setValue],
   );
 
   const handleApplyContentFormat = (action: ContentFormatAction) => {
@@ -513,28 +453,119 @@ const WritePage = () => {
       return;
     }
 
+    const value = getValues("content");
+    const selectionStart = textarea.selectionStart;
+    const selectionEnd = textarea.selectionEnd;
+
     switch (action) {
-      case "bold":
-        applyWrappedFormat("bold", "강조 텍스트", textarea);
+      case "bold": {
+        const result = applyInlineContentFormat({
+          action: "bold",
+          placeholder: "강조 텍스트",
+          selectionEnd,
+          selectionStart,
+          value,
+        });
+        updateContentSelection(
+          textarea,
+          result.nextValue,
+          result.selectionStart,
+          result.selectionEnd,
+        );
         return;
-      case "blue":
-        applyWrappedFormat("blue", "파란 텍스트", textarea);
+      }
+      case "blue": {
+        const result = applyInlineContentFormat({
+          action: "blue",
+          placeholder: "파란 텍스트",
+          selectionEnd,
+          selectionStart,
+          value,
+        });
+        updateContentSelection(
+          textarea,
+          result.nextValue,
+          result.selectionStart,
+          result.selectionEnd,
+        );
         return;
-      case "red":
-        applyWrappedFormat("red", "빨간 텍스트", textarea);
+      }
+      case "red": {
+        const result = applyInlineContentFormat({
+          action: "red",
+          placeholder: "빨간 텍스트",
+          selectionEnd,
+          selectionStart,
+          value,
+        });
+        updateContentSelection(
+          textarea,
+          result.nextValue,
+          result.selectionStart,
+          result.selectionEnd,
+        );
         return;
-      case "heading1":
-        toggleLinePrefix("# ", textarea);
+      }
+      case "heading1": {
+        const result = applyBlockContentFormat({
+          action: "heading1",
+          selectionEnd,
+          selectionStart,
+          value,
+        });
+        updateContentSelection(
+          textarea,
+          result.nextValue,
+          result.selectionStart,
+          result.selectionEnd,
+        );
         return;
-      case "heading2":
-        toggleLinePrefix("## ", textarea);
+      }
+      case "heading2": {
+        const result = applyBlockContentFormat({
+          action: "heading2",
+          selectionEnd,
+          selectionStart,
+          value,
+        });
+        updateContentSelection(
+          textarea,
+          result.nextValue,
+          result.selectionStart,
+          result.selectionEnd,
+        );
         return;
-      case "list":
-        toggleLinePrefix("- ", textarea);
+      }
+      case "list": {
+        const result = applyBlockContentFormat({
+          action: "list",
+          selectionEnd,
+          selectionStart,
+          value,
+        });
+        updateContentSelection(
+          textarea,
+          result.nextValue,
+          result.selectionStart,
+          result.selectionEnd,
+        );
         return;
-      case "quote":
-        toggleLinePrefix("> ", textarea);
+      }
+      case "quote": {
+        const result = applyBlockContentFormat({
+          action: "quote",
+          selectionEnd,
+          selectionStart,
+          value,
+        });
+        updateContentSelection(
+          textarea,
+          result.nextValue,
+          result.selectionStart,
+          result.selectionEnd,
+        );
         return;
+      }
       default:
         return;
     }
